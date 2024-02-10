@@ -1,0 +1,2 @@
+echo "💬 Commit Lint"
+npx --no-install commitlint --edit $1
