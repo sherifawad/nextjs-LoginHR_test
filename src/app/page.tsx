@@ -1,3 +1,5 @@
+import MaxWidthWrapper from "@/components/layout/MaxWidthWrapper";
+
 export default function Home() {
-	return <section className='container'>Home</section>;
+	return <MaxWidthWrapper>Home</MaxWidthWrapper>;
 }

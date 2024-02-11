@@ -1,3 +1,5 @@
+import SidebarNoHeader from "@/components/layout/Sidebar-Without-Header";
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -17,9 +19,14 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body className={inter.className}>
-				<main className='flex min-h-screen flex-col items-center justify-between p-24'>
-					{children}
+				{/* <main className='grid-rows-header grid min-h-screen bg-zinc-100'>
+					<Layout>{children}</Layout>
+				</main> */}
+				<main className='flex'>
+					<SidebarNoHeader />
+					<div className='ml-14 flex-1 md:ml-40'>{children}</div>
 				</main>
+				<Toaster />
 			</body>
 		</html>
 	);
