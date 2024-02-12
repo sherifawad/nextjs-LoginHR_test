@@ -49,6 +49,8 @@ export async function getNewCode(): Promise<number> {
 
 export async function create(employee: Employee): Promise<Employee> {
 	let employees = await getAll();
+	const exist = await getByCode(employee.code);
+	if (exist) throw new Error("Code Duplicate");
 	// generate new employee id
 
 	// add and save employee
@@ -62,15 +64,24 @@ export async function update(
 	params: { [x in keyof Employee]: Employee[x] },
 ): Promise<Employee> {
 	let employees = await getAll();
-	let employee = employees.find(x => x.code === code);
+	let employee = await getByCode(code);
 	if (!employee || employee == null) throw new Error("Not Found");
 	if (params.code && code !== params.code) {
 		const employee = employees.find(x => x.code === params.code);
 		if (employee) throw new Error("Invalid Code");
 	}
 
-	Object.assign(employee, params);
-	await saveData(employees);
+	const result = employees.map(e => {
+		if (e.code === code) {
+			return {
+				...e,
+				...params,
+			};
+		}
+		return e;
+	});
+
+	await saveData(result);
 
 	return employee;
 }

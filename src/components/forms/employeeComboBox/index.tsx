@@ -10,6 +10,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { useKeyPress } from "@/hooks/useKeyPress";
+import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { PlusCircleIcon } from "lucide-react";
 import CodeInput from "./comboBox-button";
 import EmployeesCodesTable from "./employeesCodesTable";
@@ -25,10 +26,17 @@ function CodeComboBox({ selectedValue, onSelection }: Props) {
 		selectedValue,
 	);
 
+	const { deleteParams, setParams } = useSearchUrlParams();
+
+	const onInputChange = (code: number) => {
+		setSelectedCode(code);
+		onSelection(code);
+	};
+
 	useKeyPress(async () => {
 		const newCode = await GetNewEmployee();
-		setSelectedCode(newCode);
-		onSelection(newCode);
+		onInputChange(newCode);
+		setParams([{ employee: newCode + "" }]);
 	}, ["F8"]);
 
 	return (
@@ -38,7 +46,14 @@ function CodeComboBox({ selectedValue, onSelection }: Props) {
 				name='code'
 				id='code'
 				value={selectedCode}
-				onChange={e => setSelectedCode(+e.target.value)}
+				onChange={e => {
+					onInputChange(+e.target.value);
+					setTimeout(() => {
+						if (e) {
+							deleteParams(["employee"]);
+						}
+					}, 1000);
+				}}
 			/>
 
 			<Popover open={open} onOpenChange={setOpen}>
@@ -48,7 +63,7 @@ function CodeComboBox({ selectedValue, onSelection }: Props) {
 				<PopoverContent className='h-72 overflow-y-scroll p-0'>
 					<EmployeesCodesTable
 						onRowSelect={code => {
-							onSelection(code);
+							onInputChange(code);
 							setOpen(false);
 						}}
 					/>

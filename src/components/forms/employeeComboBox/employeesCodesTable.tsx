@@ -1,6 +1,7 @@
 "use client";
 
 import { GetAllEmployees } from "@/app/profile/_actions";
+import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { Employee } from "@/types";
 import { useEffect, useState } from "react";
 import { Input } from "../../ui/input";
@@ -19,6 +20,7 @@ type Props = {
 };
 
 function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
+	const { setParams } = useSearchUrlParams();
 	const [employees, setEmployees] = useState<Employee[]>(
 		employeesList ? employeesList : [],
 	);
@@ -32,9 +34,19 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 			const result = await GetAllEmployees();
 
 			setEmployees(result);
+			setFilteredList(result);
 		};
 		fetchData();
 	}, []);
+
+	const SelectionHandler = (code: number) => {
+		onRowSelect(code);
+		setParams([
+			{
+				employee: code + "",
+			},
+		]);
+	};
 
 	return (
 		<Table>
@@ -76,20 +88,22 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 					</TableHead>
 				</TableRow>
 			</TableHeader>
-			<TableBody className=' '>
+			<TableBody className=''>
 				{filteredList.length > 0 ? (
 					filteredList.map(e => (
 						<TableRow
 							key={e.code}
 							className='cursor-pointer'
-							onClick={() => onRowSelect(e.code)}
+							onClick={() => SelectionHandler(e.code)}
 						>
 							<TableCell className='font-medium'>{e.code}</TableCell>
 							<TableCell>{e.name}</TableCell>
 						</TableRow>
 					))
 				) : (
-					<div className='w-full p-4 text-center'>No Results.</div>
+					<TableRow className='p-8 text-center font-medium'>
+						No Results.
+					</TableRow>
 				)}
 			</TableBody>
 		</Table>

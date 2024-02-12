@@ -1,6 +1,7 @@
 "use client";
 
 import { CreateEmployee, UpdateEmployee } from "@/app/profile/_actions";
+import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { Employee, SalaryStatus } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -16,6 +17,7 @@ import {
 	FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { useToast } from "../ui/use-toast";
 import ComboBox from "./comboBox";
 import DatePicker from "./datePicker";
 import CodeComboBox from "./employeeComboBox";
@@ -29,44 +31,72 @@ export const formatErrors = (errors: Record<string, FieldError>) =>
 
 type Props = {
 	employee?: Employee;
+	editMode?: boolean;
 };
 
-const EmployeeForm = ({ employee }: Props) => {
+const defaultValues = {
+	code: -1,
+	hiringDate: new Date(),
+	name: "",
+	position: {
+		positionCode: -1,
+		positionName: "",
+	},
+	salaryStatus: SalaryStatus.VALID,
+};
+
+const EmployeeForm = ({ employee, editMode }: Props) => {
 	const form = useForm<z.infer<typeof Employee>>({
 		resolver: zodResolver(Employee),
-
-		defaultValues: {
-			code: employee?.code ?? -1,
-			hiringDate: employee?.hiringDate,
-			name: employee?.name ?? "",
-			position: employee?.position ?? {
-				positionCode: -1,
-				positionName: "",
-			},
-			salaryStatus: employee?.salaryStatus ?? SalaryStatus.VALID,
-		},
+		defaultValues,
 	});
 
-	const [editMode, setEditMode] = React.useState<boolean>(
-		employee?.code ? true : false,
-	);
+	const { toast } = useToast();
+	const { deleteParams } = useSearchUrlParams();
 
 	const [isClient, setIsClient] = React.useState(false);
 
 	React.useEffect(() => {
 		setIsClient(true);
-	}, []);
+		if (employee) {
+			form.setValue("code", employee.code);
+			form.setValue("name", employee.name);
+			form.setValue("hiringDate", employee.hiringDate);
+			form.setValue("position", employee.position);
+			form.setValue("salaryStatus", employee.salaryStatus);
+		} else {
+			form.reset();
+			form.setValue("code", -1);
+		}
+	}, [employee, form]);
 
 	async function onSubmit(values: z.infer<typeof Employee>) {
 		try {
+			let employee = undefined;
 			if (editMode) {
 				const { code } = values;
-				await UpdateEmployee(code, values);
+				employee = await UpdateEmployee(code, values);
 			} else {
-				await CreateEmployee(values);
+				employee = await CreateEmployee(values);
 			}
 		} catch (error) {
-			console.log("🚀 ~ forms ~ error:", error);
+			let errorMessage = error;
+			if (error instanceof Error) {
+				error = error.message;
+			}
+			toast({
+				variant: "destructive",
+				title: "Uh oh! Something went wrong.",
+				description: `${errorMessage}`,
+			});
+		} finally {
+			if (employee) {
+				toast({
+					variant: "success",
+					title: "Success",
+				});
+				deleteParams(["employee"]);
+			}
 		}
 	}
 
@@ -76,7 +106,7 @@ const EmployeeForm = ({ employee }: Props) => {
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='grid  grid-cols-1 gap-4 gap-x-2 text-sm md:grid-cols-2 '
+				className='grid  grid-cols-1 gap-4 gap-x-2 px-8 text-sm md:grid-cols-2'
 			>
 				<FormField
 					control={form.control}
@@ -186,9 +216,6 @@ const EmployeeForm = ({ employee }: Props) => {
 					</div>
 				</div>
 			</form>
-			<pre>
-				{JSON.stringify(formatErrors(form.formState.errors as any), null, 2)}
-			</pre>
 		</Form>
 	);
 };

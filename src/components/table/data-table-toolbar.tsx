@@ -6,7 +6,10 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { JobCode, statuses } from "../../data";
+import { GetAllJobs } from "@/app/profile/_actions";
+import { enumToLabelKeyValues } from "@/lib/utils";
+import { EmployeePosition, SalaryStatus } from "@/types";
+import React from "react";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
 
@@ -18,6 +21,17 @@ export function DataTableToolbar<TData>({
 	table,
 }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
+
+	const [jobs, setJobs] = React.useState<EmployeePosition[]>([]);
+
+	React.useEffect(() => {
+		const fetchData = async () => {
+			const result = await GetAllJobs();
+
+			setJobs(result);
+		};
+		fetchData();
+	}, []);
 
 	return (
 		<div className='flex items-center justify-between'>
@@ -34,14 +48,17 @@ export function DataTableToolbar<TData>({
 					<DataTableFacetedFilter
 						column={table.getColumn("salaryStatus")}
 						title='salaryStatus'
-						options={statuses}
+						options={enumToLabelKeyValues(SalaryStatus)}
 					/>
 				)}
-				{table.getColumn("jobCode") && (
+				{table.getColumn("position") && (
 					<DataTableFacetedFilter
-						column={table.getColumn("jobCode")}
+						column={table.getColumn("position")}
 						title='JobCode'
-						options={[...JobCode].map(c => ({ ...c, value: c.value + "" }))}
+						options={jobs.map(j => ({
+							label: j.positionName,
+							value: j.positionCode + "",
+						}))}
 					/>
 				)}
 				{isFiltered && (

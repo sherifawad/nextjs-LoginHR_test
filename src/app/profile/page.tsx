@@ -13,16 +13,18 @@ type Props = {
 
 async function Profile({ searchParams }: Props) {
 	let employee = undefined;
+	let edit = false;
 
 	const validateCode = Searchparams.safeParse(searchParams);
 	if (validateCode.success) {
 		employee = await GetEmployeeUnique(validateCode.data.employee);
+		edit = employee ? true : false;
 	}
 	return (
 		<>
 			<h1 className='py-8 text-3xl font-bold text-primary'>Employee Profile</h1>
 			<section>
-				<EmployeeForm employee={employee} />
+				<EmployeeForm employee={employee} editMode={edit} />
 			</section>
 		</>
 	);

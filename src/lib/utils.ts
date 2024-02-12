@@ -1,10 +1,18 @@
-import { dateInput } from "@/types";
+import { SalaryStatus, dateInput } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
+
+export const getSalaryStatusName = () => {
+	const names: string[] = [];
+	for (var n in SalaryStatus) {
+		if (typeof SalaryStatus[n] === "number") names.push(n);
+	}
+	return names;
+};
 
 export const ConvertToArabicNumbers = (num: number) => {
 	const arabicNumbers =
@@ -69,3 +77,42 @@ export function isIterable(variable: unknown) {
 export function serialize(obj: any) {
 	return JSON.parse(JSON.stringify(obj));
 }
+
+export const getEnumName = (key: string, enumValue: any) => {
+	const valid = isIterable(enumValue);
+	let value = undefined;
+	if (valid) {
+		for (var n in enumValue) {
+			if (enumValue[n] === key) {
+				value = n;
+				break;
+			}
+		}
+	}
+	return value;
+};
+
+export const enumToLabelKeyValues = (enumValue: any) => {
+	const valid = isIterable(enumValue);
+	let result: {
+		label: string;
+		value: string;
+	}[] = [];
+	if (valid) {
+		if (isObject(Array.from(enumValue)[0])) {
+			result = Object.entries(enumValue).map(([key, value]) => ({
+				label: key,
+				value: `${value}`,
+			}));
+		}
+		for (let n in enumValue) {
+			if (isNaN(n as unknown as number)) {
+				result.push({
+					label: n,
+					value: enumValue[n],
+				});
+			}
+		}
+	}
+	return result;
+};
