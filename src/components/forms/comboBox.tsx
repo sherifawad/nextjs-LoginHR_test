@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
+import { GetAllJobs, GetJob } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -16,19 +17,24 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { EmployeePosition } from "@/types";
 type Props = {
-	options: {
-		label: string;
-		value: number;
-	}[];
-
-	selectedValue: number | undefined;
-	onSelection: (selectedValue: number) => void;
+	selectedValue: EmployeePosition | undefined;
+	onSelection: (job: EmployeePosition | undefined) => void;
 };
 
-function ComboBox({ options, selectedValue, onSelection }: Props) {
+function ComboBox({ selectedValue, onSelection }: Props) {
+	const [jobs, setJobs] = React.useState<EmployeePosition[]>([]);
 	const [open, setOpen] = React.useState(false);
+
+	React.useEffect(() => {
+		const fetchData = async () => {
+			const result = await GetAllJobs();
+
+			setJobs(result);
+		};
+		fetchData();
+	}, []);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -37,38 +43,40 @@ function ComboBox({ options, selectedValue, onSelection }: Props) {
 					variant='outline'
 					role='combobox'
 					aria-expanded={open}
-					className='w-full justify-between'
+					className=' h-11 w-full justify-between bg-muted'
 				>
 					{selectedValue
-						? options.find(option => option.value === selectedValue)?.label ??
-							"Select option..."
+						? jobs.find(x => x.positionCode === selectedValue.positionCode)
+								?.positionName ?? "Select option..."
 						: "Select option..."}
 					<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className='w-[200px] p-0'>
+			<PopoverContent className=' p-0'>
 				<Command>
 					<CommandInput placeholder='Search option...' />
 					<CommandEmpty>No option found.</CommandEmpty>
 					<CommandGroup>
-						{options.map(option => (
+						{jobs.map(j => (
 							<CommandItem
-								key={option.value}
-								value={option.value + ""}
-								onSelect={currentValue => {
-									onSelection(+currentValue);
+								key={j.positionCode}
+								value={j.positionCode + ""}
+								onSelect={async currentValue => {
+									const selectedJob = await GetJob(+currentValue);
+									onSelection(selectedJob);
 									setOpen(false);
 								}}
 							>
-								<Check
+								{/* TODO: Add check box */}
+								{/* <Check
 									className={cn(
 										"mr-2 h-4 w-4",
 										selectedValue === option.value
 											? "opacity-100"
 											: "opacity-0",
 									)}
-								/>
-								{option.label}
+								/> */}
+								{j.positionName}
 							</CommandItem>
 						))}
 					</CommandGroup>

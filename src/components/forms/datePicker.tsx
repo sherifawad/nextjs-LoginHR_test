@@ -25,7 +25,7 @@ function DatePicker({ date, onDateSelect }: Props) {
 				<Button
 					variant={"outline"}
 					className={cn(
-						"w-full justify-start text-left font-normal",
+						"w-full justify-start bg-muted text-left font-normal",
 						!date && "text-muted-foreground",
 					)}
 				>

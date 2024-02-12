@@ -1,14 +1,14 @@
 "use client";
 
+import { DeleteEmployee, GetEmployees } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { employeesRepo } from "@/database/employees-repo";
 import { Employee } from "@/types";
 import { FormEvent, useState } from "react";
-import PopUpDialogue from "./popup-dialogue";
+import PopUpDialogue from "../../popup-dialogue";
 
 const CodeSearchTrigger = () => {
 	return <Button>Search</Button>;
@@ -19,14 +19,13 @@ type Props = {
 };
 
 function EmployeeCodeSearch({ editEmployee }: Props) {
-	const { delete: _delete, filter } = employeesRepo;
 	const [employeeCodeSearch, setEmployeeCodeSearch] = useState<
 		number | undefined
 	>();
 	const [list, setList] = useState<Employee[]>([]);
 
-	const onDelete = (code: number) => {
-		_delete(code);
+	const onDelete = async (code: number) => {
+		DeleteEmployee(code);
 		const filteredList = list.filter(e => e.code !== code);
 		if (filteredList.length < 1) {
 			setEmployeeCodeSearch(undefined);
@@ -38,7 +37,7 @@ function EmployeeCodeSearch({ editEmployee }: Props) {
 		e.preventDefault();
 
 		if (!employeeCodeSearch) return;
-		const filteredList = await filter(x => x.code === employeeCodeSearch);
+		const filteredList = await GetEmployees(x => x.code === employeeCodeSearch);
 		setList(filteredList);
 	};
 

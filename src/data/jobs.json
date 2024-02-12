@@ -1,0 +1,18 @@
+[
+	{
+		"positionName": "Manager",
+		"positionCode": 1
+	},
+	{
+		"positionName": "HR",
+		"positionCode": 2
+	},
+	{
+		"positionName": "Programmer",
+		"positionCode": 3
+	},
+	{
+		"positionName": "Accountant",
+		"positionCode": 4
+	}
+]

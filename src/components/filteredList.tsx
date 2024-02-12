@@ -1,9 +1,8 @@
-import { employeesRepo } from "@/database/employees-repo";
+import { GetAllEmployees } from "@/app/profile/_actions";
 import EmployeesList from "./table/employees-list";
 
 async function FilteredList() {
-	const { getAll } = employeesRepo;
-	const employees = await getAll();
+	const employees = await GetAllEmployees();
 	return (
 		<section>
 			<EmployeesList employeesList={employees} />

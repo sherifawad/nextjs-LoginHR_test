@@ -1,3 +1,4 @@
+import MaxWidthWrapper from "@/components/layout/MaxWidthWrapper";
 import SidebarNoHeader from "@/components/layout/Sidebar-Without-Header";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
@@ -24,7 +25,9 @@ export default function RootLayout({
 				</main> */}
 				<main className='flex'>
 					<SidebarNoHeader />
-					<div className='ml-14 flex-1 md:ml-40'>{children}</div>
+					<div className='ml-32 flex-1 md:ml-48'>
+						<MaxWidthWrapper>{children}</MaxWidthWrapper>
+					</div>
 				</main>
 				<Toaster />
 			</body>
