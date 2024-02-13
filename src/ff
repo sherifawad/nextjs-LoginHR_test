@@ -1,0 +1,23 @@
+var op = { //for operator
+    eq: b => a => a === b,  //equal
+    neq: b => a => a !== b, //not equal,
+    gt: b => a => a > b,    //greater than
+    lt: b => a => a < b,    //lower than
+    gteq: b => a => a >= b,
+    lteq: b => a => a <= b,
+
+    //bonus, negating a function:
+    not: fn => (...args) => !fn(...args) //to be used as `arr.filter( op.not(filterFn) )`
+}
+
+The shortcuts are common for these operators, besides that I think that the resulting code pretty readable and self-explaining
+
+var filtered = [12, 5, 8, 130, 44].filter( op.gteq(10) );
+
+result = data
+        .filter(x => fns.every(f => f(x)))
+        .map(whatever);
+
+        var combined = [firstFilterFunction, seconfFilterFunction, ...]
+                .reduce((x, y) => (z => x(z) && y(z)));
+var filtered = myData.filter(combined);

@@ -22,7 +22,9 @@ async function Profile({ searchParams }: Props) {
 	}
 	return (
 		<>
-			<h1 className='py-8 text-3xl font-bold text-primary'>Employee Profile</h1>
+			<h1 className='whitespace-nowrap py-8 text-3xl font-bold text-primary'>
+				Employee Profile
+			</h1>
 			<section>
 				<EmployeeForm employee={employee} editMode={edit} />
 			</section>

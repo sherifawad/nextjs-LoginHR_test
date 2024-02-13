@@ -16,7 +16,7 @@ function SidebarNoHeader() {
 	const pathname = usePathname();
 
 	return (
-		<nav className='fixed flex h-screen min-w-14 max-w-44 flex-shrink-0 flex-col justify-between border-r-[1px] bg-primary-foreground p-4'>
+		<aside className=' flex h-full   flex-col items-center justify-between  border-r-[1px]  bg-primary-foreground   p-4  shadow transition-transform'>
 			<Logo />
 			<ul className='flex flex-1 flex-shrink-0 flex-col items-center border-t-[1px]'>
 				{SideBarLinks.map(link => {
@@ -38,7 +38,7 @@ function SidebarNoHeader() {
 					);
 				})}
 			</ul>
-		</nav>
+		</aside>
 	);
 }
 

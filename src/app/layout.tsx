@@ -23,9 +23,9 @@ export default function RootLayout({
 				{/* <main className='grid-rows-header grid min-h-screen bg-zinc-100'>
 					<Layout>{children}</Layout>
 				</main> */}
-				<main className='flex'>
+				<main className='flex h-screen w-screen overflow-x-hidden'>
 					<SidebarNoHeader />
-					<div className='ml-32 flex-1 md:ml-48'>
+					<div className=' flex-1  overflow-x-auto'>
 						<MaxWidthWrapper>{children}</MaxWidthWrapper>
 					</div>
 				</main>
