@@ -48,7 +48,7 @@ export function DataTableToolbar<TData>({
 					<DataTableFacetedFilter
 						column={table.getColumn("salaryStatus")}
 						title='salaryStatus'
-						options={enumToLabelKeyValues(SalaryStatus)}
+						options={enumToLabelKeyValues(SalaryStatus) as any}
 					/>
 				)}
 				{table.getColumn("position") && (

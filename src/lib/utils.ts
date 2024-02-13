@@ -1,4 +1,4 @@
-import { SalaryStatus, dateInput } from "@/types";
+import { FilterOption, SalaryStatus, dateInput } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -92,27 +92,59 @@ export const getEnumName = (key: string, enumValue: any) => {
 	return value;
 };
 
-export const enumToLabelKeyValues = (enumValue: any) => {
-	const valid = isIterable(enumValue);
-	let result: {
-		label: string;
-		value: string;
-	}[] = [];
-	if (valid) {
-		if (isObject(Array.from(enumValue)[0])) {
-			result = Object.entries(enumValue).map(([key, value]) => ({
-				label: key,
-				value: `${value}`,
-			}));
+const keyValuePair = (obj: Object) => {
+	return Object.entries(obj).map(entry => entry);
+};
+const objectToValueLabel = (obj: Object) => {
+	const result: FilterOption[] = [];
+	for (let n in obj) {
+		if (isNaN(n as unknown as number)) {
+			result.push({
+				label: n,
+				value: (obj as any)[n],
+			});
 		}
-		for (let n in enumValue) {
-			if (isNaN(n as unknown as number)) {
+	}
+	return result;
+};
+
+const iterate = (obj: any) => {
+	const result: FilterOption[] = [];
+	Object.keys(obj).forEach(key => {
+		const value = obj[key];
+		if (typeof value === "object" && value !== null) {
+			const newArray: any[] = [];
+			Object.keys(value).forEach(nestedKey => {
+				const nestedValue = value[nestedKey];
+				if (typeof nestedValue === "object" && nestedValue !== null) {
+					iterate(nestedValue);
+				} else {
+					newArray.push(nestedValue);
+				}
+			});
+			result.push({
+				label: newArray[0],
+				value: newArray[1],
+			});
+		} else {
+			if (isNaN(key as unknown as number)) {
 				result.push({
-					label: n,
-					value: enumValue[n],
+					label: key,
+					value: obj[key],
 				});
 			}
 		}
-	}
+	});
+	return result.filter(
+		({ label }, index) => index === result.findIndex(x => x.label === label),
+	);
+};
+
+export const enumToLabelKeyValues = (value: any) => {
+	let result: FilterOption[] = [];
+	const iterable = isIterable(value);
+	if (!iterable) return result;
+	result = iterate(value);
+
 	return result;
 };

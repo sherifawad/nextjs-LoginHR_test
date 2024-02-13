@@ -1,3 +1,4 @@
+import { GetAllEmployees } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -7,14 +8,23 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { enumToLabelKeyValues } from "@/lib/utils";
 import {
 	BasicValues,
 	EmployeeFilterComparisonOption,
 	EmployeePropertyOption,
 	Filter,
+	FilterOption,
 	FilterValueSelect,
 } from "@/types";
-import { Dispatch, FormEvent, SetStateAction, useState } from "react";
+import {
+	Dispatch,
+	FormEvent,
+	SetStateAction,
+	useCallback,
+	useMemo,
+	useState,
+} from "react";
 import {
 	PropertiesLabels,
 	getComparisonList,
@@ -32,15 +42,18 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	const [property, setProperty] = useState<
 		EmployeePropertyOption | undefined
 	>();
-	const onPropertyChange = (value: EmployeePropertyOption) => {
+	const onPropertyChange = useCallback((value: EmployeePropertyOption) => {
+		setOptions([]);
 		setProperty(value);
 		const comparisonsList = getComparisonList(value.label);
 		setOperationList(comparisonsList);
-	};
+	}, []);
 
 	// values
 	const [data, setData] = useState<BasicValues | any[] | undefined>();
 	const [component, setComponent] = useState<FilterValueSelect | undefined>();
+	const [options, setOptions] = useState<FilterOption[]>([]);
+	const employees = useMemo(async () => await GetAllEmployees(), []);
 
 	// comparison
 	const [operation, setOperation] = useState<
@@ -49,11 +62,23 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	const [operationList, setOperationList] = useState<
 		EmployeeFilterComparisonOption[]
 	>([]);
-	const onOperationChange = (value: EmployeeFilterComparisonOption) => {
-		setOperation(value);
-		const component = setComparisonComponentType(property!.label, value.label);
-		setComponent(component);
-	};
+	const onOperationChange = useCallback(
+		async (value: EmployeeFilterComparisonOption) => {
+			setOptions([]);
+			setOperation(value);
+			const component = setComparisonComponentType(
+				property!.label,
+				value.label,
+			);
+			setComponent(component);
+			if (component === FilterValueSelect.Enum.LIST) {
+				const list = (await employees).map(e => e[property!.label]);
+				const result = enumToLabelKeyValues(list);
+				setOptions(result);
+			}
+		},
+		[employees, property],
+	);
 
 	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -101,6 +126,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 								setValues={value => setData(value)}
 								values={data}
 								componentToShow={component}
+								options={options}
 							/>
 						)}
 					</div>

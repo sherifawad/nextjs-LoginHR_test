@@ -1,5 +1,4 @@
-import { JobCode } from "@/data";
-import { BasicValues, FilterValueSelect } from "@/types";
+import { BasicValues, FilterOption, FilterValueSelect } from "@/types";
 import DateInput from "./DateInput/DateInput";
 import DefaultInput from "./DefaultInput";
 import MultiSelectInput from "./MultiSelectInput";
@@ -8,9 +7,16 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
 	setValues: (values: BasicValues | any[] | undefined) => void;
 	values: BasicValues | any[] | undefined;
 	componentToShow: FilterValueSelect | undefined;
+	options: FilterOption[];
 };
 
-function FilterInput({ componentToShow, setValues, values, ...rest }: Props) {
+function FilterInput({
+	options,
+	componentToShow,
+	setValues,
+	values,
+	...rest
+}: Props) {
 	return (
 		<div {...rest}>
 			{componentToShow === FilterValueSelect.enum.DATE && (
@@ -33,7 +39,7 @@ function FilterInput({ componentToShow, setValues, values, ...rest }: Props) {
 			)}
 			{componentToShow === FilterValueSelect.enum.LIST && (
 				<MultiSelectInput
-					options={JobCode}
+					options={options}
 					onValuesChange={vs => setValues(vs)}
 					values={values as any[] | undefined}
 				/>
