@@ -70,7 +70,7 @@ export type EmployeePropertyOption = z.infer<typeof EmployeePropertyOption>;
 export const Filter = z.object({
 	property: FilterOption,
 	operation: FilterOption,
-	data: BasicValues.or(BasicValues.array().nonempty()),
+	data: BasicValues.or(z.any().array()),
 });
 export type Filter = z.infer<typeof Filter>;
 

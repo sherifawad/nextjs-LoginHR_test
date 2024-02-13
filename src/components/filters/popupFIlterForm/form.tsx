@@ -39,7 +39,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	};
 
 	// values
-	const [data, setData] = useState<BasicValues | undefined>();
+	const [data, setData] = useState<BasicValues | any[] | undefined>();
 	const [component, setComponent] = useState<FilterValueSelect | undefined>();
 
 	// comparison
