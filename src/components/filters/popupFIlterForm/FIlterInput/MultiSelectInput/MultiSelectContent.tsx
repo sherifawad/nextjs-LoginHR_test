@@ -32,7 +32,10 @@ function MultiSelectContent({
 	const onValuesSelection = (values: FilterOption[]) => {
 		setSelectedValues(values);
 		if (values.length > 0) {
-			onValuesChange(values.map(v => v.value.toString().toLocaleLowerCase()));
+			const selectedArray = values.map(v =>
+				v.value.toString().toLocaleLowerCase(),
+			);
+			onValuesChange(selectedArray);
 		}
 	};
 	return (

@@ -1,4 +1,3 @@
-import { GetAllEmployees } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -8,21 +7,20 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { enumToLabelKeyValues } from "@/lib/utils/array";
+import { generateLabelValueEmployeesList } from "@/lib/utils/filterUtils";
 import {
 	BasicValues,
 	EmployeeFilterComparisonOption,
 	EmployeePropertyOption,
-	Filter,
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import {
 	Dispatch,
 	FormEvent,
 	SetStateAction,
 	useCallback,
-	useMemo,
 	useState,
 } from "react";
 import {
@@ -30,14 +28,16 @@ import {
 	getComparisonList,
 	setComparisonComponentType,
 } from "../constants";
+import { FilterResult } from "../filterList";
 import FilterInput from "./FIlterInput";
 import FilterSelect from "./FilterSelect";
 
 type Props = {
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	addFilter: (filter: Filter) => void;
+	addFilter: (filter: EmployeeFilter) => FilterResult;
+	initialEmployees: Employee[];
 };
-function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
+function FilterPopUpForm({ setIsOpen, addFilter, initialEmployees }: Props) {
 	// Employee Properties
 	const [property, setProperty] = useState<
 		EmployeePropertyOption | undefined
@@ -53,7 +53,6 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	const [data, setData] = useState<BasicValues | undefined>();
 	const [component, setComponent] = useState<FilterValueSelect | undefined>();
 	const [options, setOptions] = useState<FilterOption[]>([]);
-	const employees = useMemo(async () => await GetAllEmployees(), []);
 
 	// comparison
 	const [operation, setOperation] = useState<
@@ -72,31 +71,30 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 			);
 			setComponent(component);
 			if (component === FilterValueSelect.Enum.LIST) {
-				const list = (await employees).map(e => e[property!.label]);
-				console.log("🚀 ~ list:", list);
-				const result = enumToLabelKeyValues(list);
+				const result = generateLabelValueEmployeesList(
+					initialEmployees,
+					property!.value,
+				);
 				setOptions(result);
 			}
 		},
-		[employees, property],
+		[initialEmployees, property],
 	);
 
 	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// const formData = new FormData(e.currentTarget);
-		// const property = String(formData.get("property"));
-		// const operation = String(formData.get("operation"));
-		// console.log("👍👍👍👍", property);
-		if (operation && property && data) {
-			console.log("🚀 ~ onSubmit ~ data:", data);
-			addFilter({
-				property,
-				operation,
+		if (property && operation && data) {
+			const { result } = addFilter({
+				property: property.value,
+				operation: operation.value,
 				data,
 			});
-			setIsOpen(false);
+			if (result === "success") {
+				setIsOpen(false);
+			}
 		}
 	};
+
 	return (
 		<form onSubmit={onSubmit}>
 			<Card className='w-[350px]'>

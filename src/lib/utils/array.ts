@@ -18,6 +18,7 @@ export const splitStringToArray = (value: string, separator: string = " ") => {
 };
 
 export const isArrayString = (value: any): boolean => {
+	console.log("🚀 ~ isArrayString ~ value:", value);
 	if (!isIterable(value)) return false;
 	if (!isArray(value)) return false;
 	value.forEach(function (item: any) {
@@ -90,7 +91,7 @@ export const iterate = (obj: any) => {
 	);
 };
 
-export const enumToLabelKeyValues = (value: any) => {
+export const enumToLabelKeyValues = (value: any): FilterOption[] => {
 	let result: FilterOption[] = [];
 	const iterable = isIterable(value);
 	if (!iterable) return result;

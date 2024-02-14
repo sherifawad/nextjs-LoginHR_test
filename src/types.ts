@@ -24,10 +24,10 @@ export type dateInput = {
 };
 
 export const BasicValues = z.union([
-	z.coerce.string().min(1),
+	z.coerce.date().array().min(2).max(2),
 	z.coerce.date(),
-	z.string().array().min(1),
-	z.date().array().min(2).max(2),
+	z.coerce.string().array().min(1),
+	z.coerce.string().min(1),
 ]);
 export type BasicValues = z.infer<typeof BasicValues>;
 
@@ -39,7 +39,7 @@ export const FilterOption = z.object({
 });
 export const EmployeePropertyOption = z.object({
 	label: z.custom<keyof Employee>(),
-	value: OptionValue,
+	value: z.custom<keyof Employee>(),
 });
 
 // export type SelectionType = { label: string; value: string | number | Date };
@@ -55,7 +55,7 @@ export type Filter = z.infer<typeof Filter>;
 
 export const EmployeeFilterComparisonOption = z.object({
 	label: FilterComparison,
-	value: OptionValue,
+	value: FilterComparison,
 });
 export type EmployeeFilterComparisonOption = z.infer<
 	typeof EmployeeFilterComparisonOption

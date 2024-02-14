@@ -3,15 +3,17 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { Filter } from "@/types";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { FilterResult } from "../filterList";
 import FilterPopUpForm from "./form";
 
 type Props = {
-	addFilter: (filter: Filter) => void;
+	addFilter: (filter: EmployeeFilter) => FilterResult;
+	initialEmployees: Employee[];
 };
-function FilterPopUp({ addFilter }: Props) {
+function FilterPopUp({ addFilter, initialEmployees }: Props) {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -21,7 +23,11 @@ function FilterPopUp({ addFilter }: Props) {
 				</div>
 			</PopoverTrigger>
 			<PopoverContent className=' p-0'>
-				<FilterPopUpForm setIsOpen={setIsOpen} addFilter={addFilter} />
+				<FilterPopUpForm
+					setIsOpen={setIsOpen}
+					addFilter={addFilter}
+					initialEmployees={initialEmployees}
+				/>
 			</PopoverContent>
 		</Popover>
 	);

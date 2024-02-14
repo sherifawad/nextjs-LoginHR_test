@@ -286,7 +286,10 @@ export const setComparisonComponentType = (
 			return FilterValueSelect.Enum.TEXT;
 		}
 		case "date": {
-			if (operation === FilterComparison.enum.Between) {
+			if (
+				operation === FilterComparison.enum.Between ||
+				operation === FilterComparison.enum.Not_Between
+			) {
 				return FilterValueSelect.Enum.DATE_RANGE;
 			}
 			return FilterValueSelect.Enum.DATE;

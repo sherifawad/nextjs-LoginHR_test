@@ -33,6 +33,17 @@ export const EmployeeFilter = z
 					} else if (data.property == "code") {
 						return isArrayString(data.data);
 					}
+					return true;
+				}
+				return false;
+			}
+			if (data.operation === "InList" || data.operation === "Not_InList") {
+				if (isArray(data.data)) {
+					if (data.property === "hiringDate") {
+						return isArrayDate(data.data);
+					} else {
+						return isArrayString(data.data);
+					}
 				}
 				return false;
 			}

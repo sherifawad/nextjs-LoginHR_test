@@ -1,13 +1,16 @@
-import { GetAllEmployees } from "@/app/profile/_actions";
+import { Employee } from "@/validation/employeeSchema";
 import EmployeesList from "./table/employees-list";
 
-async function FilteredList() {
-	const employees = await GetAllEmployees();
+type FilteredSimpleListProps = {
+	initialsList: Employee[];
+};
+
+async function FilteredSimpleList({ initialsList }: FilteredSimpleListProps) {
 	return (
 		<section>
-			<EmployeesList employeesList={employees} />
+			<EmployeesList employeesList={initialsList} />
 		</section>
 	);
 }
 
-export default FilteredList;
+export default FilteredSimpleList;
