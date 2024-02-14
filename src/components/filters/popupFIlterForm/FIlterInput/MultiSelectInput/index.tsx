@@ -21,8 +21,12 @@ type Props = {
 
 function MultiSelectInput({ options, values, onValuesChange }: Props) {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedValues, setSelectedValues] = useState<string[] | undefined>(
-		values,
+	const [selectedValues, setSelectedValues] = useState<
+		FilterOption[] | undefined
+	>(
+		options.filter(o =>
+			values?.some(v => v === o.value.toString().toLocaleLowerCase()),
+		),
 	);
 
 	return (
@@ -50,9 +54,8 @@ function MultiSelectInput({ options, values, onValuesChange }: Props) {
 									</Badge>
 								) : (
 									options
-										.filter(
-											option =>
-												selectedValues?.indexOf(option.value as string) !== -1,
+										.filter(option =>
+											selectedValues?.some(v => v.value === option.value),
 										)
 										.map(option => (
 											<Badge

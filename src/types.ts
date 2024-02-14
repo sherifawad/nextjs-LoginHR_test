@@ -24,21 +24,22 @@ export type dateInput = {
 };
 
 export const BasicValues = z.union([
-	z.coerce.string(),
+	z.coerce.string().min(1),
 	z.coerce.date(),
-	z.string().array(),
-	z.date().array(),
+	z.string().array().min(1),
+	z.date().array().min(2).max(2),
 ]);
-
 export type BasicValues = z.infer<typeof BasicValues>;
+
+const OptionValue = z.coerce.string().min(1);
 
 export const FilterOption = z.object({
 	label: z.string().min(1),
-	value: BasicValues,
+	value: OptionValue,
 });
 export const EmployeePropertyOption = z.object({
-	label: z.custom<keyof z.infer<typeof Employee>>(),
-	value: BasicValues,
+	label: z.custom<keyof Employee>(),
+	value: OptionValue,
 });
 
 // export type SelectionType = { label: string; value: string | number | Date };
@@ -54,7 +55,7 @@ export type Filter = z.infer<typeof Filter>;
 
 export const EmployeeFilterComparisonOption = z.object({
 	label: FilterComparison,
-	value: BasicValues,
+	value: OptionValue,
 });
 export type EmployeeFilterComparisonOption = z.infer<
 	typeof EmployeeFilterComparisonOption
@@ -74,7 +75,7 @@ export type FilterValueSelect = z.infer<typeof FilterValueSelect>;
 // zod set operation Schema
 
 export const EmployeeFilterOperation = z.object({
-	valueB: BasicValues.or(BasicValues.array().nonempty()),
+	valueB: BasicValues,
 	operation: FilterComparison,
 	valueC: BasicValues.optional(),
 });

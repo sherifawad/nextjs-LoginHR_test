@@ -101,8 +101,6 @@ export const Operation = (
 			break;
 		case FilterComparison.Enum.InList:
 			if (firstValue && secondValue && isArray(secondValue)) {
-				console.log("🚀 ~ secondValue:", secondValue);
-				console.log("🚀 ~ firstValue:", firstValue);
 				// return (secondValue as string[]).filter(e => e !== firstValue);
 				return (secondValue as string[]).some(
 					y => y === (firstValue as string),
@@ -359,7 +357,8 @@ export const constructOperation = (
 			};
 		} else {
 			result = {
-				valueB: validatedData.data.toString().split(","),
+				valueB: validatedData.data,
+				// valueB: validatedData.data.toString().split(","),
 				operation: validatedOperation.data,
 			};
 		}

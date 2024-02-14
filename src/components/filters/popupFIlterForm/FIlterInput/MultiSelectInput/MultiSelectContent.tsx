@@ -17,8 +17,8 @@ import { Dispatch, SetStateAction } from "react";
 type Props = {
 	options: FilterOption[];
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	setSelectedValues: Dispatch<SetStateAction<string[] | undefined>>;
-	selectedValues: string[] | undefined;
+	setSelectedValues: Dispatch<SetStateAction<FilterOption[] | undefined>>;
+	selectedValues: FilterOption[] | undefined;
 	onValuesChange: (values: string[]) => void;
 };
 
@@ -29,9 +29,11 @@ function MultiSelectContent({
 	selectedValues,
 	onValuesChange,
 }: Props) {
-	const onValuesSelection = (values: string[]) => {
+	const onValuesSelection = (values: FilterOption[]) => {
 		setSelectedValues(values);
-		onValuesChange(values);
+		if (values.length > 0) {
+			onValuesChange(values.map(v => v.value.toString().toLocaleLowerCase()));
+		}
 	};
 	return (
 		<div className=''>
