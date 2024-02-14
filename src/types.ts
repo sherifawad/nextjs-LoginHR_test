@@ -1,11 +1,6 @@
 import { z } from "zod";
 
-export enum SalaryStatus {
-	VALID,
-	NOT_VALID,
-}
-
-export const SalaryStatusEnum = z.nativeEnum(SalaryStatus);
+export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
 export type SalaryStatusEnum = z.infer<typeof SalaryStatusEnum>;
 
 export const EmployeePosition = z.object({
@@ -49,10 +44,13 @@ export const BasicValues = z.coerce
 	.string()
 	.min(1)
 	.or(z.coerce.number().int().min(1).positive())
-	.or(z.date());
+	.or(z.date())
+	.or(z.object({}))
+	.or(z.string().array())
+	.or(z.number().array())
+	.or(z.object({}).array());
 
 export type BasicValues = z.infer<typeof BasicValues>;
-type dd = keyof z.infer<typeof Employee>;
 
 export const FilterOption = z.object({
 	label: z.string().min(1),
@@ -70,7 +68,7 @@ export type EmployeePropertyOption = z.infer<typeof EmployeePropertyOption>;
 export const Filter = z.object({
 	property: FilterOption,
 	operation: FilterOption,
-	data: BasicValues.or(z.any().array()),
+	data: BasicValues,
 });
 export type Filter = z.infer<typeof Filter>;
 
@@ -83,10 +81,15 @@ export const FilterComparison = z.enum([
 	"GreaterThan_Or_Equal",
 	"LessThan_Or_Equal",
 	"Between",
+	"Not_Between",
 	"InList",
 	"Not_InList",
-	"Contain",
 	"Include",
+	"Not_Include",
+	"IsBlank",
+	"Is_Not_Blank",
+	"Is_Null",
+	"Is_Not_Null",
 ]);
 
 export type FilterComparison = z.infer<typeof FilterComparison>;
@@ -100,6 +103,22 @@ export type EmployeeFilterComparisonOption = z.infer<
 >;
 
 //To Show FilterValue Component
-export const FilterValueSelect = z.enum(["TEXT", "DATE", "DATE_RANGE", "LIST"]);
+export const FilterValueSelect = z.enum([
+	"TEXT",
+	"RANGE",
+	"DATE",
+	"DATE_RANGE",
+	"LIST",
+]);
 
 export type FilterValueSelect = z.infer<typeof FilterValueSelect>;
+
+// zod set operation Schema
+
+export const EmployeeFilterOperation = z.object({
+	valueB: BasicValues.or(BasicValues.array().nonempty()),
+	operation: FilterComparison,
+	valueC: BasicValues.optional(),
+});
+
+export type EmployeeFilterOperation = z.infer<typeof EmployeeFilterOperation>;

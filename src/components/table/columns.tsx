@@ -1,5 +1,4 @@
-import { getEnumName } from "@/lib/utils";
-import { Employee, EmployeePosition, SalaryStatus } from "@/types";
+import { Employee, EmployeePosition } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
 import { DataTableColumnHeader } from "./data-table-column-header";
@@ -38,15 +37,18 @@ export const columns: ColumnDef<Employee>[] = [
 			<DataTableColumnHeader column={column} title='Salary Status' />
 		),
 		cell: ({ row }) => {
-			const value = getEnumName(row.getValue("salaryStatus"), SalaryStatus);
-			return <div className='w-[70px] text-center'>{value}</div>;
+			const value = row.getValue("salaryStatus");
+			return (
+				<div className='w-[70px] text-center'>
+					{row.getValue("salaryStatus")}
+				</div>
+			);
 		},
 		// enableSorting: false,
 		// enableHiding: false,
 		filterFn: (row, id, value) => {
 			if (id === "salaryStatus") {
 				const original = row.original as Employee;
-
 				return value.includes(original.salaryStatus);
 			}
 		},

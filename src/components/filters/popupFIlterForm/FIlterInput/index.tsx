@@ -1,11 +1,12 @@
 import { BasicValues, FilterOption, FilterValueSelect } from "@/types";
+import BetweenInput from "./BetweenInput";
 import DateInput from "./DateInput/DateInput";
 import DefaultInput from "./DefaultInput";
 import MultiSelectInput from "./MultiSelectInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-	setValues: (values: BasicValues | any[] | undefined) => void;
-	values: BasicValues | any[] | undefined;
+	setValues: (values: BasicValues | undefined) => void;
+	values: BasicValues | undefined;
 	componentToShow: FilterValueSelect | undefined;
 	options: FilterOption[];
 };
@@ -37,11 +38,17 @@ function FilterInput({
 					onValueChange={i => setValues(i)}
 				/>
 			)}
+			{componentToShow === FilterValueSelect.enum.RANGE && (
+				<BetweenInput
+					inputValue={values as number[] | undefined}
+					onValueChange={i => setValues(i)}
+				/>
+			)}
 			{componentToShow === FilterValueSelect.enum.LIST && (
 				<MultiSelectInput
 					options={options}
 					onValuesChange={vs => setValues(vs)}
-					values={values as any[] | undefined}
+					values={values as BasicValues | undefined}
 				/>
 			)}
 		</div>

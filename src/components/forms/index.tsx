@@ -2,7 +2,7 @@
 
 import { CreateEmployee, UpdateEmployee } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee, SalaryStatus } from "@/types";
+import { Employee, SalaryStatusEnum } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { FieldError, useForm } from "react-hook-form";
@@ -42,7 +42,7 @@ const defaultValues = {
 		positionCode: -1,
 		positionName: "",
 	},
-	salaryStatus: SalaryStatus.VALID,
+	salaryStatus: SalaryStatusEnum.Values.VALID,
 };
 
 const EmployeeForm = ({ employee, editMode }: Props) => {
@@ -190,11 +190,11 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 									items={[
 										{
 											label: "Valid",
-											value: SalaryStatus.VALID.toString(),
+											value: SalaryStatusEnum.Values.VALID,
 										},
 										{
 											label: "Not Valid",
-											value: SalaryStatus.NOT_VALID.toString(),
+											value: SalaryStatusEnum.Values.NOT_VALID,
 										},
 									]}
 								/>

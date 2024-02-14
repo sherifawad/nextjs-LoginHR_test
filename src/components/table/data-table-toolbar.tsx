@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { GetAllJobs } from "@/app/profile/_actions";
-import { enumToLabelKeyValues } from "@/lib/utils";
-import { EmployeePosition, SalaryStatus } from "@/types";
+import { iterate } from "@/lib/utils";
+import { EmployeePosition, SalaryStatusEnum } from "@/types";
 import React from "react";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
@@ -48,7 +48,7 @@ export function DataTableToolbar<TData>({
 					<DataTableFacetedFilter
 						column={table.getColumn("salaryStatus")}
 						title='salaryStatus'
-						options={enumToLabelKeyValues(SalaryStatus) as any}
+						options={iterate(SalaryStatusEnum.Enum) as any}
 					/>
 				)}
 				{table.getColumn("position") && (

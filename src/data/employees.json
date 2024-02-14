@@ -2,7 +2,7 @@
 	{
 		"name": "Gerrie Do",
 		"code": 1,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2023-08-05T21:00:00.000Z",
 		"position": {
 			"positionName": "Manager",
@@ -12,7 +12,7 @@
 	{
 		"name": "Syd Neame",
 		"code": 2,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2021-12-09T22:00:00.000Z",
 		"position": {
 			"positionName": "Manager",
@@ -22,7 +22,7 @@
 	{
 		"name": "Gwennie Templeton",
 		"code": 3,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2023-05-19T21:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -32,7 +32,7 @@
 	{
 		"name": "Ajay Cristofaro",
 		"code": 4,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2022-05-30T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -42,7 +42,7 @@
 	{
 		"name": "Waylen Downse",
 		"code": 5,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2021-10-08T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -52,7 +52,7 @@
 	{
 		"name": "Ginger Forlonge",
 		"code": 6,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2021-08-04T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -62,7 +62,7 @@
 	{
 		"name": "Jacobo Parmiter",
 		"code": 7,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2021-08-15T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -72,7 +72,7 @@
 	{
 		"name": "Lannie Bonifant",
 		"code": 8,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2021-07-22T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -82,7 +82,7 @@
 	{
 		"name": "Temple Paddick",
 		"code": 9,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2024-01-21T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
@@ -92,7 +92,7 @@
 	{
 		"name": "Trudi Aikin",
 		"code": 10,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2023-03-18T22:00:00.000Z",
 		"position": {
 			"positionName": "Programmer",
@@ -102,7 +102,7 @@
 	{
 		"name": "Rey Pinch",
 		"code": 11,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2022-08-21T22:00:00.000Z",
 		"position": {
 			"positionName": "Programmer",
@@ -112,7 +112,7 @@
 	{
 		"name": "Ezechiel Logsdale",
 		"code": 12,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2023-10-04T21:00:00.000Z",
 		"position": {
 			"positionName": "Programmer",
@@ -122,7 +122,7 @@
 	{
 		"name": "Legra Ladloe",
 		"code": 13,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2023-07-26T21:00:00.000Z",
 		"position": {
 			"positionName": "Programmer",
@@ -132,7 +132,7 @@
 	{
 		"name": "Brooks Sands-Allan",
 		"code": 14,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2022-07-15T22:00:00.000Z",
 		"position": {
 			"positionName": "Programmer",
@@ -142,7 +142,7 @@
 	{
 		"name": "Dirk Tytterton",
 		"code": 15,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2022-05-02T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -152,7 +152,7 @@
 	{
 		"name": "Haleigh Jills",
 		"code": 16,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2023-11-08T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -162,7 +162,7 @@
 	{
 		"name": "Burt Ellerker",
 		"code": 17,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2022-05-29T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -172,7 +172,7 @@
 	{
 		"name": "Hedvige Noe",
 		"code": 18,
-		"salaryStatus": 0,
+		"salaryStatus": "VALID",
 		"hiringDate": "2021-07-05T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -182,7 +182,7 @@
 	{
 		"name": "Lelia Mote",
 		"code": 19,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2022-11-16T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -192,7 +192,7 @@
 	{
 		"name": "Henderson Eeles",
 		"code": 20,
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2022-09-10T22:00:00.000Z",
 		"position": {
 			"positionName": "Accountant",
@@ -202,7 +202,7 @@
 	{
 		"code": 21,
 		"name": "sherif awad",
-		"salaryStatus": 1,
+		"salaryStatus": "NOT_VALID",
 		"hiringDate": "2024-02-11T22:00:00.000Z",
 		"position": {
 			"positionName": "Manager",

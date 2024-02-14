@@ -12,14 +12,14 @@ type Props = {
 		value: string;
 	}[];
 
-	selectedValue: number | undefined;
-	onSelection: (value: number | undefined) => void;
+	selectedValue: string | undefined;
+	onSelection: (value: string | undefined) => void;
 };
 function EmployeeSelect({ items, selectedValue, onSelection }: Props) {
 	return (
 		<Select
 			value={selectedValue + ""}
-			onValueChange={value => onSelection(parseInt(value))}
+			onValueChange={value => onSelection(value)}
 		>
 			<SelectTrigger className='bg-muted'>
 				<SelectValue placeholder='Select ' />
