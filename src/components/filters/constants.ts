@@ -353,7 +353,8 @@ export const constructOperation = (
 			validatedFilter.data.property.value === "salaryStatus"
 		) {
 			result = {
-				valueB: (filter.data as FilterOption[]).map(e => e.value),
+				valueB: filter.data,
+				// valueB: (filter.data as FilterOption[]).map(e => e.value),
 				operation: validatedOperation.data,
 			};
 		} else {

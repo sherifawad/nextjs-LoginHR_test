@@ -2,7 +2,7 @@
 
 import { CreateEmployee, UpdateEmployee } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee, SalaryStatusEnum } from "@/types";
+import { Employee, SalaryStatusEnum } from "@/validation/employeeSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { FieldError, useForm } from "react-hook-form";

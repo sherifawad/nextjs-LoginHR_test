@@ -1,6 +1,6 @@
 "use client";
 
-import { Employee } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 

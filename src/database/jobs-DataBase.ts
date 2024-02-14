@@ -1,7 +1,6 @@
 import "server-only";
 
-import { EmployeePosition } from "@/types";
-
+import { EmployeePosition } from "@/validation/employeeSchema";
 import { promises as fs } from "fs";
 import path from "path";
 

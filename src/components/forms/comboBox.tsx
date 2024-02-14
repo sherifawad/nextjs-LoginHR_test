@@ -17,7 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { EmployeePosition } from "@/types";
+import { EmployeePosition } from "@/validation/employeeSchema";
 type Props = {
 	selectedValue: EmployeePosition | undefined;
 	onSelection: (job: EmployeePosition | undefined) => void;

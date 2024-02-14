@@ -1,4 +1,4 @@
-import { Employee, EmployeePosition } from "@/types";
+import { Employee, EmployeePosition } from "@/validation/employeeSchema";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
 import { DataTableColumnHeader } from "./data-table-column-header";

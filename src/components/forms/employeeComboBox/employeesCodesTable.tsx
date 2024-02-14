@@ -2,7 +2,7 @@
 
 import { GetAllEmployees } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { useEffect, useState } from "react";
 import { Input } from "../../ui/input";
 import {

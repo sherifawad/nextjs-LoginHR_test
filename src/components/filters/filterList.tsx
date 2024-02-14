@@ -1,7 +1,8 @@
 "use client";
 
 import { GetAllEmployees } from "@/app/profile/_actions";
-import { BasicValues, Employee, Filter } from "@/types";
+import { BasicValues, Filter } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Operation, constructOperation } from "./constants";
