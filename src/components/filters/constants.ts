@@ -1,14 +1,14 @@
-import { isArray } from "@/lib/utils";
+import { isArray } from "@/lib/utils/array";
 import {
 	BasicValues,
-	Employee,
 	EmployeeFilterComparisonOption,
 	EmployeeFilterOperation,
 	Filter,
-	FilterComparison,
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
+import { FilterComparison } from "@/validation/comparisonSnema";
+import { Employee } from "@/validation/employeeSchema";
 import { z } from "zod";
 
 export const NumberOps = {

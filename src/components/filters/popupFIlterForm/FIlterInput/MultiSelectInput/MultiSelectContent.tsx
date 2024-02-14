@@ -9,7 +9,7 @@ import {
 	CommandSeparator,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { BasicValues, FilterOption } from "@/types";
+import { FilterOption } from "@/types";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { CheckIcon } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
@@ -17,9 +17,9 @@ import { Dispatch, SetStateAction } from "react";
 type Props = {
 	options: FilterOption[];
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	setSelectedValues: Dispatch<SetStateAction<BasicValues | undefined>>;
-	selectedValues: BasicValues | undefined;
-	onValuesChange: (values: BasicValues | undefined) => void;
+	setSelectedValues: Dispatch<SetStateAction<string[] | undefined>>;
+	selectedValues: string[] | undefined;
+	onValuesChange: (values: string[]) => void;
 };
 
 function MultiSelectContent({
@@ -29,7 +29,7 @@ function MultiSelectContent({
 	selectedValues,
 	onValuesChange,
 }: Props) {
-	const onValuesSelection = (values: BasicValues | undefined) => {
+	const onValuesSelection = (values: string[]) => {
 		setSelectedValues(values);
 		onValuesChange(values);
 	};

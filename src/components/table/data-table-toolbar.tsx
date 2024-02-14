@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { GetAllJobs } from "@/app/profile/_actions";
-import { iterate } from "@/lib/utils";
-import { EmployeePosition, SalaryStatusEnum } from "@/types";
+import { iterate } from "@/lib/utils/array";
+import {
+	EmployeePosition,
+	SalaryStatusEnum,
+} from "@/validation/employeeSchema";
 import React from "react";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";

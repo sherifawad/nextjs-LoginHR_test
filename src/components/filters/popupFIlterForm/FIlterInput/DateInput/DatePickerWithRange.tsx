@@ -1,6 +1,6 @@
 "use client";
 
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
@@ -15,23 +15,28 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-	onRangeDateSelected: (range: DateRange | undefined) => void;
-	dateRange: DateRange | undefined;
+	onRangeDateSelected: (range: Date[]) => void;
+	dateRange: Date[] | undefined;
 };
 
 export default function DatePickerWithRange({
 	onRangeDateSelected,
-	dateRange = {
-		from: new Date(2023, 0, 20),
-		to: addDays(new Date(2023, 0, 20), 20),
-	},
+	dateRange,
 	className,
 }: Props) {
-	const [date, setDate] = React.useState<DateRange | undefined>(dateRange);
+	const [date, setDate] = React.useState<DateRange | undefined>(
+		dateRange
+			? {
+					from: dateRange[0],
+					to: dateRange[1],
+				}
+			: undefined,
+	);
 
 	const onSelection = (range: DateRange | undefined) => {
 		setDate(range);
-		onRangeDateSelected(range);
+		if (range && range.from && range.to)
+			onRangeDateSelected([range.from, range.to]);
 	};
 
 	return (

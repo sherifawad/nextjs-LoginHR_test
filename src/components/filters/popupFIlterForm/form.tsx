@@ -8,7 +8,7 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { enumToLabelKeyValues } from "@/lib/utils";
+import { enumToLabelKeyValues } from "@/lib/utils/array";
 import {
 	BasicValues,
 	EmployeeFilterComparisonOption,
@@ -88,6 +88,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 		// const operation = String(formData.get("operation"));
 		// console.log("👍👍👍👍", property);
 		if (operation && property && data) {
+			console.log("🚀 ~ onSubmit ~ data:", data);
 			addFilter({
 				property,
 				operation,

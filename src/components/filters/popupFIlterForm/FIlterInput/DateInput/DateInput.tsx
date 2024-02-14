@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = {
-	onDateSelected: (range: Date | undefined) => void;
+	onDateSelected: (range: Date) => void;
 	SelectedDate: Date | undefined;
 };
 
@@ -23,7 +23,7 @@ export default function DateInput({ onDateSelected, SelectedDate }: Props) {
 
 	const onSelection = (selectedDate: Date | undefined) => {
 		setDate(selectedDate);
-		onDateSelected(selectedDate);
+		if (selectedDate) onDateSelected(selectedDate);
 	};
 
 	return (

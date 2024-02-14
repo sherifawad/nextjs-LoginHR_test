@@ -1,23 +1,6 @@
 import { z } from "zod";
-
-export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
-export type SalaryStatusEnum = z.infer<typeof SalaryStatusEnum>;
-
-export const EmployeePosition = z.object({
-	positionName: z.string().min(1),
-	positionCode: z.coerce.number().int().min(1).positive(),
-});
-export type EmployeePosition = z.infer<typeof EmployeePosition>;
-
-export const Employee = z.object({
-	code: z.coerce.number(),
-	name: z.string().min(5),
-	salaryStatus: SalaryStatusEnum,
-	hiringDate: z.date(),
-	position: EmployeePosition,
-});
-
-export type Employee = z.infer<typeof Employee>;
+import { FilterComparison } from "./validation/comparisonSnema";
+import { Employee } from "./validation/employeeSchema";
 
 export type employeeFilter = {
 	[key in keyof Employee]: Employee[key];
@@ -40,15 +23,12 @@ export type dateInput = {
 	year: number;
 };
 
-export const BasicValues = z.coerce
-	.string()
-	.min(1)
-	.or(z.coerce.number().int().min(1).positive())
-	.or(z.date())
-	.or(z.object({}))
-	.or(z.string().array())
-	.or(z.number().array())
-	.or(z.object({}).array());
+export const BasicValues = z.union([
+	z.coerce.string(),
+	z.coerce.date(),
+	z.string().array(),
+	z.date().array(),
+]);
 
 export type BasicValues = z.infer<typeof BasicValues>;
 
@@ -71,28 +51,6 @@ export const Filter = z.object({
 	data: BasicValues,
 });
 export type Filter = z.infer<typeof Filter>;
-
-//To Show FilterValue Component
-export const FilterComparison = z.enum([
-	"GreaterThan",
-	"LessThan",
-	"Equal",
-	"Not_Equal",
-	"GreaterThan_Or_Equal",
-	"LessThan_Or_Equal",
-	"Between",
-	"Not_Between",
-	"InList",
-	"Not_InList",
-	"Include",
-	"Not_Include",
-	"IsBlank",
-	"Is_Not_Blank",
-	"Is_Null",
-	"Is_Not_Null",
-]);
-
-export type FilterComparison = z.infer<typeof FilterComparison>;
 
 export const EmployeeFilterComparisonOption = z.object({
 	label: FilterComparison,

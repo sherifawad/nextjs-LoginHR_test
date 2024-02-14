@@ -2,15 +2,17 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 type Props = {
-	onValueChange: (value: string | number | undefined) => void;
-	inputValue: string | number | undefined;
+	onValueChange: (value: string) => void;
+	inputValue: string | undefined;
 };
 
 function DefaultInput({ onValueChange, inputValue }: Props) {
 	const [value, setValue] = useState<string | number | undefined>(inputValue);
 	const onInputChange = (value: string) => {
 		setValue(value);
-		onValueChange(value);
+		if (value.length > 0) {
+			onValueChange(value);
+		}
 	};
 	return (
 		<>

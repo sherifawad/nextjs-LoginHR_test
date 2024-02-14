@@ -11,7 +11,7 @@ import {
 	update,
 } from "@/database/employees-dataBase";
 import { findByCode, getAllJobs } from "@/database/jobs-DataBase";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 
 export async function UpdateEmployee(
 	code: number,
