@@ -1,17 +1,38 @@
 "use client";
 
-import { Filter } from "@/types";
+import { GetAllEmployees } from "@/app/profile/_actions";
+import { BasicValues, Employee, Filter } from "@/types";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { Operation, constructOperation } from "./constants";
 import FilterPopUp from "./popupFIlterForm";
 
 function FilterList() {
 	const [Filters, setFilters] = useState<Filter[]>([]);
-	const addFilter = (filter: Filter) => {
+	const addFilter = async (filter: Filter) => {
+		console.log("🚀 ~ addFilter ~ filter:", filter);
+		const data = constructOperation(filter);
+		console.log("🚀 ~ addFilter ~ data:", JSON.stringify(data, null, 2));
+		console.log("🚀 ~ addFilter ~ property:", filter.property);
+		if (!data) return;
+
 		setFilters(prev => [...prev, filter]);
+		const employees = await GetAllEmployees();
+
+		const result = employees.filter(x =>
+			Operation(
+				x[filter.property.value as unknown as keyof Employee] as BasicValues,
+				{
+					valueB: data.valueB,
+					valueC: data.valueC,
+					operation: data.operation,
+				},
+			),
+		);
+		console.log("🚀 ~ addFilter ~ result:", result);
 	};
 	return (
-		<div className=' mx-auto mb-8 flex  w-full max-w-md items-end justify-center gap-2  p-2'>
+		<div className=' mx-auto mb-8 flex w-full  max-w-md flex-row-reverse items-end justify-center gap-2  p-2'>
 			<ul className='flex flex-wrap gap-2 self-start'>
 				{Filters?.map((item, index) => (
 					<li

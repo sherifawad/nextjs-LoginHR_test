@@ -9,7 +9,7 @@ import {
 	CommandSeparator,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { FilterOption } from "@/types";
+import { BasicValues, FilterOption } from "@/types";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { CheckIcon } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
@@ -17,9 +17,9 @@ import { Dispatch, SetStateAction } from "react";
 type Props = {
 	options: FilterOption[];
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	setSelectedValues: Dispatch<SetStateAction<any[] | undefined>>;
-	selectedValues: any[] | undefined;
-	onValuesChange: (values: any[] | undefined) => void;
+	setSelectedValues: Dispatch<SetStateAction<BasicValues | undefined>>;
+	selectedValues: BasicValues | undefined;
+	onValuesChange: (values: BasicValues | undefined) => void;
 };
 
 function MultiSelectContent({
@@ -29,7 +29,7 @@ function MultiSelectContent({
 	selectedValues,
 	onValuesChange,
 }: Props) {
-	const onValuesSelection = (values: any[] | undefined) => {
+	const onValuesSelection = (values: BasicValues | undefined) => {
 		setSelectedValues(values);
 		onValuesChange(values);
 	};
@@ -42,7 +42,7 @@ function MultiSelectContent({
 					<ScrollArea className='max-h-72'>
 						<CommandGroup>
 							{options.map(option => {
-								const isSelected = selectedValues?.find(
+								const isSelected = (selectedValues as any[])?.find(
 									x => x.value === option.value,
 								);
 								return (
@@ -51,11 +51,11 @@ function MultiSelectContent({
 										onSelect={() => {
 											let values = [];
 											if (isSelected) {
-												values = (selectedValues ?? []).filter(
+												values = ((selectedValues as any[]) ?? []).filter(
 													x => x.value !== option.value,
 												);
 											} else {
-												values = [...(selectedValues ?? []), option];
+												values = [...((selectedValues as any[]) ?? []), option];
 											}
 											onValuesSelection(values);
 										}}
@@ -77,7 +77,7 @@ function MultiSelectContent({
 						</CommandGroup>
 					</ScrollArea>
 					<CommandSeparator />
-					{selectedValues && selectedValues.length > 0 && (
+					{selectedValues && ((selectedValues as any[]) ?? []).length > 0 && (
 						<div className='flex  flex-row items-center gap-x-2 p-2'>
 							<Button
 								variant={"ghost"}

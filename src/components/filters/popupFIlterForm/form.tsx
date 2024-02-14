@@ -50,7 +50,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	}, []);
 
 	// values
-	const [data, setData] = useState<BasicValues | any[] | undefined>();
+	const [data, setData] = useState<BasicValues | undefined>();
 	const [component, setComponent] = useState<FilterValueSelect | undefined>();
 	const [options, setOptions] = useState<FilterOption[]>([]);
 	const employees = useMemo(async () => await GetAllEmployees(), []);
@@ -73,6 +73,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 			setComponent(component);
 			if (component === FilterValueSelect.Enum.LIST) {
 				const list = (await employees).map(e => e[property!.label]);
+				console.log("🚀 ~ list:", list);
 				const result = enumToLabelKeyValues(list);
 				setOptions(result);
 			}

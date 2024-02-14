@@ -1,15 +1,16 @@
-import { FilterOption, SalaryStatus, dateInput } from "@/types";
+import { FilterOption, dateInput } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { EnumValues } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const getSalaryStatusName = () => {
+export const getSalaryStatusName = (s: EnumValues) => {
 	const names: string[] = [];
-	for (var n in SalaryStatus) {
-		if (typeof SalaryStatus[n] === "number") names.push(n);
+	for (var n in s) {
+		if (typeof s[n] === "number") names.push(n);
 	}
 	return names;
 };
@@ -108,10 +109,11 @@ const objectToValueLabel = (obj: Object) => {
 	return result;
 };
 
-const iterate = (obj: any) => {
+export const iterate = (obj: any) => {
 	const result: FilterOption[] = [];
 	Object.keys(obj).forEach(key => {
 		const value = obj[key];
+
 		if (typeof value === "object" && value !== null) {
 			const newArray: any[] = [];
 			Object.keys(value).forEach(nestedKey => {
@@ -130,7 +132,12 @@ const iterate = (obj: any) => {
 			if (isNaN(key as unknown as number)) {
 				result.push({
 					label: key,
-					value: obj[key],
+					value,
+				});
+			} else if (isNaN(value as unknown as number)) {
+				result.push({
+					label: value,
+					value,
 				});
 			}
 		}
