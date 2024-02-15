@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FilterComparison } from "./validation/comparisonSnema";
+import { FilterComparison } from "./validation/comparisonSchema";
 import { Employee } from "./validation/employeeSchema";
 
 export type employeeFilter = {

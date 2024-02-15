@@ -51,7 +51,7 @@ export const searchParamsToFilter = (
 ): EmployeeFilter[] => {
 	const result: EmployeeFilter[] = [];
 	const filtersList = searchParams.split(",");
-	const resulted = filtersList.forEach(l => {
+	filtersList.forEach(l => {
 		const filters = l.split("_");
 		if (filters.length !== 3) return;
 		const [property, operation, data] = filters;
@@ -64,7 +64,6 @@ export const searchParamsToFilter = (
 
 		if (validate.success) {
 			result.push(validate.data);
-		} else {
 		}
 	});
 	return result;
@@ -73,7 +72,7 @@ export const getReadableFilterValues = (
 	filter: EmployeeFilter,
 	employees: Employee[],
 ): EmployeeFilter => {
-	if (filter.operation === "InList" || filter.operation === "Not_InList") {
+	if (filter.operation === "InList" || filter.operation === "Not-InList") {
 		const list = getLabelValueList(
 			filter.data as string[],
 			employees,

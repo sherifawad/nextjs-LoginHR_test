@@ -1,7 +1,7 @@
 import { isArray, isArrayDate, isArrayString } from "@/lib/utils/array";
 import { BasicValues } from "@/types";
 import { z } from "zod";
-import { FilterComparison } from "./comparisonSnema";
+import { FilterComparison } from "./comparisonSchema";
 
 export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
 
@@ -27,7 +27,7 @@ export const EmployeeFilter = z
 	.refine(
 		data => {
 			console.log("🚀 ~ data:", data);
-			if (data.operation === "Between" || data.operation === "Not_Between") {
+			if (data.operation === "Between" || data.operation === "Not-Between") {
 				console.log("1️⃣");
 				if (isArray(data.data)) {
 					console.log("1️⃣  2️⃣");
@@ -45,7 +45,7 @@ export const EmployeeFilter = z
 				console.log("1️⃣  6️⃣");
 				return false;
 			}
-			if (data.operation === "InList" || data.operation === "Not_InList") {
+			if (data.operation === "InList" || data.operation === "Not-InList") {
 				console.log("1️⃣  7️⃣");
 				if (isArray(data.data)) {
 					console.log("1️⃣  8️⃣");

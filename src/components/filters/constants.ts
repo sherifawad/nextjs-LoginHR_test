@@ -7,7 +7,7 @@ import {
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
-import { FilterComparison } from "@/validation/comparisonSnema";
+import { FilterComparison } from "@/validation/comparisonSchema";
 import { Employee } from "@/validation/employeeSchema";
 import { z } from "zod";
 
@@ -77,14 +77,14 @@ export const Operation = (
 	switch (operation) {
 		case FilterComparison.Enum.Equal:
 			return firstValue === secondValue;
-		case FilterComparison.Enum.Not_Equal:
+		case FilterComparison.Enum["Not-Equal"]:
 			return firstValue !== secondValue;
 		case FilterComparison.Enum.GreaterThan:
 			if (firstValue && secondValue) {
 				return firstValue > secondValue;
 			}
 			break;
-		case FilterComparison.Enum.GreaterThan_Or_Equal:
+		case FilterComparison.Enum["GreaterThan-Or-Equal"]:
 			if (firstValue && secondValue) {
 				return firstValue >= secondValue;
 			}
@@ -94,7 +94,7 @@ export const Operation = (
 				return firstValue < secondValue;
 			}
 			break;
-		case FilterComparison.Enum.LessThan_Or_Equal:
+		case FilterComparison.Enum["LessThan-Or-Equal"]:
 			if (firstValue && secondValue) {
 				return firstValue <= secondValue;
 			}
@@ -107,7 +107,7 @@ export const Operation = (
 				);
 			}
 			break;
-		case FilterComparison.Enum.Not_InList:
+		case FilterComparison.Enum["Not-InList"]:
 			if (firstValue && secondValue && isArray(secondValue)) {
 				return (secondValue as string[]).every(
 					y => y !== (firstValue as string),
@@ -120,7 +120,7 @@ export const Operation = (
 				return firstValue.toString().includes(secondValue.toString());
 			}
 			break;
-		case FilterComparison.Enum.Not_Include:
+		case FilterComparison.Enum["Not-Include"]:
 			if (firstValue && secondValue) {
 				return !firstValue.toString().includes(secondValue.toString());
 			}
@@ -130,7 +130,7 @@ export const Operation = (
 				return firstValue >= secondValue && firstValue <= thirdValue;
 			}
 			break;
-		case FilterComparison.Enum.Not_Between:
+		case FilterComparison.Enum["Not-Between"]:
 			if (firstValue && secondValue && thirdValue) {
 				return firstValue < secondValue || firstValue > thirdValue;
 			}
@@ -152,12 +152,12 @@ const FavoriteComparison: EmployeeFilterComparisonOption[] = [
 	},
 
 	{
-		label: FilterComparison.enum.GreaterThan_Or_Equal,
-		value: FilterComparison.Values.GreaterThan_Or_Equal,
+		label: FilterComparison.enum["GreaterThan-Or-Equal"],
+		value: FilterComparison.Values["GreaterThan-Or-Equal"],
 	},
 	{
-		label: FilterComparison.enum.LessThan_Or_Equal,
-		value: FilterComparison.Values.LessThan_Or_Equal,
+		label: FilterComparison.enum["LessThan-Or-Equal"],
+		value: FilterComparison.Values["LessThan-Or-Equal"],
 	},
 ];
 
@@ -167,18 +167,18 @@ const BlankComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values.IsBlank,
 	},
 	{
-		label: FilterComparison.enum.Is_Not_Blank,
-		value: FilterComparison.Values.Is_Not_Blank,
+		label: FilterComparison.enum["Is-Not-Blank"],
+		value: FilterComparison.Values["Is-Not-Blank"],
 	},
 ];
 const NullComparison: EmployeeFilterComparisonOption[] = [
 	{
-		label: FilterComparison.enum.Is_Null,
-		value: FilterComparison.Values.Is_Null,
+		label: FilterComparison.enum["Is-Null"],
+		value: FilterComparison.Values["Is-Null"],
 	},
 	{
-		label: FilterComparison.enum.Is_Not_Null,
-		value: FilterComparison.Values.Is_Not_Null,
+		label: FilterComparison.enum["Is-Not-Null"],
+		value: FilterComparison.Values["Is-Not-Null"],
 	},
 ];
 const BetweenComparison: EmployeeFilterComparisonOption[] = [
@@ -187,8 +187,8 @@ const BetweenComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values.Between,
 	},
 	{
-		label: FilterComparison.enum.Not_Between,
-		value: FilterComparison.Values.Not_Between,
+		label: FilterComparison.enum["Not-Between"],
+		value: FilterComparison.Values["Not-Between"],
 	},
 ];
 const IncludeComparison: EmployeeFilterComparisonOption[] = [
@@ -197,16 +197,16 @@ const IncludeComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values.Include,
 	},
 	{
-		label: FilterComparison.enum.Not_Include,
-		value: FilterComparison.Values.Not_Include,
+		label: FilterComparison.enum["Not-Include"],
+		value: FilterComparison.Values["Not-Include"],
 	},
 ];
 
 const EqualComparison: EmployeeFilterComparisonOption[] = [
 	{ label: FilterComparison.enum.Equal, value: FilterComparison.Values.Equal },
 	{
-		label: FilterComparison.enum.Not_Equal,
-		value: FilterComparison.Values.Not_Equal,
+		label: FilterComparison.enum["Not-Equal"],
+		value: FilterComparison.Values["Not-Equal"],
 	},
 ];
 const ListComparison: EmployeeFilterComparisonOption[] = [
@@ -215,8 +215,8 @@ const ListComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values.InList,
 	},
 	{
-		label: FilterComparison.enum.Not_InList,
-		value: FilterComparison.Values.Not_InList,
+		label: FilterComparison.enum["Not-InList"],
+		value: FilterComparison.Values["Not-InList"],
 	},
 ];
 
@@ -271,12 +271,12 @@ export const setComparisonComponentType = (
 		case "number": {
 			if (
 				operation === FilterComparison.enum.InList ||
-				operation === FilterComparison.enum.Not_InList
+				operation === FilterComparison.enum["Not-InList"]
 			) {
 				return FilterValueSelect.Enum.LIST;
 			} else if (
 				operation === FilterComparison.enum.Between ||
-				operation === FilterComparison.enum.Not_Between
+				operation === FilterComparison.enum["Not-Between"]
 			) {
 				return FilterValueSelect.Enum.RANGE;
 			}
@@ -288,7 +288,7 @@ export const setComparisonComponentType = (
 		case "date": {
 			if (
 				operation === FilterComparison.enum.Between ||
-				operation === FilterComparison.enum.Not_Between
+				operation === FilterComparison.enum["Not-Between"]
 			) {
 				return FilterValueSelect.Enum.DATE_RANGE;
 			}
@@ -311,7 +311,6 @@ export const constructOperation = (
 ): EmployeeFilterOperation | undefined => {
 	const validatedFilter = Filter.safeParse(filter);
 	if (!validatedFilter.success) {
-		console.log("🚀 ~ addFilter ~ validatedFilter:", validatedFilter.error);
 		return undefined;
 	}
 	let result: EmployeeFilterOperation;
@@ -319,22 +318,17 @@ export const constructOperation = (
 		validatedFilter.data.operation.value,
 	);
 	if (!validatedOperation.success) {
-		console.log(
-			"🚀 ~ addFilter ~ validatedOperation:",
-			validatedOperation.error,
-		);
 		return undefined;
 	}
 	const validatedData = BasicValues.safeParse(validatedFilter.data.data);
 	if (!validatedData.success) {
-		console.log("🚀 ~ addFilter ~ validatedData:", validatedData.error);
 		return undefined;
 	}
-	console.log("🚀 ~ validatedData:", validatedData.data);
 
 	if (
 		validatedFilter.data.operation.value === FilterComparison.Values.Between ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Not_Between
+		validatedFilter.data.operation.value ===
+			FilterComparison.Values["Not-Between"]
 	) {
 		const [value1, value2] = validatedData.data.toString().split(",");
 		result = {
@@ -345,9 +339,10 @@ export const constructOperation = (
 	} else if (
 		validatedFilter.data.operation.value === FilterComparison.Values.InList ||
 		validatedFilter.data.operation.value ===
-			FilterComparison.Values.Not_InList ||
+			FilterComparison.Values["Not-InList"] ||
 		validatedFilter.data.operation.value === FilterComparison.Values.Include ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Not_Include
+		validatedFilter.data.operation.value ===
+			FilterComparison.Values["Not-Include"]
 	) {
 		if (
 			validatedFilter.data.property.value === "position" ||
