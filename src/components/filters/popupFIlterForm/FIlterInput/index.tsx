@@ -19,7 +19,7 @@ function FilterInput({
 	values,
 	...rest
 }: Props) {
-	console.log("🚀 ~ componentToShow:", componentToShow);
+	// console.log("🚀 ~ componentToShow:", componentToShow);
 	return (
 		<div {...rest}>
 			{componentToShow === FilterValueSelect.enum.DATE && (

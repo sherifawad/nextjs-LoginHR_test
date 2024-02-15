@@ -24,11 +24,8 @@ import {
 	useCallback,
 	useState,
 } from "react";
-import {
-	PropertiesLabels,
-	getComparisonList,
-	setComparisonComponentType,
-} from "../constants";
+import { getComparisonList } from "../comparisonSelections/comparispnList";
+import { PropertiesLabels, setComparisonComponentType } from "../constants";
 import { FilterResult } from "../filterList";
 import FilterInput from "./FIlterInput";
 import FilterSelect from "./FilterSelect";

@@ -18,7 +18,7 @@ export const splitStringToArray = (value: string, separator: string = " ") => {
 };
 
 export const isArrayString = (value: any): boolean => {
-	console.log("🚀 ~ isArrayString ~ value:", value);
+	// console.log("🚀 ~ isArrayString ~ value:", value);
 	if (!isIterable(value)) return false;
 	if (!isArray(value)) return false;
 	value.forEach(function (item: any) {

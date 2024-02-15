@@ -1,15 +1,13 @@
 import { isArray } from "@/lib/utils/array";
 import {
 	BasicValues,
-	EmployeeFilterComparisonOption,
 	EmployeeFilterOperation,
-	Filter,
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
-import { FilterComparison } from "@/validation/comparisonSchema";
-import { Employee } from "@/validation/employeeSchema";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { z } from "zod";
+import { FilterComparison } from "./comparisonSelections/comparisonSchema";
 
 export const NumberOps = {
 	//for operator
@@ -58,7 +56,7 @@ export const Operation = (
 			String(v).toLocaleLowerCase(),
 		);
 	}
-	if (valueC) thirdValue = String(valueB).toLocaleLowerCase();
+	if (valueC) thirdValue = String(valueC).toLocaleLowerCase();
 
 	// Set Input Types
 	if (typeof valueA === "object") {
@@ -127,12 +125,12 @@ export const Operation = (
 			break;
 		case FilterComparison.Enum.Between:
 			if (firstValue && secondValue && thirdValue) {
-				return firstValue >= secondValue && firstValue <= thirdValue;
+				return +firstValue >= +secondValue && +firstValue <= +thirdValue;
 			}
 			break;
 		case FilterComparison.Enum["Not-Between"]:
 			if (firstValue && secondValue && thirdValue) {
-				return firstValue < secondValue || firstValue > thirdValue;
+				return +firstValue < +secondValue || +firstValue > +thirdValue;
 			}
 			break;
 
@@ -140,85 +138,6 @@ export const Operation = (
 			break;
 	}
 };
-
-const FavoriteComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.GreaterThan,
-		value: FilterComparison.Values.GreaterThan,
-	},
-	{
-		label: FilterComparison.enum.LessThan,
-		value: FilterComparison.Values.LessThan,
-	},
-
-	{
-		label: FilterComparison.enum["GreaterThan-Or-Equal"],
-		value: FilterComparison.Values["GreaterThan-Or-Equal"],
-	},
-	{
-		label: FilterComparison.enum["LessThan-Or-Equal"],
-		value: FilterComparison.Values["LessThan-Or-Equal"],
-	},
-];
-
-const BlankComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.IsBlank,
-		value: FilterComparison.Values.IsBlank,
-	},
-	{
-		label: FilterComparison.enum["Is-Not-Blank"],
-		value: FilterComparison.Values["Is-Not-Blank"],
-	},
-];
-const NullComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum["Is-Null"],
-		value: FilterComparison.Values["Is-Null"],
-	},
-	{
-		label: FilterComparison.enum["Is-Not-Null"],
-		value: FilterComparison.Values["Is-Not-Null"],
-	},
-];
-const BetweenComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.Between,
-		value: FilterComparison.Values.Between,
-	},
-	{
-		label: FilterComparison.enum["Not-Between"],
-		value: FilterComparison.Values["Not-Between"],
-	},
-];
-const IncludeComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.Include,
-		value: FilterComparison.Values.Include,
-	},
-	{
-		label: FilterComparison.enum["Not-Include"],
-		value: FilterComparison.Values["Not-Include"],
-	},
-];
-
-const EqualComparison: EmployeeFilterComparisonOption[] = [
-	{ label: FilterComparison.enum.Equal, value: FilterComparison.Values.Equal },
-	{
-		label: FilterComparison.enum["Not-Equal"],
-		value: FilterComparison.Values["Not-Equal"],
-	},
-];
-const ListComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.InList,
-		value: FilterComparison.Values.InList,
-	},
-	{
-		label: FilterComparison.enum["Not-InList"],
-		value: FilterComparison.Values["Not-InList"],
-	},
-];
 
 export const PropertiesLabels: FilterOption[] = Object.keys(Employee.shape).map(
 	e => ({
@@ -232,40 +151,12 @@ export const getType = (value: keyof z.infer<typeof Employee>) => {
 		.join("")
 		.toLocaleLowerCase();
 };
-
-export const getComparisonList = (property: keyof z.infer<typeof Employee>) => {
-	const _type = getType(property);
-	console.log("🚀 ~ getComparisonList ~ _type:", _type);
-	let comparisonsList: EmployeeFilterComparisonOption[] = [];
-	if (_type === "number") {
-		comparisonsList = [
-			...EqualComparison,
-			...FavoriteComparison,
-			...IncludeComparison,
-			...BetweenComparison,
-		];
-	} else if (_type === "string") {
-		comparisonsList = [...EqualComparison, ...IncludeComparison];
-	} else if (_type === "date") {
-		comparisonsList = [
-			...EqualComparison,
-			...FavoriteComparison,
-			...BetweenComparison,
-		];
-	} else if (_type === "object" || _type === "enum" || _type === "nativeenum") {
-		comparisonsList = ListComparison;
-	} else {
-		comparisonsList = [...IncludeComparison, ...ListComparison];
-	}
-	return comparisonsList;
-};
-
 export const setComparisonComponentType = (
 	property: keyof z.infer<typeof Employee>,
 	operation: FilterComparison,
 ): FilterValueSelect => {
 	const _type = getType(property);
-	console.log("🚀 ~ _type:", _type);
+	// console.log("🚀 ~ _type:", _type);
 	let comparisonsList: FilterOption[] = [];
 	switch (_type) {
 		case "number": {
@@ -307,64 +198,44 @@ export const setComparisonComponentType = (
 
 // create operation
 export const constructOperation = (
-	filter: Filter,
-): EmployeeFilterOperation | undefined => {
-	const validatedFilter = Filter.safeParse(filter);
-	if (!validatedFilter.success) {
-		return undefined;
-	}
+	filter: EmployeeFilter,
+): EmployeeFilterOperation => {
 	let result: EmployeeFilterOperation;
-	const validatedOperation = FilterComparison.safeParse(
-		validatedFilter.data.operation.value,
-	);
-	if (!validatedOperation.success) {
-		return undefined;
-	}
-	const validatedData = BasicValues.safeParse(validatedFilter.data.data);
-	if (!validatedData.success) {
-		return undefined;
-	}
 
 	if (
-		validatedFilter.data.operation.value === FilterComparison.Values.Between ||
-		validatedFilter.data.operation.value ===
-			FilterComparison.Values["Not-Between"]
+		filter.operation === FilterComparison.Values.Between ||
+		filter.operation === FilterComparison.Values["Not-Between"]
 	) {
-		const [value1, value2] = validatedData.data.toString().split(",");
+		const [value1, value2] = filter.data.toString().split(",");
 		result = {
 			valueB: value1,
 			valueC: value2,
-			operation: validatedOperation.data,
+			operation: filter.operation,
 		};
 	} else if (
-		validatedFilter.data.operation.value === FilterComparison.Values.InList ||
-		validatedFilter.data.operation.value ===
-			FilterComparison.Values["Not-InList"] ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Include ||
-		validatedFilter.data.operation.value ===
-			FilterComparison.Values["Not-Include"]
+		filter.operation === FilterComparison.Values.InList ||
+		filter.operation === FilterComparison.Values["Not-InList"] ||
+		filter.operation === FilterComparison.Values.Include ||
+		filter.operation === FilterComparison.Values["Not-Include"]
 	) {
-		if (
-			validatedFilter.data.property.value === "position" ||
-			validatedFilter.data.property.value === "salaryStatus"
-		) {
+		if (filter.property === "position" || filter.property === "salaryStatus") {
 			result = {
 				valueB: filter.data,
 				// valueB: (filter.data as FilterOption[]).map(e => e.value),
-				operation: validatedOperation.data,
+				operation: filter.operation,
 			};
 		} else {
 			result = {
-				valueB: validatedData.data,
-				// valueB: validatedData.data.toString().split(","),
-				operation: validatedOperation.data,
+				valueB: filter.data,
+				// valueB: filter.data.toString().split(","),
+				operation: filter.operation,
 			};
 		}
 	} else {
 		result = {
-			valueB: validatedData.data,
+			valueB: filter.data,
 			valueC: undefined,
-			operation: validatedOperation.data,
+			operation: filter.operation,
 		};
 	}
 

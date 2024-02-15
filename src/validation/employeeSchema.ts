@@ -1,7 +1,7 @@
 import { isArray, isArrayDate, isArrayString } from "@/lib/utils/array";
 import { BasicValues } from "@/types";
 import { z } from "zod";
-import { FilterComparison } from "./comparisonSchema";
+import { FilterComparison } from "../components/filters/comparisonSelections/comparisonSchema";
 
 export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
 

@@ -8,6 +8,7 @@ import { EmployeeFilter } from "@/validation/employeeSchema";
 import { Suspense } from "react";
 import { GetAllEmployees } from "../profile/_actions";
 import { BasicSearchParamsSchema } from "../searchUrlSchema";
+import { getFilteredEmployees } from "./_actions";
 
 type Props = {
 	searchParams: { [key: string]: string[] | string | undefined };
@@ -15,6 +16,7 @@ type Props = {
 async function EmployeesPage({ searchParams }: Props) {
 	// get all employees
 	const initialEmployees = await GetAllEmployees();
+	let filteredEmployees = initialEmployees;
 	// set empty filters
 	let initialFilters: { [key: string]: EmployeeFilter }[] = [];
 	//validate search params
@@ -33,6 +35,7 @@ async function EmployeesPage({ searchParams }: Props) {
 						fv,
 				};
 			});
+			filteredEmployees = await getFilteredEmployees(initialFilters);
 		}
 	}
 
@@ -44,7 +47,7 @@ async function EmployeesPage({ searchParams }: Props) {
 			<section>
 				<Suspense fallback={<>Loading ....</>}>
 					<FilterList
-						initialEmployees={initialEmployees}
+						initialEmployees={filteredEmployees}
 						initialFilters={initialFilters}
 					/>
 				</Suspense>

@@ -1,11 +1,13 @@
 "use server";
 
+import { Operation, constructOperation } from "@/components/filters/constants";
 import {
 	checkFilterMatch,
 	dataToStringWithCustomSeparator,
 	getReadableFilterValues,
 } from "@/lib/utils/filterUtils";
-import { EmployeeFilter } from "@/validation/employeeSchema";
+import { BasicValues } from "@/types";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { GetAllEmployees } from "../profile/_actions";
 
 export const addNewFilter = async ({
@@ -48,4 +50,21 @@ export const addNewFilter = async ({
 		[`${basicString}${dataToStringWithCustomSeparator(readableFilter.data)}`]:
 			constructedFilter,
 	};
+};
+
+export const getFilteredEmployees = async (
+	filters: { [key: string]: EmployeeFilter }[],
+): Promise<Employee[]> => {
+	const employees = await GetAllEmployees();
+	const filterValues: EmployeeFilter[] = filters.map(f => Object.values(f)[0]);
+	return employees.filter(x => {
+		return filterValues.some(f => {
+			const data = constructOperation(f);
+			return Operation(x[f.property] as BasicValues, {
+				valueB: data.valueB,
+				valueC: data.valueC,
+				operation: data.operation,
+			});
+		});
+	});
 };
