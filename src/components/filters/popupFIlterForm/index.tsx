@@ -22,7 +22,10 @@ function FilterPopUp({ addFilter, initialEmployees }: Props) {
 					<Plus className='h-3 w-3' />
 				</div>
 			</PopoverTrigger>
-			<PopoverContent className=' p-0'>
+			<PopoverContent
+				className=' p-0'
+				onInteractOutside={e => e.preventDefault()}
+			>
 				<FilterPopUpForm
 					setIsOpen={setIsOpen}
 					addFilter={addFilter}

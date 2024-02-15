@@ -45,9 +45,9 @@ export const Operation = (
 	valueA: BasicValues,
 	{ valueB, operation, valueC }: EmployeeFilterOperation,
 ) => {
-	let firstValue: string | number | Date | string[] | number[] | undefined;
-	let secondValue: string | number | Date | string[] | number[] | undefined;
-	let thirdValue: string | number | Date | undefined;
+	let firstValue: BasicValues;
+	let secondValue: BasicValues;
+	let thirdValue: string | Date | undefined;
 
 	secondValue = String(valueB).toLocaleLowerCase();
 
@@ -59,18 +59,18 @@ export const Operation = (
 	if (valueC) thirdValue = String(valueC).toLocaleLowerCase();
 
 	// Set Input Types
-	if (typeof valueA === "object") {
+
+	if (Object.prototype.toString.call(valueA) === "[object Date]") {
+		firstValue = new Date(valueA as string).getTime().toString();
+		secondValue = new Date(valueB as string).getTime().toString();
+		if (valueC) thirdValue = new Date(valueC as string).getTime().toString();
+	} else if (typeof valueA === "object") {
 		firstValue = Object.entries(valueA).map(([_, value]) =>
 			value.toString().toLocaleLowerCase(),
 		)[1];
-	} else if (Object.prototype.toString.call(valueA) === "[object Date]") {
-		firstValue = (valueA as unknown as Date).getTime();
-		secondValue = (valueB as Date).getTime();
-		if (valueC) thirdValue = (valueC as Date).getTime();
 	} else {
 		firstValue = String(valueA).toLocaleLowerCase();
 	}
-
 	// Return Comparison Expression
 	switch (operation) {
 		case FilterComparison.Enum.Equal:

@@ -72,7 +72,11 @@ function MultiSelectInput({ options, values, onValuesChange }: Props) {
 					)}
 				</Button>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent
+				onInteractOutside={e => {
+					e.preventDefault();
+				}}
+			>
 				<DialogHeader>
 					<DialogTitle>{"title"}</DialogTitle>
 				</DialogHeader>

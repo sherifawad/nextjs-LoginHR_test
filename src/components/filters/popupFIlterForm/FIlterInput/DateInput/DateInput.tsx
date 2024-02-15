@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ export default function DateInput({ onDateSelected, SelectedDate }: Props) {
 
 	const onSelection = (selectedDate: Date | undefined) => {
 		setDate(selectedDate);
-		if (selectedDate) onDateSelected(selectedDate);
+		if (selectedDate) onDateSelected(addDays(selectedDate, 1));
 	};
 
 	return (
@@ -40,7 +40,12 @@ export default function DateInput({ onDateSelected, SelectedDate }: Props) {
 					{date ? format(date, "PPP") : <span>Pick a date</span>}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className='w-auto p-0'>
+			<PopoverContent
+				className='w-auto p-0'
+				onInteractOutside={e => {
+					e.preventDefault();
+				}}
+			>
 				<Calendar
 					mode='single'
 					selected={date}

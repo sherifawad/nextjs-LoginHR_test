@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
@@ -36,7 +36,7 @@ export default function DatePickerWithRange({
 	const onSelection = (range: DateRange | undefined) => {
 		setDate(range);
 		if (range && range.from && range.to)
-			onRangeDateSelected([range.from, range.to]);
+			onRangeDateSelected([addDays(range.from, 1), addDays(range.to, 1)]);
 	};
 
 	return (
@@ -55,24 +55,30 @@ export default function DatePickerWithRange({
 						{date?.from ? (
 							date.to ? (
 								<>
-									{format(date.from, "LLL dd, y")} -{" "}
-									{format(date.to, "LLL dd, y")}
+									{format(date.from, "PPP")} - {format(date.to, "PPP")}
 								</>
 							) : (
-								format(date.from, "LLL dd, y")
+								format(date.from, "PPP")
 							)
 						) : (
 							<span>Pick a date</span>
 						)}
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className='w-auto p-0' align='start'>
+				<PopoverContent
+					className='w-auto p-0'
+					align='start'
+					onInteractOutside={e => {
+						e.preventDefault();
+					}}
+				>
 					<Calendar
 						initialFocus
 						mode='range'
 						defaultMonth={date?.from}
 						selected={date}
 						onSelect={r => onSelection(r)}
+						numberOfMonths={2}
 					/>
 				</PopoverContent>
 			</Popover>

@@ -88,14 +88,21 @@ export const getReadableFilterValues = (
 		if (isArray(filter.data)) {
 			filter = {
 				...filter,
-				data: (filter.data as string[]).map(l =>
-					new Intl.DateTimeFormat("en-GB").format(new Date(l)),
-				),
+				data: (filter.data as string[]).map(l => {
+					// isNumber
+					if (!isNaN(Number(l))) {
+						return new Intl.DateTimeFormat("en-GB").format(new Date(+l));
+					} else {
+						return new Intl.DateTimeFormat("en-GB").format(new Date(l));
+					}
+				}),
 			};
 		} else {
 			filter = {
 				...filter,
-				data: new Intl.DateTimeFormat("en-GB").format(filter.data as Date),
+				data: new Intl.DateTimeFormat("en-GB").format(
+					new Date(filter.data as Date),
+				),
 			};
 		}
 	}
