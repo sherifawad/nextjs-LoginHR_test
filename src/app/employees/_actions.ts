@@ -55,10 +55,15 @@ export const addNewFilter = async ({
 	};
 };
 
+export const deleteExistingFilter = async ({}) => {};
+
 export const getFilteredEmployees = async (
 	filters: { [key: string]: EmployeeFilter }[],
 ): Promise<Employee[]> => {
 	const employees = await GetAllEmployees();
+	if (filters.length === 0) {
+		return employees;
+	}
 	const filterValues: EmployeeFilter[] = filters.map(f => Object.values(f)[0]);
 
 	return employees.filter(x => {

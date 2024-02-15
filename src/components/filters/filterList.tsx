@@ -26,7 +26,8 @@ function FilteredEmployees({
 	initialFilters,
 }: FilteredEmployeesProps) {
 	// functions to manipulate searchParams
-	const { deleteParams, updateParams, setParams } = useSearchUrlParams();
+	const { deleteParams, updateParams, setParams, router } =
+		useSearchUrlParams();
 	// filtered employees
 	const [employeesList, setEmployeesList] =
 		useState<Employee[]>(initialEmployees);
@@ -58,8 +59,6 @@ function FilteredEmployees({
 			return { result: "error", error: `${validate.error.errors[0].message}` };
 		}
 		const newFiltersList = [...Filters, newFilter];
-		const filteredEmployees = await getFilteredEmployees(newFiltersList);
-		setEmployeesList(filteredEmployees);
 
 		updateParams([
 			{
@@ -68,6 +67,8 @@ function FilteredEmployees({
 		]);
 
 		setFilters(newFiltersList);
+		const filteredEmployees = await getFilteredEmployees(newFiltersList);
+		setEmployeesList(filteredEmployees);
 
 		return { result: "success" };
 	};
@@ -91,8 +92,6 @@ function FilteredEmployees({
 				});
 			});
 
-			const filteredEmployees = await getFilteredEmployees(filteredList);
-			setEmployeesList(filteredEmployees);
 			// set Filter values in searchParams
 			setParams([
 				{
@@ -100,9 +99,10 @@ function FilteredEmployees({
 				},
 			]);
 		}
-
 		//set new Filter
 		setFilters(filteredList);
+		const filteredEmployees = await getFilteredEmployees(filteredList);
+		setEmployeesList(filteredEmployees);
 	};
 	return (
 		<div className='grid grid-rows-[auto_1fr] gap-8 py-8'>

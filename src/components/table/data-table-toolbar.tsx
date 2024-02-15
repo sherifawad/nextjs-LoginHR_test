@@ -26,7 +26,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
 	const selectedData = table.getState().rowSelection;
-	console.log("🚀 ~ selectedData:", selectedData);
 	const isSelected =
 		Object.keys(selectedData).length !== 0 ||
 		selectedData.constructor !== Object;

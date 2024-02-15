@@ -1,3 +1,4 @@
+import { searchParamsContext } from "@/context/serarchParamsContext";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -13,12 +14,9 @@ function useSearchUrlParams() {
 
 	const updateParams = useCallback(
 		(props: Params[]) => {
-			const params = new URLSearchParams(searchParams);
-			props.forEach(p => {
-				Object.entries(p).forEach(([key, value]) => {
-					const current = params.get(key);
-					params.set(key, current ? `${current},${value}` : value);
-				});
+			const params = searchParamsContext.update({
+				params: props,
+				currentParams: searchParams,
 			});
 			const route = `${pathname}?${params}`;
 			setRoute(route);
@@ -28,11 +26,9 @@ function useSearchUrlParams() {
 	);
 	const setParams = useCallback(
 		(props: Params[]) => {
-			const params = new URLSearchParams(searchParams);
-			props.forEach(p => {
-				Object.entries(p).forEach(([key, value]) => {
-					params.set(key, value);
-				});
+			const params = searchParamsContext.create({
+				params: props,
+				currentParams: searchParams,
 			});
 			const route = `${pathname}?${params}`;
 			setRoute(route);
@@ -42,9 +38,9 @@ function useSearchUrlParams() {
 	);
 	const deleteParams = useCallback(
 		(props: string[]) => {
-			const params = new URLSearchParams(searchParams);
-			props.forEach(p => {
-				params.delete(p);
+			const params = searchParamsContext.delete({
+				keys: props,
+				currentParams: searchParams,
 			});
 			const route = `${pathname}?${params}`;
 			setRoute(route);
