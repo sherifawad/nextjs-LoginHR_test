@@ -95,6 +95,22 @@ export async function _delete(code: number): Promise<Employee> {
 	await saveData(employees);
 	return employee;
 }
+export async function deleteMany(codeList: number[]): Promise<Employee[]> {
+	let employees = await getAll();
+	const deletedEmployees: Employee[] = [];
+	employees = employees.filter(x =>
+		codeList.every(l => {
+			if (l !== x.code) {
+				return true;
+			}
+			deletedEmployees.push(x);
+			return false;
+		}),
+	);
+	// await saveData(employees);
+
+	return deletedEmployees;
+}
 
 async function saveData(employees: Employee[]) {
 	// await fs.unlink(`${dataFilePath}`);

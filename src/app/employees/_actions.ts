@@ -1,6 +1,7 @@
 "use server";
 
 import { Operation, constructOperation } from "@/components/filters/constants";
+import { deleteMany } from "@/database/employees-dataBase";
 import {
 	checkFilterMatch,
 	dataToStringWithCustomSeparator,
@@ -8,6 +9,8 @@ import {
 } from "@/lib/utils/filterUtils";
 import { BasicValues } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { GetAllEmployees } from "../profile/_actions";
 
 export const addNewFilter = async ({
@@ -57,6 +60,7 @@ export const getFilteredEmployees = async (
 ): Promise<Employee[]> => {
 	const employees = await GetAllEmployees();
 	const filterValues: EmployeeFilter[] = filters.map(f => Object.values(f)[0]);
+
 	return employees.filter(x => {
 		return filterValues.some(f => {
 			const data = constructOperation(f);
@@ -67,4 +71,16 @@ export const getFilteredEmployees = async (
 			});
 		});
 	});
+};
+
+export const DeleteManyEmployees = async (
+	codes: number[],
+): Promise<Employee[]> => {
+	const inputSchema = z.coerce.number().array();
+	const validated = inputSchema.safeParse(codes);
+	if (!validated.success) {
+		return [];
+	}
+	revalidatePath("/employees");
+	return deleteMany(validated.data);
 };

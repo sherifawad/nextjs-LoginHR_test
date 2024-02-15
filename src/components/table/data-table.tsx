@@ -4,6 +4,7 @@ import {
 	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
+	VisibilityState,
 	flexRender,
 	getCoreRowModel,
 	getFacetedRowModel,
@@ -22,6 +23,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { Employee } from "@/validation/employeeSchema";
 import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
@@ -37,17 +39,24 @@ export function DataTable<TData, TValue>({
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-
+	const [rowSelection, setRowSelection] = React.useState({});
+	const [columnVisibility, setColumnVisibility] =
+		React.useState<VisibilityState>({});
 	const table = useReactTable({
 		data,
 		columns,
+		getRowId: row => (row as Employee).code + "",
 		state: {
 			sorting,
 			columnFilters,
+			columnVisibility,
+			rowSelection,
 		},
 		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
+		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
