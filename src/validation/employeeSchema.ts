@@ -26,58 +26,57 @@ export const EmployeeFilter = z
 	})
 	.refine(
 		data => {
-			console.log("🚀 ~ data:", data);
+			// console.log("🚀 ~ data:", data);
 			if (data.operation === "Between" || data.operation === "Not-Between") {
-				console.log("1️⃣");
+				// console.log("1️⃣");
 				if (isArray(data.data)) {
-					console.log("1️⃣  2️⃣");
+					// console.log("1️⃣  2️⃣");
 					if (data.property === "hiringDate") {
-						console.log("1️⃣  3️⃣");
+						// console.log("1️⃣  3️⃣");
 						return isArrayDate(data.data);
 					} else if (data.property == "code") {
-						console.log("1️⃣  4️⃣");
-						console.log("1️⃣  4️⃣");
+						// console.log("1️⃣  4️⃣");
 						return isArrayString(data.data);
 					}
-					console.log("1️⃣  5️⃣");
+					// console.log("1️⃣  5️⃣");
 					return true;
 				}
-				console.log("1️⃣  6️⃣");
+				// console.log("1️⃣  6️⃣");
 				return false;
 			}
 			if (data.operation === "InList" || data.operation === "Not-InList") {
-				console.log("1️⃣  7️⃣");
+				// console.log("1️⃣  7️⃣");
 				if (isArray(data.data)) {
-					console.log("1️⃣  8️⃣");
+					// console.log("1️⃣  8️⃣");
 
 					if (data.property === "hiringDate") {
-						console.log("1️⃣  9️⃣");
+						// console.log("1️⃣  9️⃣");
 
 						return isArrayDate(data.data);
 					} else {
-						console.log("1️⃣   🔟");
+						// console.log("1️⃣   🔟");
 
 						return isArrayString(data.data);
 					}
 				}
-				console.log("1️⃣  1️⃣  1️⃣");
+				// console.log("1️⃣  1️⃣  1️⃣");
 
 				return false;
 			}
 			if (data.property === "hiringDate") {
-				console.log("2️⃣  1️⃣");
+				// console.log("2️⃣  1️⃣");
 
 				return Object.prototype.toString.call(data.data) === "[object Date]";
 			}
 			if (data.property === "position" || data.property == "salaryStatus") {
-				console.log("3️⃣  1️⃣");
+				// console.log("3️⃣  1️⃣");
 
 				return isArrayString(data.data);
 			}
-			console.log("4️⃣   1️⃣");
+			// console.log("4️⃣   1️⃣");
 
-			console.log("🚀 ~ typeof data.data:", typeof data.data);
-			console.log("🚀 ~ schema data.data:::::::::::::", data.data);
+			// console.log("🚀 ~ typeof data.data:", typeof data.data);
+			// console.log("🚀 ~ schema data.data:::::::::::::", data.data);
 			return typeof data.data === "string";
 		},
 		{

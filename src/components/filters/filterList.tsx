@@ -1,11 +1,8 @@
 "use client";
 
+import { addNewFilter } from "@/app/employees/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import {
-	checkFilterMatch,
-	dataToStringWithCustomSeparator,
-	getReadableFilterValues,
-} from "@/lib/utils/filterUtils";
+import { dataToStringWithCustomSeparator } from "@/lib/utils/filterUtils";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { useState } from "react";
 import FilteredSimpleList from "../filteredList";
@@ -41,7 +38,15 @@ function FilteredEmployees({
 	 * @param filter employee property - comparison type - data to compate
 	 * @returns result of success or error with error data
 	 */
-	const addFilter = (filter: EmployeeFilter): FilterResult => {
+	const addFilter = async (filter: EmployeeFilter): Promise<FilterResult> => {
+		const newFilter = await addNewFilter({
+			filters: Filters,
+			newFilter: filter,
+		});
+		if (!newFilter) {
+			return { result: "error", error: `Internal Error` };
+		}
+
 		// validate input filter
 		const validate = EmployeeFilter.safeParse(filter);
 
@@ -52,46 +57,13 @@ function FilteredEmployees({
 			return { result: "error", error: `${validate.error.errors[0].message}` };
 		}
 
-		// initiate  validated filter object
-		const constructedFilter: EmployeeFilter = {
-			data: validate.data.data,
-			operation: validate.data.operation,
-			property: validate.data.property,
-		};
-		// organize filter data according to operation or property values
-
-		const readableFilter = getReadableFilterValues(
-			validate.data,
-			initialEmployees,
-		);
-
-		const noMatchExist =
-			Filters.length > 0 &&
-			Filters.find(f => checkFilterMatch(Object.values(f)[0], readableFilter));
-
-		if (noMatchExist) {
-			return { result: "error", error: "Filter Exist" };
-		}
-
-		// set string fot searchParams and fot filter list
-		// if data is object or date  => format for filter list as key and
-		// not format fot searchParams string
-
-		const basicString = `${constructedFilter.property}_${constructedFilter.operation}_`;
-
 		updateParams([
 			{
-				filter: `${basicString}${dataToStringWithCustomSeparator(constructedFilter.data)}`,
+				filter: Object.keys(newFilter)[0],
 			},
 		]);
 
-		setFilters(prev => [
-			...prev,
-			{
-				[`${basicString}${dataToStringWithCustomSeparator(readableFilter.data)}`]:
-					constructedFilter,
-			},
-		]);
+		setFilters(prev => [...prev, newFilter]);
 
 		return { result: "success" };
 	};

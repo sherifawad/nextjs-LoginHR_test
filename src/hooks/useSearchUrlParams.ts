@@ -1,5 +1,5 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 type Params = {
 	[key: string]: string;
@@ -9,6 +9,7 @@ function useSearchUrlParams() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const [route, setRoute] = useState(`${pathname}`);
 
 	const updateParams = useCallback(
 		(props: Params[]) => {
@@ -19,8 +20,9 @@ function useSearchUrlParams() {
 					params.set(key, current ? `${current},${value}` : value);
 				});
 			});
-			router.push(`${pathname}?${params}`);
-			router.refresh();
+			const route = `${pathname}?${params}`;
+			setRoute(route);
+			router.push(route);
 		},
 		[pathname, router, searchParams],
 	);
@@ -32,8 +34,9 @@ function useSearchUrlParams() {
 					params.set(key, value);
 				});
 			});
-			router.push(`${pathname}?${params}`);
-			router.refresh();
+			const route = `${pathname}?${params}`;
+			setRoute(route);
+			router.push(route);
 		},
 		[pathname, router, searchParams],
 	);
@@ -43,8 +46,9 @@ function useSearchUrlParams() {
 			props.forEach(p => {
 				params.delete(p);
 			});
-			router.push(`${pathname}?${params}`);
-			router.refresh();
+			const route = `${pathname}?${params}`;
+			setRoute(route);
+			router.push(route);
 		},
 		[pathname, router, searchParams],
 	);
@@ -53,6 +57,10 @@ function useSearchUrlParams() {
 		setParams,
 		deleteParams,
 		updateParams,
+		router,
+		pathname,
+		searchParams,
+		route,
 	};
 }
 

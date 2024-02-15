@@ -40,6 +40,7 @@ export const dataToStringWithCustomSeparator = (
 	data: BasicValues,
 	separator?: string,
 ): string => {
+	console.log("🚀 ~ separator:", separator);
 	if (isArray(data)) {
 		return (data as string[]).join(separator || "*");
 	}

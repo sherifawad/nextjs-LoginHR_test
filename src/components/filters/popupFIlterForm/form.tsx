@@ -35,7 +35,7 @@ import FilterSelect from "./FilterSelect";
 
 type Props = {
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	addFilter: (filter: EmployeeFilter) => FilterResult;
+	addFilter: (filter: EmployeeFilter) => Promise<FilterResult>;
 	initialEmployees: Employee[];
 };
 function FilterPopUpForm({ setIsOpen, addFilter, initialEmployees }: Props) {
@@ -84,10 +84,10 @@ function FilterPopUpForm({ setIsOpen, addFilter, initialEmployees }: Props) {
 		[initialEmployees, property],
 	);
 
-	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+	const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (property && operation && data) {
-			const result = addFilter({
+			const result = await addFilter({
 				property: property.value,
 				operation: operation.value,
 				data,

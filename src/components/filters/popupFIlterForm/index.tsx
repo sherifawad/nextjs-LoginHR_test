@@ -10,7 +10,7 @@ import { FilterResult } from "../filterList";
 import FilterPopUpForm from "./form";
 
 type Props = {
-	addFilter: (filter: EmployeeFilter) => FilterResult;
+	addFilter: (filter: EmployeeFilter) => Promise<FilterResult>;
 	initialEmployees: Employee[];
 };
 function FilterPopUp({ addFilter, initialEmployees }: Props) {
