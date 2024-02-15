@@ -5,7 +5,7 @@ type FilteredSimpleListProps = {
 	initialsList: Employee[];
 };
 
-async function FilteredSimpleList({ initialsList }: FilteredSimpleListProps) {
+function FilteredSimpleList({ initialsList }: FilteredSimpleListProps) {
 	return (
 		<section>
 			<EmployeesList employeesList={initialsList} />

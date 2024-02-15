@@ -24,10 +24,10 @@ export type dateInput = {
 };
 
 export const BasicValues = z.union([
-	z.coerce.date().array().min(2).max(2),
-	z.coerce.date(),
-	z.coerce.string().array().min(1),
-	z.coerce.string().min(1),
+	z.date().array().min(2).max(2),
+	z.date(),
+	z.string().array().min(1),
+	z.string().min(1),
 ]);
 export type BasicValues = z.infer<typeof BasicValues>;
 

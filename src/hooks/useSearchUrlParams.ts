@@ -10,6 +10,20 @@ function useSearchUrlParams() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
+	const updateParams = useCallback(
+		(props: Params[]) => {
+			const params = new URLSearchParams(searchParams);
+			props.forEach(p => {
+				Object.entries(p).forEach(([key, value]) => {
+					const current = params.get(key);
+					params.set(key, current ? `${current},${value}` : value);
+				});
+			});
+			router.push(`${pathname}?${params}`);
+			router.refresh();
+		},
+		[pathname, router, searchParams],
+	);
 	const setParams = useCallback(
 		(props: Params[]) => {
 			const params = new URLSearchParams(searchParams);
@@ -38,6 +52,7 @@ function useSearchUrlParams() {
 	return {
 		setParams,
 		deleteParams,
+		updateParams,
 	};
 }
 

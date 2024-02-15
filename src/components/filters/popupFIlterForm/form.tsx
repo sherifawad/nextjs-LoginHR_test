@@ -7,6 +7,7 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { generateLabelValueEmployeesList } from "@/lib/utils/filterUtils";
 import {
 	BasicValues,
@@ -38,6 +39,8 @@ type Props = {
 	initialEmployees: Employee[];
 };
 function FilterPopUpForm({ setIsOpen, addFilter, initialEmployees }: Props) {
+	const { toast } = useToast();
+
 	// Employee Properties
 	const [property, setProperty] = useState<
 		EmployeePropertyOption | undefined
@@ -84,13 +87,19 @@ function FilterPopUpForm({ setIsOpen, addFilter, initialEmployees }: Props) {
 	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (property && operation && data) {
-			const { result } = addFilter({
+			const result = addFilter({
 				property: property.value,
 				operation: operation.value,
 				data,
 			});
-			if (result === "success") {
+			if (result.result === "success") {
 				setIsOpen(false);
+			} else {
+				toast({
+					variant: "destructive",
+					title: "Uh oh! Something went wrong.",
+					description: result.error,
+				});
 			}
 		}
 	};

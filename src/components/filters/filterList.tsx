@@ -1,11 +1,15 @@
 "use client";
 
-import { getLabelValueList } from "@/lib/utils/filterUtils";
+import useSearchUrlParams from "@/hooks/useSearchUrlParams";
+import {
+	checkFilterMatch,
+	dataToStringWithCustomSeparator,
+	getReadableFilterValues,
+} from "@/lib/utils/filterUtils";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { useState } from "react";
 import FilteredSimpleList from "../filteredList";
 import { Button } from "../ui/button";
-import { useToast } from "../ui/use-toast";
 import FilterPopUp from "./popupFIlterForm";
 
 export type FilterResult =
@@ -16,87 +20,133 @@ export type FilterResult =
 
 type FilteredEmployeesProps = {
 	initialEmployees: Employee[];
+	initialFilters: { [key: string]: EmployeeFilter }[];
 };
 
-function FilteredEmployees({ initialEmployees }: FilteredEmployeesProps) {
-	const { toast } = useToast();
-
+function FilteredEmployees({
+	initialEmployees,
+	initialFilters,
+}: FilteredEmployeesProps) {
+	// functions to manipulate searchParams
+	const { deleteParams, updateParams, setParams } = useSearchUrlParams();
+	// filtered employees
 	const [employeesList, setEmployeesList] =
 		useState<Employee[]>(initialEmployees);
+	// filterList
+	const [Filters, setFilters] =
+		useState<{ [key: string]: EmployeeFilter }[]>(initialFilters);
 
-	const [Filters, setFilters] = useState<EmployeeFilter[]>([]);
-
+	/**
+	 * add new Filter
+	 * @param filter employee property - comparison type - data to compate
+	 * @returns result of success or error with error data
+	 */
 	const addFilter = (filter: EmployeeFilter): FilterResult => {
+		// validate input filter
 		const validate = EmployeeFilter.safeParse(filter);
 
 		if (!validate.success) {
+			// if error set result as error and add error value
 			console.log(validate.error);
-			toast({
-				variant: "destructive",
-				title: "Uh oh! Something went wrong.",
-				description: `${validate.error.errors[0].message}`,
-			});
+
 			return { result: "error", error: `${validate.error.errors[0].message}` };
 		}
 
-		if (filter.operation === "InList" || filter.operation === "Not_InList") {
-			const list = getLabelValueList(
-				validate.data.data as string[],
-				initialEmployees,
-				validate.data.property,
-			);
-			console.log("🚀 ~ addFilter ~ list:", list);
+		// initiate  validated filter object
+		const constructedFilter: EmployeeFilter = {
+			data: validate.data.data,
+			operation: validate.data.operation,
+			property: validate.data.property,
+		};
+		// organize filter data according to operation or property values
+
+		const readableFilter = getReadableFilterValues(
+			validate.data,
+			initialEmployees,
+		);
+
+		const noMatchExist =
+			Filters.length > 0 &&
+			Filters.find(f => checkFilterMatch(Object.values(f)[0], readableFilter));
+
+		if (noMatchExist) {
+			return { result: "error", error: "Filter Exist" };
 		}
 
-		// const result = enumToLabelKeyValues(list);
-		// console.log("🚀 ~ addFilter ~ filter:", filter);
-		// const data = constructOperation(filter);
-		// console.log("🚀 ~ addFilter ~ data:", JSON.stringify(data, null, 2));
-		// console.log("🚀 ~ addFilter ~ property:", filter.property);
-		// if (!data) return;
-		// setFilters(prev => [...prev, filter]);
-		// const employees = await GetAllEmployees();
-		// const result = employees.filter(x =>
-		// 	Operation(
-		// 		x[filter.property.value as unknown as keyof Employee] as BasicValues,
-		// 		{
-		// 			valueB: data.valueB,
-		// 			valueC: data.valueC,
-		// 			operation: data.operation,
-		// 		},
-		// 	),
-		// );
-		// console.log("🚀 ~ addFilter ~ result:", result);
+		// set string fot searchParams and fot filter list
+		// if data is object or date  => format for filter list as key and
+		// not format fot searchParams string
+
+		const basicString = `${constructedFilter.property}_${constructedFilter.operation}_`;
+
+		updateParams([
+			{
+				filter: `${basicString}${dataToStringWithCustomSeparator(constructedFilter.data)}`,
+			},
+		]);
+
+		setFilters(prev => [
+			...prev,
+			{
+				[`${basicString}${dataToStringWithCustomSeparator(readableFilter.data)}`]:
+					constructedFilter,
+			},
+		]);
+
 		return { result: "success" };
+	};
+
+	const deleteFilter = (item: string) => {
+		//filter list
+
+		const filteredList = Filters.filter(f =>
+			Object.keys(f).find(key => key !== item),
+		);
+		console.log("🚀 ~ deleteFilter ~ filteredList:", filteredList);
+		// if list is empty remove filter key in searchParams
+		if (filteredList.length === 0) {
+			deleteParams(["filter"]);
+		} else {
+			//create filter values in searchParams
+			const filterString: string[] = [];
+			filteredList.forEach(fl => {
+				Object.values(fl).map(v => {
+					const dataAsString = dataToStringWithCustomSeparator(v.data);
+					filterString.push(`${v.property}_${v.operation}_${dataAsString}`);
+				});
+			});
+			// set Filter values in searchParams
+			setParams([
+				{
+					filter: filterString.toString(),
+				},
+			]);
+		}
+
+		//set new Filter
+		setFilters(filteredList);
 	};
 	return (
 		<div className='grid grid-rows-[auto_1fr] gap-8'>
-			<div className=' mx-auto  flex  w-full max-w-md flex-row-reverse items-end justify-center gap-2'>
+			<div className=' mx-auto  flex w-full  max-w-xl flex-row-reverse flex-wrap items-end justify-center gap-2'>
 				<ul className='flex flex-wrap gap-2 self-start'>
-					{Filters?.map((item, index) => (
-						<li
-							key={index}
-							className='flex flex-1 items-center justify-between whitespace-nowrap rounded-md bg-muted p-1'
-						>
-							{/* <p className='flex-1 flex-wrap px-1 text-sm text-primary'>{`${item.property?.label}_${item.operation?.label}_${JSON.stringify(item.data)}`}</p> */}
-
-							<Button
-								variant={"ghost"}
-								size={"icon"}
-								// onClick={() =>
-								// 	setFilters(prev =>
-								// 		prev.filter(
-								// 			x =>
-								// 				x.operation.label !== item.operation.label &&
-								// 				x.property.label !== item.property.label,
-								// 		),
-								// 	)
-								// }
-							>
-								<span className='text-sm text-destructive'>X</span>
-							</Button>
-						</li>
-					))}
+					{Filters?.map((item, index) => {
+						const value = Object.keys(item)[0];
+						return (
+							<li key={index} className=''>
+								<Button
+									variant={"ghost"}
+									onClick={() => deleteFilter(value)}
+									className='flex flex-1 items-center justify-between gap-x-2 whitespace-nowrap rounded-md bg-muted p-1 px-3'
+								>
+									<p className=' flex-1 flex-wrap  text-sm text-primary'>
+										{value}
+									</p>
+									<span className='text-base text-destructive'>X</span>
+								</Button>
+							</li>
+						);
+					})}
 				</ul>
 				<FilterPopUp
 					addFilter={addFilter}
