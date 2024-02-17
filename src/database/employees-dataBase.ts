@@ -17,12 +17,12 @@ const dataFilePath = path.join(process.cwd(), "src", "data", "employees.json");
 // const dataFilePath = path.resolve("..", "/data", "employees.json");
 // console.log("🚀 ~ dataFilePath:", dataFilePath);
 
-const Employees = (async function Employees() {
+const Employees = async function Employees() {
 	return JSON.parse(await fs.readFile(dataFilePath, "utf8"));
-})() as unknown as Promise<Employee[]>;
+};
 
 export async function getAll(): Promise<Employee[]> {
-	return (await Employees).map(e => ({
+	return ((await Employees()) as Employee[]).map(e => ({
 		...e,
 		hiringDate: new Date(e.hiringDate),
 	}));
@@ -96,20 +96,24 @@ export async function _delete(code: number): Promise<Employee> {
 	return employee;
 }
 export async function deleteMany(codeList: number[]): Promise<Employee[]> {
-	let employees = await getAll();
-	const deletedEmployees: Employee[] = [];
-	employees = employees.filter(x =>
-		codeList.every(l => {
-			if (l !== x.code) {
-				return true;
-			}
-			deletedEmployees.push(x);
-			return false;
-		}),
-	);
-	// await saveData(employees);
+	try {
+		let employees = await getAll();
+		const deletedEmployees: Employee[] = [];
+		employees = employees.filter(x =>
+			codeList.every(l => {
+				if (l !== x.code) {
+					return true;
+				}
+				deletedEmployees.push(x);
+				return false;
+			}),
+		);
+		await saveData(employees);
 
-	return deletedEmployees;
+		return deletedEmployees;
+	} catch (error) {
+		return [];
+	}
 }
 
 async function saveData(employees: Employee[]) {

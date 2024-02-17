@@ -1,4 +1,8 @@
-import { BasicValues, FilterOption, FilterValueSelect } from "@/types";
+import { BasicValues, FilterValueSelect } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
+import { useMemo, useState } from "react";
+import { FilterComparison } from "../../comparisonSelections/selections/comparisonSelections/comparisonSchema";
+import { setComparisonComponentType } from "../../constants";
 import BetweenInput from "./BetweenInput";
 import DateInput from "./DateInput/DateInput";
 import DatePickerWithRange from "./DateInput/DatePickerWithRange";
@@ -6,51 +10,41 @@ import DefaultInput from "./DefaultInput";
 import MultiSelectInput from "./MultiSelectInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-	setValues: (values: BasicValues) => void;
-	values: BasicValues | undefined;
-	componentToShow: FilterValueSelect | undefined;
-	options: FilterOption[];
+	onDataSet: (value: BasicValues) => Promise<void>;
+	property: keyof Employee;
+	comparison: FilterComparison;
 };
 
-function FilterInput({
-	options,
-	componentToShow,
-	setValues,
-	values,
-	...rest
-}: Props) {
-	// console.log("🚀 ~ componentToShow:", componentToShow);
+function FilterInput({ onDataSet, property, comparison, ...rest }: Props) {
+	const [componentToShow, setComponentToShow] = useState<
+		FilterValueSelect | undefined
+	>();
+
+	useMemo(() => {
+		const result = setComparisonComponentType(property, comparison);
+		setComponentToShow(result);
+	}, [comparison, property]);
+
 	return (
 		<div {...rest}>
 			{componentToShow === FilterValueSelect.enum.DATE && (
-				<DateInput
-					SelectedDate={values as Date | undefined}
-					onDateSelected={d => setValues(d)}
-				/>
+				<DateInput onDateSelected={d => onDataSet(d)} />
 			)}
 			{componentToShow === FilterValueSelect.enum.DATE_RANGE && (
 				<DatePickerWithRange
-					dateRange={values as Date[] | undefined}
-					onRangeDateSelected={d => setValues(d)}
+					onRangeDateInSecondStringSelected={d => onDataSet(d)}
 				/>
 			)}
 			{componentToShow === FilterValueSelect.enum.TEXT && (
-				<DefaultInput
-					inputValue={values as string | undefined}
-					onValueChange={i => setValues(i)}
-				/>
+				<DefaultInput onValueChange={i => onDataSet(i)} />
 			)}
 			{componentToShow === FilterValueSelect.enum.RANGE && (
-				<BetweenInput
-					inputValue={values as string[] | undefined}
-					onValueChange={i => setValues(i)}
-				/>
+				<BetweenInput onValueChange={i => onDataSet(i)} />
 			)}
 			{componentToShow === FilterValueSelect.enum.LIST && (
 				<MultiSelectInput
-					options={options}
-					onValuesChange={vs => setValues(vs)}
-					values={values as string[] | undefined}
+					onValuesChange={vs => onDataSet(vs)}
+					property={property}
 				/>
 			)}
 		</div>

@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { GetNewEmployee } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
+import { CommandShortcut } from "@/components/ui/command";
 import {
 	Popover,
 	PopoverContent,
@@ -18,9 +19,10 @@ import EmployeesCodesTable from "./employeesCodesTable";
 type Props = {
 	selectedValue: number | undefined;
 	onSelection: (selectedValue: number | undefined) => void;
+	disabled?: boolean;
 };
 
-function CodeComboBox({ selectedValue, onSelection }: Props) {
+function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 	const [open, setOpen] = React.useState(false);
 	const [selectedCode, setSelectedCode] = React.useState<number | undefined>(
 		selectedValue,
@@ -34,6 +36,7 @@ function CodeComboBox({ selectedValue, onSelection }: Props) {
 	};
 
 	useKeyPress(async () => {
+		if (disabled) return;
 		const newCode = await GetNewEmployee();
 		onInputChange(newCode);
 		setParams([{ employee: newCode + "" }]);
@@ -41,34 +44,38 @@ function CodeComboBox({ selectedValue, onSelection }: Props) {
 
 	return (
 		<div className='flex flex-shrink-0 flex-row-reverse items-center gap-x-2 bg-muted px-2'>
-			<CodeInput
-				type='text'
-				name='code'
-				id='code'
-				value={selectedCode}
-				onChange={e => {
-					onInputChange(+e.target.value);
-					setTimeout(() => {
-						if (e) {
-							deleteParams(["employee"]);
-						}
-					}, 1000);
-				}}
-			/>
-
-			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<TriggerButton />
-				</PopoverTrigger>
-				<PopoverContent className='h-72 overflow-y-scroll p-0'>
-					<EmployeesCodesTable
-						onRowSelect={code => {
-							onInputChange(code);
-							setOpen(false);
-						}}
-					/>
-				</PopoverContent>
-			</Popover>
+			<div className='flex flex-1 items-center gap-x-2 bg-muted px-2'>
+				<CodeInput
+					type='text'
+					name='code'
+					id='code'
+					value={selectedCode}
+					onChange={e => {
+						onInputChange(+e.target.value);
+						setTimeout(() => {
+							if (e) {
+								deleteParams(["employee"]);
+							}
+						}, 1000);
+					}}
+				/>
+				{!disabled && <CommandShortcut>⌘F8</CommandShortcut>}
+			</div>
+			{!disabled && (
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<TriggerButton />
+					</PopoverTrigger>
+					<PopoverContent className='h-72 overflow-y-scroll p-0'>
+						<EmployeesCodesTable
+							onRowSelect={code => {
+								onInputChange(code);
+								setOpen(false);
+							}}
+						/>
+					</PopoverContent>
+				</Popover>
+			)}
 		</div>
 	);
 }

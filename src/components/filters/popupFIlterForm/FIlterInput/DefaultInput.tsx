@@ -3,11 +3,10 @@ import { useState } from "react";
 
 type Props = {
 	onValueChange: (value: string) => void;
-	inputValue: string | undefined;
 };
 
-function DefaultInput({ onValueChange, inputValue }: Props) {
-	const [value, setValue] = useState<string | number | undefined>(inputValue);
+function DefaultInput({ onValueChange }: Props) {
+	const [value, setValue] = useState<string>("");
 	const onInputChange = (value: string) => {
 		setValue(value);
 		if (value.length > 0) {
@@ -17,6 +16,7 @@ function DefaultInput({ onValueChange, inputValue }: Props) {
 	return (
 		<>
 			<Input
+				name='data'
 				className='bg-muted'
 				value={value}
 				onChange={e => onInputChange(e.target.value)}

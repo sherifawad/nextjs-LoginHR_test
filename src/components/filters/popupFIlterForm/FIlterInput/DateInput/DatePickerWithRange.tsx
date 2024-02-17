@@ -1,6 +1,6 @@
 "use client";
 
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
@@ -15,28 +15,23 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-	onRangeDateSelected: (range: Date[]) => void;
-	dateRange: Date[] | undefined;
+	onRangeDateInSecondStringSelected: (range: string[]) => void;
 };
 
 export default function DatePickerWithRange({
-	onRangeDateSelected,
-	dateRange,
+	onRangeDateInSecondStringSelected,
 	className,
 }: Props) {
-	const [date, setDate] = React.useState<DateRange | undefined>(
-		dateRange
-			? {
-					from: dateRange[0],
-					to: dateRange[1],
-				}
-			: undefined,
-	);
+	const [date, setDate] = React.useState<DateRange | undefined>(undefined);
 
 	const onSelection = (range: DateRange | undefined) => {
 		setDate(range);
 		if (range && range.from && range.to)
-			onRangeDateSelected([addDays(range.from, 1), addDays(range.to, 1)]);
+			// onRangeDateSelected([addDays(range.from, 1), addDays(range.to, 1)]);
+			onRangeDateInSecondStringSelected([
+				range.from.getTime().toString(),
+				range.to.getTime().toString(),
+			]);
 	};
 
 	return (
@@ -47,7 +42,7 @@ export default function DatePickerWithRange({
 						id='date'
 						variant={"outline"}
 						className={cn(
-							"w-[300px] justify-start text-left font-normal",
+							"w-full justify-start text-left font-normal",
 							!date && "text-muted-foreground",
 						)}
 					>
@@ -55,10 +50,10 @@ export default function DatePickerWithRange({
 						{date?.from ? (
 							date.to ? (
 								<>
-									{format(date.from, "PPP")} - {format(date.to, "PPP")}
+									{format(date.from, "PP")} - {format(date.to, "PP")}
 								</>
 							) : (
-								format(date.from, "PPP")
+								format(date.from, "PP")
 							)
 						) : (
 							<span>Pick a date</span>
@@ -78,7 +73,6 @@ export default function DatePickerWithRange({
 						defaultMonth={date?.from}
 						selected={date}
 						onSelect={r => onSelection(r)}
-						numberOfMonths={2}
 					/>
 				</PopoverContent>
 			</Popover>

@@ -52,7 +52,7 @@ function ComboBox({ selectedValue, onSelection }: Props) {
 					<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className=' p-0'>
+			<PopoverContent className='w-auto p-0'>
 				<Command>
 					<CommandInput placeholder='Search option...' />
 					<CommandEmpty>No option found.</CommandEmpty>
@@ -67,15 +67,6 @@ function ComboBox({ selectedValue, onSelection }: Props) {
 									setOpen(false);
 								}}
 							>
-								{/* TODO: Add check box */}
-								{/* <Check
-									className={cn(
-										"mr-2 h-4 w-4",
-										selectedValue === option.value
-											? "opacity-100"
-											: "opacity-0",
-									)}
-								/> */}
 								{j.positionName}
 							</CommandItem>
 						))}

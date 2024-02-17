@@ -4,11 +4,10 @@ import { useState } from "react";
 
 type Props = {
 	onValueChange: (value: string[]) => void;
-	inputValue: string[] | undefined;
 };
 
-function BetweenInput({ onValueChange, inputValue }: Props) {
-	const [value, setValue] = useState<string[] | undefined>(inputValue);
+function BetweenInput({ onValueChange }: Props) {
+	const [value, setValue] = useState<string[] | undefined>(undefined);
 	const onInputChange = (data: { index: number; value: string }) => {
 		const result = [...(value ?? ["", ""])].map((v, i) => {
 			if (i === data.index) {

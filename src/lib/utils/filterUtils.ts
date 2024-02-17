@@ -46,7 +46,7 @@ export const dataToStringWithCustomSeparator = (
 	return data.toString();
 };
 
-export const searchParamsToFilter = (
+export const stringValuesToFilter = (
 	searchParams: string,
 ): EmployeeFilter[] => {
 	const result: EmployeeFilter[] = [];
@@ -59,11 +59,18 @@ export const searchParamsToFilter = (
 		const validate = EmployeeFilter.safeParse({
 			property,
 			operation,
-			data: dataList.length === 1 ? dataList[0] : dataList,
+			// check if is a list of a single number
+			data: dataList
+				? dataList.length === 1 && !isNaN(Number(dataList[0]))
+					? dataList[0]
+					: dataList
+				: dataList,
 		});
 
 		if (validate.success) {
 			result.push(validate.data);
+		} else {
+			console.log("🚀 ~ validate:", validate.error);
 		}
 	});
 	return result;
@@ -90,19 +97,13 @@ export const getReadableFilterValues = (
 				...filter,
 				data: (filter.data as string[]).map(l => {
 					// isNumber
-					if (!isNaN(Number(l))) {
-						return new Intl.DateTimeFormat("en-GB").format(new Date(+l));
-					} else {
-						return new Intl.DateTimeFormat("en-GB").format(new Date(l));
-					}
+					return new Intl.DateTimeFormat("en-GB").format(new Date(+l));
 				}),
 			};
 		} else {
 			filter = {
 				...filter,
-				data: new Intl.DateTimeFormat("en-GB").format(
-					new Date(filter.data as Date),
-				),
+				data: new Intl.DateTimeFormat("en-GB").format(new Date(+filter.data)),
 			};
 		}
 	}

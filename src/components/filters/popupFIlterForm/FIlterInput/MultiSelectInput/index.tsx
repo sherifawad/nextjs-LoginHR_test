@@ -1,3 +1,4 @@
+import { getSelectedOptions } from "@/app/_actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,32 +10,37 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { FilterOption } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MultiSelectContent from "./MultiSelectContent";
 
 type Props = {
-	options: FilterOption[];
-	values: string[] | undefined;
+	property: keyof Employee;
 	onValuesChange: (values: string[]) => void;
 };
 
-function MultiSelectInput({ options, values, onValuesChange }: Props) {
+function MultiSelectInput({ onValuesChange, property }: Props) {
+	const [options, setOptions] = useState<FilterOption[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedValues, setSelectedValues] = useState<
-		FilterOption[] | undefined
-	>(
-		options.filter(o =>
-			values?.some(v => v === o.value.toString().toLocaleLowerCase()),
-		),
-	);
+
+	const [selectedValues, setSelectedValues] = useState<FilterOption[]>([]);
+
+	useEffect(() => {
+		const result = async () => {
+			const result = await getSelectedOptions(property);
+			setOptions(result);
+		};
+
+		result();
+	}, [property]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' size='sm' className='h-8 border-dashed'>
+				<Button variant='outline' className='h-8 border-dashed'>
 					<Plus className='mr-2 h-4 w-4' />
-					title
+
 					{selectedValues && selectedValues.length > 0 && (
 						<>
 							<Separator orientation='vertical' className='mx-2 h-4' />

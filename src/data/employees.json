@@ -20,46 +20,6 @@
 		}
 	},
 	{
-		"name": "Gwennie Templeton",
-		"code": 3,
-		"salaryStatus": "VALID",
-		"hiringDate": "2023-05-19T21:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Ajay Cristofaro",
-		"code": 4,
-		"salaryStatus": "VALID",
-		"hiringDate": "2022-05-30T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Waylen Downse",
-		"code": 5,
-		"salaryStatus": "VALID",
-		"hiringDate": "2021-10-08T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Ginger Forlonge",
-		"code": 6,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2021-08-04T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
 		"name": "Jacobo Parmiter",
 		"code": 7,
 		"salaryStatus": "VALID",

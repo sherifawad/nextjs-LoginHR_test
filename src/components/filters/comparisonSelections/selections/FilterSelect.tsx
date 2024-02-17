@@ -43,7 +43,7 @@ function FilterSelect({
 				<SelectValue placeholder='Select ' />
 			</SelectTrigger>
 			<SelectContent position='popper'>
-				<ScrollArea className='max-h-60'>
+				<ScrollArea className='max-h-60 w-full'>
 					{options.map(i => (
 						<SelectItem key={i.value + ""} value={i.value + ""}>
 							{i.label}

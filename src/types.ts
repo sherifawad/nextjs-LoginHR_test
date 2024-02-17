@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FilterComparison } from "./components/filters/comparisonSelections/comparisonSchema";
+import { FilterComparison } from "./components/filters/comparisonSelections/selections/comparisonSelections/comparisonSchema";
 import { Employee } from "./validation/employeeSchema";
 
 export type employeeFilter = {
@@ -24,8 +24,6 @@ export type dateInput = {
 };
 
 export const BasicValues = z.union([
-	z.date().array().min(2).max(2),
-	z.date(),
 	z.string().array().min(1),
 	z.string().min(1),
 ]);
@@ -37,14 +35,9 @@ export const FilterOption = z.object({
 	label: z.string().min(1),
 	value: OptionValue,
 });
-export const EmployeePropertyOption = z.object({
-	label: z.custom<keyof Employee>(),
-	value: z.custom<keyof Employee>(),
-});
 
 // export type SelectionType = { label: string; value: string | number | Date };
 export type FilterOption = z.infer<typeof FilterOption>;
-export type EmployeePropertyOption = z.infer<typeof EmployeePropertyOption>;
 
 export const Filter = z.object({
 	property: FilterOption,
@@ -52,14 +45,6 @@ export const Filter = z.object({
 	data: BasicValues,
 });
 export type Filter = z.infer<typeof Filter>;
-
-export const EmployeeFilterComparisonOption = z.object({
-	label: FilterComparison,
-	value: FilterComparison,
-});
-export type EmployeeFilterComparisonOption = z.infer<
-	typeof EmployeeFilterComparisonOption
->;
 
 //To Show FilterValue Component
 export const FilterValueSelect = z.enum([

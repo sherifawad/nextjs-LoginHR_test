@@ -7,7 +7,7 @@ import {
 } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { z } from "zod";
-import { FilterComparison } from "./comparisonSelections/comparisonSchema";
+import { FilterComparison } from "./comparisonSelections/selections/comparisonSelections/comparisonSchema";
 
 export const NumberOps = {
 	//for operator
@@ -41,95 +41,77 @@ export const StringOps = {
 		a.map(x => x.toLowerCase()).includes(b.toLowerCase()), //contain
 } as const;
 
-export const Operation = (
-	valueA: BasicValues,
+const Operation = (
+	valueA: string | number | Date | object,
 	{ valueB, operation, valueC }: EmployeeFilterOperation,
 ) => {
-	let firstValue: BasicValues;
+	let firstValue: string;
 	let secondValue: BasicValues;
-	let thirdValue: string | Date | undefined;
+	let thirdValue: string | undefined;
 
-	secondValue = String(valueB).toLocaleLowerCase();
+	if (valueC) thirdValue = valueC as string;
 
 	if (isArray(valueB)) {
 		secondValue = Array.from(valueB as any[]).map(v =>
 			String(v).toLocaleLowerCase(),
 		);
+	} else {
+		secondValue = valueB.toString().toLocaleLowerCase();
 	}
-	if (valueC) thirdValue = String(valueC).toLocaleLowerCase();
 
-	// Set Input Types
+	// Get First Input Type
 
 	if (Object.prototype.toString.call(valueA) === "[object Date]") {
-		firstValue = new Date(valueA as string).getTime().toString();
-		secondValue = new Date(valueB as string).getTime().toString();
-		if (valueC) thirdValue = new Date(valueC as string).getTime().toString();
+		firstValue = new Date(valueA as Date).getTime().toString();
 	} else if (typeof valueA === "object") {
 		firstValue = Object.entries(valueA).map(([_, value]) =>
 			value.toString().toLocaleLowerCase(),
 		)[1];
 	} else {
-		firstValue = String(valueA).toLocaleLowerCase();
+		firstValue = valueA.toString().toLocaleLowerCase();
 	}
 	// Return Comparison Expression
 	switch (operation) {
 		case FilterComparison.Enum.Equal:
 			return firstValue === secondValue;
+
 		case FilterComparison.Enum["Not-Equal"]:
 			return firstValue !== secondValue;
+
 		case FilterComparison.Enum.GreaterThan:
-			if (firstValue && secondValue) {
-				return firstValue > secondValue;
-			}
-			break;
+			return +firstValue > +secondValue;
+
 		case FilterComparison.Enum["GreaterThan-Or-Equal"]:
-			if (firstValue && secondValue) {
-				return firstValue >= secondValue;
-			}
-			break;
+			return +firstValue >= +secondValue;
+
 		case FilterComparison.Enum.LessThan:
-			if (firstValue && secondValue) {
-				return firstValue < secondValue;
-			}
-			break;
+			return +firstValue < +secondValue;
+
 		case FilterComparison.Enum["LessThan-Or-Equal"]:
-			if (firstValue && secondValue) {
-				return firstValue <= secondValue;
-			}
-			break;
+			return +firstValue <= +secondValue;
+
 		case FilterComparison.Enum.InList:
-			if (firstValue && secondValue && isArray(secondValue)) {
-				// return (secondValue as string[]).filter(e => e !== firstValue);
-				return (secondValue as string[]).some(
-					y => y === (firstValue as string),
-				);
-			}
-			break;
+			return (secondValue as string[]).some(y => y === (firstValue as string));
+
 		case FilterComparison.Enum["Not-InList"]:
-			if (firstValue && secondValue && isArray(secondValue)) {
-				return (secondValue as string[]).every(
-					y => y !== (firstValue as string),
-				);
-			}
-			break;
+			return (secondValue as string[]).every(y => y !== (firstValue as string));
 
 		case FilterComparison.Enum.Include:
-			if (firstValue && secondValue) {
-				return firstValue.toString().includes(secondValue.toString());
-			}
-			break;
+			// console.log("🚀 ~ firstValue:", firstValue);
+
+			return firstValue.toString().includes(secondValue.toString());
+
 		case FilterComparison.Enum["Not-Include"]:
-			if (firstValue && secondValue) {
-				return !firstValue.toString().includes(secondValue.toString());
-			}
-			break;
+			return !firstValue.toString().includes(secondValue.toString());
+
 		case FilterComparison.Enum.Between:
-			if (firstValue && secondValue && thirdValue) {
-				return +firstValue >= +secondValue && +firstValue <= +thirdValue;
+			if (thirdValue) {
+				const dd = +firstValue >= +secondValue && +firstValue <= +thirdValue;
+				return dd;
 			}
 			break;
 		case FilterComparison.Enum["Not-Between"]:
-			if (firstValue && secondValue && thirdValue) {
+			if (thirdValue) {
 				return +firstValue < +secondValue || +firstValue > +thirdValue;
 			}
 			break;
@@ -139,12 +121,6 @@ export const Operation = (
 	}
 };
 
-export const PropertiesLabels: FilterOption[] = Object.keys(Employee.shape).map(
-	e => ({
-		label: e,
-		value: e,
-	}),
-);
 export const getType = (value: keyof z.infer<typeof Employee>) => {
 	return Object.values(Employee.shape[value]._def.typeName)
 		.toSpliced(0, 3)
@@ -152,7 +128,7 @@ export const getType = (value: keyof z.infer<typeof Employee>) => {
 		.toLocaleLowerCase();
 };
 export const setComparisonComponentType = (
-	property: keyof z.infer<typeof Employee>,
+	property: keyof Employee,
 	operation: FilterComparison,
 ): FilterValueSelect => {
 	const _type = getType(property);
@@ -197,7 +173,7 @@ export const setComparisonComponentType = (
 };
 
 // create operation
-export const constructOperation = (
+const constructOperation = (
 	filter: EmployeeFilter,
 ): EmployeeFilterOperation => {
 	let result: EmployeeFilterOperation;
@@ -240,4 +216,23 @@ export const constructOperation = (
 	}
 
 	return result;
+};
+
+export const getFilteredResult = ({
+	employees,
+	filters,
+}: {
+	employees: Employee[];
+	filters: EmployeeFilter[];
+}): Employee[] => {
+	return employees.filter(x => {
+		return filters.every(f => {
+			const data = constructOperation(f);
+			return Operation(x[f.property] as string | number | Date | object, {
+				valueB: data.valueB,
+				valueC: data.valueC,
+				operation: data.operation,
+			});
+		});
+	});
 };

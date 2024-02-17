@@ -1,81 +1,112 @@
 "use server";
 
-import { Operation, constructOperation } from "@/components/filters/constants";
+import { getFilteredResult } from "@/components/filters/constants";
 import { deleteMany } from "@/database/employees-dataBase";
 import {
-	checkFilterMatch,
 	dataToStringWithCustomSeparator,
 	getReadableFilterValues,
+	stringValuesToFilter,
 } from "@/lib/utils/filterUtils";
-import { BasicValues } from "@/types";
+import { FilterOption } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { GetAllEmployees } from "../profile/_actions";
 
+export type CreatedFilter =
+	| {
+			status: "success";
+			createdFilterValueString: string;
+			updatedFilterList: FilterOption[];
+			employees: Employee[];
+	  }
+	| {
+			status: "error";
+			message: string;
+	  };
+
 export const addNewFilter = async ({
 	filters,
 	newFilter,
 }: {
-	filters: { [key: string]: EmployeeFilter }[];
+	filters: FilterOption[];
 	newFilter: EmployeeFilter;
-}): Promise<{ [key: string]: EmployeeFilter } | undefined> => {
-	const employees = await GetAllEmployees();
-	// validate input filter
-	const validate = EmployeeFilter.safeParse(newFilter);
-	if (!validate.success) {
-		return undefined;
+}): Promise<CreatedFilter> => {
+	try {
+		const employees = await GetAllEmployees();
+		// validate input filter
+		const validate = EmployeeFilter.safeParse(newFilter);
+		if (!validate.success) {
+			return {
+				status: "error",
+				message: validate.error.errors[0].message,
+			};
+		}
+		// initiate  validated filter object
+		const constructedFilter: EmployeeFilter = {
+			data: validate.data.data,
+			operation: validate.data.operation,
+			property: validate.data.property,
+		};
+
+		// organize filter data according to operation or property values
+
+		const basicString = `${constructedFilter.property}_${constructedFilter.operation}_`;
+		const readableFilter = getReadableFilterValues(validate.data, employees);
+		const createdFilterLabelString = `${basicString}${readableFilter.data}`;
+		const createdFilterValueString = `${basicString}${dataToStringWithCustomSeparator(constructedFilter.data)}`;
+
+		const matchExist =
+			filters.length > 0 &&
+			filters.find(f => f.label === createdFilterLabelString);
+		if (matchExist) {
+			return {
+				status: "error",
+				message: "Filter Duplicate",
+			};
+		}
+
+		const updatedFilterList = [
+			...filters,
+			{
+				label: createdFilterLabelString,
+				value: createdFilterValueString,
+			},
+		];
+		// console.log("🚀 ~ updatedFilterList:", updatedFilterList);
+		const filteredEmployees = await getFilteredEmployees(
+			updatedFilterList.map(f => f.value),
+		);
+
+		return {
+			status: "success",
+			createdFilterValueString,
+			updatedFilterList: updatedFilterList,
+			employees: filteredEmployees,
+		};
+	} catch (error) {
+		// console.log("🚀 ~ error:", error);
+		let message = error;
+		if (error instanceof Error) {
+			message = error.message;
+		}
+		return { status: "error", message: `${message}` };
 	}
-	// initiate  validated filter object
-	const constructedFilter: EmployeeFilter = {
-		data: validate.data.data,
-		operation: validate.data.operation,
-		property: validate.data.property,
-	};
-
-	// organize filter data according to operation or property values
-
-	const readableFilter = getReadableFilterValues(validate.data, employees);
-
-	const noMatchExist =
-		filters.length > 0 &&
-		filters.find(f => checkFilterMatch(Object.values(f)[0], readableFilter));
-	if (noMatchExist) {
-		return undefined;
-	}
-	// set string fot searchParams and fot filter list
-	// if data is object or date  => format for filter list as key and
-	// not format fot searchParams string
-
-	const basicString = `${constructedFilter.property}_${constructedFilter.operation}_`;
-
-	return {
-		[`${basicString}${dataToStringWithCustomSeparator(readableFilter.data)}`]:
-			constructedFilter,
-	};
 };
 
-export const deleteExistingFilter = async ({}) => {};
-
 export const getFilteredEmployees = async (
-	filters: { [key: string]: EmployeeFilter }[],
+	filterValues: string[],
 ): Promise<Employee[]> => {
 	const employees = await GetAllEmployees();
-	if (filters.length === 0) {
+	if (filterValues.length === 0) {
 		return employees;
 	}
-	const filterValues: EmployeeFilter[] = filters.map(f => Object.values(f)[0]);
-
-	return employees.filter(x => {
-		return filterValues.some(f => {
-			const data = constructOperation(f);
-			return Operation(x[f.property] as BasicValues, {
-				valueB: data.valueB,
-				valueC: data.valueC,
-				operation: data.operation,
-			});
-		});
+	const filters = stringValuesToFilter(filterValues.toString());
+	const result = getFilteredResult({
+		employees,
+		filters,
 	});
+	return result;
 };
 
 export const DeleteManyEmployees = async (
@@ -86,6 +117,11 @@ export const DeleteManyEmployees = async (
 	if (!validated.success) {
 		return [];
 	}
-	revalidatePath("/employees");
-	return deleteMany(validated.data);
+	const deleted = await deleteMany(validated.data);
+	if (deleted.length > 0) {
+		revalidatePath("/profile");
+		revalidatePath("/search");
+		revalidatePath("/employees");
+	}
+	return deleted;
 };

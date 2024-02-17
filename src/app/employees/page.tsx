@@ -1,13 +1,14 @@
-import FilterList from "@/components/filters/filterList";
+import TableSkeleton from "@/app/employees/(content)/table/tableSkeletotn";
 import {
 	dataToStringWithCustomSeparator,
 	getReadableFilterValues,
-	searchParamsToFilter,
 } from "@/lib/utils/filterUtils";
-import { EmployeeFilter } from "@/validation/employeeSchema";
+import { FilterOption } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { Suspense } from "react";
 import { GetAllEmployees } from "../profile/_actions";
 import { BasicSearchParamsSchema } from "../searchUrlSchema";
+import FilteredEmployees from "./(content)";
 import { getFilteredEmployees } from "./_actions";
 
 type Props = {
@@ -18,24 +19,35 @@ async function EmployeesPage({ searchParams }: Props) {
 	const initialEmployees = await GetAllEmployees();
 	let filteredEmployees = initialEmployees;
 	// set empty filters
-	let initialFilters: { [key: string]: EmployeeFilter }[] = [];
+	let initialFilters: FilterOption[] = [];
+	let employeeToEdit: Employee | undefined = undefined;
 	//validate search params
 	const validateSearchParams = BasicSearchParamsSchema.safeParse(searchParams);
 	if (validateSearchParams.success) {
 		// check if there are filter in searchParams
+
 		if (validateSearchParams.data.filter) {
-			// validate and convert filter string  and assign it to initial filter list
-			const filterValues = searchParamsToFilter(
-				validateSearchParams.data.filter,
-			);
-			initialFilters = filterValues.map(fv => {
-				const readable = getReadableFilterValues(fv, initialEmployees);
+			initialFilters = validateSearchParams.data.filter.map(fv => {
+				const readableFilter = getReadableFilterValues(fv, initialEmployees);
+				const basicString = `${fv.property}_${fv.operation}_`;
+				const createdFilterValueString = `${basicString}${dataToStringWithCustomSeparator(fv.data)}`;
+				const createdFilterLabelString = `${basicString}${readableFilter.data}`;
 				return {
-					[`${readable.property}_${readable.operation}_${dataToStringWithCustomSeparator(readable.data)}`]:
-						fv,
+					label: createdFilterLabelString,
+					value: createdFilterValueString,
 				};
 			});
-			filteredEmployees = await getFilteredEmployees(initialFilters);
+			filteredEmployees = await getFilteredEmployees(
+				initialFilters.map(f => f.value),
+			);
+		}
+		if (filteredEmployees.length > 0 && validateSearchParams.data.employee) {
+			const employee = filteredEmployees.find(
+				f => f.code === validateSearchParams.data.employee,
+			);
+			if (employee) {
+				employeeToEdit = employee;
+			}
 		}
 	}
 
@@ -45,10 +57,11 @@ async function EmployeesPage({ searchParams }: Props) {
 				Employees List
 			</h1>
 			<section>
-				<Suspense fallback={<>Loading ....</>}>
-					<FilterList
+				<Suspense fallback={<TableSkeleton />}>
+					<FilteredEmployees
 						initialEmployees={filteredEmployees}
 						initialFilters={initialFilters}
+						employeeToEdit={employeeToEdit}
 					/>
 				</Suspense>
 			</section>

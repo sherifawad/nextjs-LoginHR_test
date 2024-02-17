@@ -1,38 +1,14 @@
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { DataTableColumnFilterHeader } from "@/components/table/data-table-column-header-filter";
 import { Employee, EmployeePosition } from "@/validation/employeeSchema";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
-import { Checkbox } from "../ui/checkbox";
-import { DataTableColumnHeader } from "./data-table-column-header";
-import { DataTableColumnFilterHeader } from "./data-table-column-header-filter";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
 export const columns: ColumnDef<Employee>[] = [
-	{
-		id: "select",
-		header: ({ table }) => (
-			<Checkbox
-				checked={
-					table.getIsAllPageRowsSelected() ||
-					(table.getIsSomePageRowsSelected() && "indeterminate")
-				}
-				onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-				className='translate-y-[2px]'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={value => row.toggleSelected(!!value)}
-				aria-label='Select row'
-				className='translate-y-[2px]'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
 	{
 		accessorKey: "code",
 		header: ({ column }) => (
@@ -122,12 +98,8 @@ export const columns: ColumnDef<Employee>[] = [
 			return value.includes(row.getValue(id));
 		},
 	},
-	// {
-	// 	id: "actions",
-	// 	cell: ({ row }) => {
-	// 		const employee = row.original;
-
-	// 		return <EmployeeActions employee={employee} />;
-	// 	},
-	// },
+	{
+		id: "actions",
+		cell: ({ row }) => <DataTableRowActions row={row} />,
+	},
 ];

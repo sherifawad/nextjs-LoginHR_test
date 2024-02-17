@@ -31,12 +31,14 @@ export const isArrayString = (value: any): boolean => {
 export const isArrayDate = (value: any): boolean => {
 	if (!isIterable(value)) return false;
 	if (!isArray(value)) return false;
-	value.forEach(function (item: any) {
-		if (Object.prototype.toString.call(item) === "[object Date]") {
-			return false;
-		}
-	});
-	return true;
+	try {
+		return (value as string[]).every(
+			v => Object.prototype.toString.call(new Date(+v)) === "[object Date]",
+		);
+	} catch (error) {
+		console.log("🚀 ~ isArrayDate ~ error:", error);
+		return false;
+	}
 };
 
 export const getEnumName = (key: string, enumValue: any) => {

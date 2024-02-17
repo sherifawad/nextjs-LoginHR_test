@@ -8,16 +8,16 @@ import {
 	CommandList,
 	CommandSeparator,
 } from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { FilterOption } from "@/types";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { CheckIcon } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 
 type Props = {
 	options: FilterOption[];
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	setSelectedValues: Dispatch<SetStateAction<FilterOption[] | undefined>>;
+	setSelectedValues: Dispatch<SetStateAction<FilterOption[]>>;
 	selectedValues: FilterOption[] | undefined;
 	onValuesChange: (values: string[]) => void;
 };
@@ -29,15 +29,18 @@ function MultiSelectContent({
 	selectedValues,
 	onValuesChange,
 }: Props) {
-	const onValuesSelection = (values: FilterOption[]) => {
-		setSelectedValues(values);
-		if (values.length > 0) {
-			const selectedArray = values.map(v =>
-				v.value.toString().toLocaleLowerCase(),
-			);
-			onValuesChange(selectedArray);
-		}
-	};
+	const onValuesSelection = useCallback(
+		(values: FilterOption[]) => {
+			setSelectedValues(values);
+			if (values.length > 0) {
+				const selectedArray = values.map(v =>
+					v.value.toString().toLocaleLowerCase(),
+				);
+				onValuesChange(selectedArray);
+			}
+		},
+		[onValuesChange, setSelectedValues],
+	);
 	return (
 		<div className=''>
 			<Command>

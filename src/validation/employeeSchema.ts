@@ -1,7 +1,7 @@
 import { isArray, isArrayDate, isArrayString } from "@/lib/utils/array";
 import { BasicValues } from "@/types";
 import { z } from "zod";
-import { FilterComparison } from "../components/filters/comparisonSelections/comparisonSchema";
+import { FilterComparison } from "../components/filters/comparisonSelections/selections/comparisonSelections/comparisonSchema";
 
 export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
 
@@ -65,8 +65,11 @@ export const EmployeeFilter = z
 			}
 			if (data.property === "hiringDate") {
 				// console.log("2️⃣  1️⃣");
-
-				return Object.prototype.toString.call(data.data) === "[object Date]";
+				const result =
+					Object.prototype.toString.call(new Date(+data.data)) ===
+					"[object Date]";
+				// console.log("🚀 ~ result:", result);
+				return result;
 			}
 			if (data.property === "position" || data.property == "salaryStatus") {
 				// console.log("3️⃣  1️⃣");

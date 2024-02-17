@@ -19,7 +19,8 @@ function useSearchUrlParams() {
 				currentParams: searchParams,
 			});
 			const route = `${pathname}?${params}`;
-			setRoute(route);
+			setRoute(pathname);
+
 			router.push(route);
 		},
 		[pathname, router, searchParams],

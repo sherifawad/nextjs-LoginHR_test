@@ -1,5 +1,3 @@
-"use client";
-
 import { Employee } from "@/validation/employeeSchema";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";

@@ -1,9 +1,16 @@
-import { EmployeeFilterComparisonOption } from "@/types";
 import { Employee } from "@/validation/employeeSchema";
-import { getType } from "../constants";
+import { z } from "zod";
+import { getType } from "../../../constants";
 import { FilterComparison } from "./comparisonSchema";
 
-const FavoriteComparison: EmployeeFilterComparisonOption[] = [
+export const FilterComparisonOption = z.object({
+	label: FilterComparison,
+	value: FilterComparison,
+});
+
+export type FilterComparisonOption = z.infer<typeof FilterComparisonOption>;
+
+const FavoriteComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum.GreaterThan,
 		value: FilterComparison.Values.GreaterThan,
@@ -23,7 +30,7 @@ const FavoriteComparison: EmployeeFilterComparisonOption[] = [
 	},
 ];
 
-const BlankComparison: EmployeeFilterComparisonOption[] = [
+const BlankComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum.IsBlank,
 		value: FilterComparison.Values.IsBlank,
@@ -33,7 +40,7 @@ const BlankComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values["Is-Not-Blank"],
 	},
 ];
-const NullComparison: EmployeeFilterComparisonOption[] = [
+const NullComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum["Is-Null"],
 		value: FilterComparison.Values["Is-Null"],
@@ -43,7 +50,7 @@ const NullComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values["Is-Not-Null"],
 	},
 ];
-const BetweenComparison: EmployeeFilterComparisonOption[] = [
+const BetweenComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum.Between,
 		value: FilterComparison.Values.Between,
@@ -53,7 +60,7 @@ const BetweenComparison: EmployeeFilterComparisonOption[] = [
 		value: FilterComparison.Values["Not-Between"],
 	},
 ];
-const IncludeComparison: EmployeeFilterComparisonOption[] = [
+const IncludeComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum.Include,
 		value: FilterComparison.Values.Include,
@@ -64,14 +71,14 @@ const IncludeComparison: EmployeeFilterComparisonOption[] = [
 	},
 ];
 
-const EqualComparison: EmployeeFilterComparisonOption[] = [
+const EqualComparison: FilterComparisonOption[] = [
 	{ label: FilterComparison.enum.Equal, value: FilterComparison.Values.Equal },
 	{
 		label: FilterComparison.enum["Not-Equal"],
 		value: FilterComparison.Values["Not-Equal"],
 	},
 ];
-const ListComparison: EmployeeFilterComparisonOption[] = [
+const ListComparison: FilterComparisonOption[] = [
 	{
 		label: FilterComparison.enum.InList,
 		value: FilterComparison.Values.InList,
@@ -85,7 +92,7 @@ const ListComparison: EmployeeFilterComparisonOption[] = [
 export const getComparisonList = (property: keyof Employee) => {
 	const _type = getType(property);
 	// console.log("🚀 ~ getComparisonList ~ _type:", _type);
-	let comparisonsList: EmployeeFilterComparisonOption[] = [];
+	let comparisonsList: FilterComparisonOption[] = [];
 	if (_type === "number") {
 		comparisonsList = [
 			...EqualComparison,

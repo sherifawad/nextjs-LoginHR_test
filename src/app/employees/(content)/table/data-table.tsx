@@ -4,12 +4,8 @@ import {
 	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
-	VisibilityState,
 	flexRender,
 	getCoreRowModel,
-	getFacetedRowModel,
-	getFacetedUniqueValues,
-	getFilteredRowModel,
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
@@ -39,29 +35,18 @@ export function DataTable<TData, TValue>({
 		[],
 	);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	const [rowSelection, setRowSelection] = React.useState({});
-	const [columnVisibility, setColumnVisibility] =
-		React.useState<VisibilityState>({});
+
 	const table = useReactTable({
 		data,
 		columns,
 		getRowId: row => (row as Employee).code + "",
 		state: {
 			sorting,
-			columnFilters,
-			columnVisibility,
-			rowSelection,
 		},
 		enableRowSelection: true,
-		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
-		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
-		getFacetedRowModel: getFacetedRowModel(),
-		getFacetedUniqueValues: getFacetedUniqueValues(),
 	});
 
 	return (
