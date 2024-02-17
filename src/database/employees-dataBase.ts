@@ -47,7 +47,7 @@ export async function getNewCode(): Promise<number> {
 }
 
 export async function create(employee: Employee): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	const exist = await getByCode(employee.code);
 	if (exist) throw new Error("Code Duplicate");
 	// generate new employee id
@@ -63,7 +63,7 @@ export async function update(
 	code: number,
 	params: { [x in keyof Employee]: Employee[x] },
 ): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	let employee = await getByCode(code);
 	if (!employee || employee == null) throw new Error("Not Found");
 	if (params.code && code !== params.code) {
@@ -90,7 +90,7 @@ export async function update(
 
 // prefixed with underscore '_' because 'delete' is a reserved word in javascript
 export async function _delete(code: number): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	let employee = employees.find(x => x.code === code);
 	if (!employee || employee == null) throw new Error("Not Found");
 	employees = employees.filter(x => x.code !== code);
@@ -101,7 +101,7 @@ export async function _delete(code: number): Promise<Employee> {
 }
 export async function deleteMany(codeList: number[]): Promise<Employee[]> {
 	try {
-		let employees = await getAll();
+		let employees = [...(await getAll())];
 		const deletedEmployees: Employee[] = [];
 		employees = employees.filter(x =>
 			codeList.every(l => {
