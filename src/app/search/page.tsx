@@ -1,5 +1,7 @@
 import { EmployeeFilter } from "@/validation/employeeSchema";
+import { Suspense } from "react";
 import SearchContent from "./(content)";
+import FilterSkeleton from "./(content)/FilterSkeleton";
 
 type Props = {};
 
@@ -10,7 +12,9 @@ function SearchPage({}: Props) {
 			<h1 className='mx-auto whitespace-nowrap py-8 text-3xl font-bold text-primary'>
 				Search
 			</h1>
-			<SearchContent />
+			<Suspense fallback={<FilterSkeleton />}>
+				<SearchContent />
+			</Suspense>
 		</div>
 	);
 }

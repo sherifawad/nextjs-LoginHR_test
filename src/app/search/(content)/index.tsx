@@ -12,11 +12,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { checkFilterMatch } from "@/lib/utils/filterUtils";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { Minus, Plus } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { getFilteredEmployees } from "../_actions";
 import FilterForm from "./form";
 import { columns } from "./table/columns";
 import { DataTable } from "./table/data-table";
+import TableSkeleton from "./tableSkeletotn";
 
 type Props = {};
 
@@ -26,7 +27,6 @@ function SearchContent({}: Props) {
 	const [filters, setFilters] = useState<EmployeeFilter[]>([]);
 
 	const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
-	const dialogButtonRef = useRef<HTMLButtonElement>(null);
 	const [filtersComponent, setFiltersComponent] = useState<number[]>([1]);
 	const formRefs = useRef<HTMLFormElement[]>([]);
 	const [isFiltersSet, setIsFiltersSet] = useState(false);
@@ -135,13 +135,16 @@ function SearchContent({}: Props) {
 				<DialogHeader>
 					<DialogTitle>Filtered List</DialogTitle>
 				</DialogHeader>
-				<ScrollArea className='max-h-[60svh]'>
-					<DataTable
-						columns={columns}
-						data={filteredEmployees}
-						deleteSelected={deleteSelected}
-					/>
-				</ScrollArea>
+
+				<Suspense fallback={<TableSkeleton />}>
+					<ScrollArea className='max-h-[60svh]'>
+						<DataTable
+							columns={columns}
+							data={filteredEmployees}
+							deleteSelected={deleteSelected}
+						/>
+					</ScrollArea>
+				</Suspense>
 			</DialogContent>
 		</Dialog>
 	);

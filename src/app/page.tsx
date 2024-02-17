@@ -22,12 +22,15 @@ export default function Home() {
 							Simple Employees Accounts CRUD and Filter
 						</h1>
 					</div>
-					{/* <div className="relative" style="padding-top: 56.25%">
-      <iframe className="absolute inset-0 w-full h-full rounded-sm border border-white"
-        src="https://www.youtube.com/embed/Aul35gjdFWM" title="YouTube video player" frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen></iframe>
-    </div> */}
+					<div className='relative' style={{ paddingTop: "56.25%" }}>
+						<iframe
+							className='absolute inset-0 h-full w-full rounded-sm border border-white'
+							src='https://www.youtube.com/embed/JwVaK6_ZEWk'
+							title='YouTube video player'
+							allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+							allowFullScreen
+						></iframe>
+					</div>
 				</div>
 				<div className='lg:1/2 w-full items-center sm:px-8'>
 					<div className='hidden lg:block'>

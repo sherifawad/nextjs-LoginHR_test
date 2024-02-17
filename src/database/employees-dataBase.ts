@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Employee } from "@/validation/employeeSchema";
+// import { promises as fs } from "fs";
 
 // employees in JSON file for simplicity, store in a db for production applications
 let EmployeesData: Employee[] = (
@@ -15,16 +16,17 @@ let EmployeesData: Employee[] = (
 // // const dataFilePath = path.resolve("..", "/data", "employees.json");
 // // console.log("🚀 ~ dataFilePath:", dataFilePath);
 
-// const Employees = async function Employees() {
+// const EmployeesData = async function Employees() {
 // 	return JSON.parse(await fs.readFile(dataFilePath, "utf8"));
 // };
 
 export async function getAll(): Promise<Employee[]> {
-	// return ((await Employees()) as Employee[]).map(e => ({
+	// return ((await EmployeesData()) as Employee[]).map(e => ({
 	// 	...e,
 	// 	hiringDate: new Date(e.hiringDate),
 	// }));
-	return EmployeesData;
+	return [...EmployeesData];
+	// return EmployeesData
 }
 export async function getByCode(code: number): Promise<Employee | undefined> {
 	return (await getAll()).find(x => x.code === code);
@@ -53,9 +55,9 @@ export async function create(employee: Employee): Promise<Employee> {
 	// generate new employee id
 
 	// add and save employee
-	employees.push(employee);
-	// await saveData(employees);
-	EmployeesData = [...employees];
+	EmployeesData = [...employees, employee];
+	// await saveData([...employees, employee]);
+
 	return employee;
 }
 
@@ -83,7 +85,7 @@ export async function update(
 
 	// await saveData(result);
 
-	EmployeesData = [...employees];
+	EmployeesData = [...result];
 
 	return employee;
 }
@@ -93,17 +95,17 @@ export async function _delete(code: number): Promise<Employee> {
 	let employees = [...(await getAll())];
 	let employee = employees.find(x => x.code === code);
 	if (!employee || employee == null) throw new Error("Not Found");
-	employees = employees.filter(x => x.code !== code);
-	// await saveData(employees);
+	const result = employees.filter(x => x.code !== code);
+	// await saveData(result);
 
-	EmployeesData = [...employees];
+	EmployeesData = [...result];
 	return employee;
 }
 export async function deleteMany(codeList: number[]): Promise<Employee[]> {
 	try {
 		let employees = [...(await getAll())];
 		const deletedEmployees: Employee[] = [];
-		employees = employees.filter(x =>
+		const result = employees.filter(x =>
 			codeList.every(l => {
 				if (l !== x.code) {
 					return true;
@@ -112,9 +114,9 @@ export async function deleteMany(codeList: number[]): Promise<Employee[]> {
 				return false;
 			}),
 		);
-		// await saveData(employees);
+		// await saveData(result);
 
-		EmployeesData = [...employees];
+		EmployeesData = [...result];
 		return deletedEmployees;
 	} catch (error) {
 		return [];

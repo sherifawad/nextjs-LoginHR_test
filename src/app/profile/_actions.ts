@@ -18,39 +18,46 @@ export async function UpdateEmployee(
 	code: number,
 	params: { [x in keyof Employee]: Employee[x] },
 ) {
+	const updatedData = update(code, params);
 	revalidatePath("/employees");
 	revalidatePath("/profile");
 	revalidatePath("/search");
-	return update(code, params);
+	return updatedData;
 }
 export async function CreateEmployee(employee: Employee) {
 	const validate = Employee.safeParse(employee);
 	if (!validate.success) throw new Error("Invalid Params");
+	const created = create(validate.data);
 	revalidatePath("/employees");
 	revalidatePath("/profile");
 	revalidatePath("/search");
-	return create(validate.data);
+	return created;
 }
 export async function DeleteEmployee(code: number) {
+	const deletedData = _delete(code);
 	revalidatePath("/employees");
 	revalidatePath("/profile");
 	revalidatePath("/search");
-	return _delete(code);
+	return deletedData;
 }
 export async function GetAllEmployees() {
-	return getAll();
+	const all = await getAll();
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return all;
 }
 export async function GetEmployeeUnique(code: number) {
-	return getByCode(code);
+	return await getByCode(code);
 }
 export async function GetEmployee(x: (x: Employee) => boolean) {
-	return getOne(x);
+	return await getOne(x);
 }
 export async function GetEmployees(x: (x: Employee) => boolean) {
-	return getMany(x);
+	return await getMany(x);
 }
 export async function GetNewEmployee() {
-	return getNewCode();
+	return await getNewCode();
 }
 
 export async function GetAllJobs() {
