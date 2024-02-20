@@ -1,4 +1,9 @@
-import { isArray, isArrayDate, isArrayString } from "@/lib/utils/array";
+import {
+	isArray,
+	isArrayDate,
+	isArrayNumber,
+	isArrayString,
+} from "@/lib/utils/array";
 import { BasicValues } from "@/types";
 import { z } from "zod";
 import { FilterComparison } from "../components/filters/comparisonSelections/selections/comparisonSelections/comparisonSchema";
@@ -32,61 +37,24 @@ export const EmployeeFilter = z
 	})
 	.refine(
 		data => {
-			// console.log("🚀 ~ data:", data);
-			if (data.operation === "Between" || data.operation === "Not-Between") {
-				// console.log("1️⃣");
-				if (isArray(data.data)) {
-					// console.log("1️⃣  2️⃣");
-					if (data.property === "hiringDate") {
-						// console.log("1️⃣  3️⃣");
-						return isArrayDate(data.data);
-					} else if (data.property == "code") {
-						// console.log("1️⃣  4️⃣");
-						return isArrayString(data.data);
-					}
-					// console.log("1️⃣  5️⃣");
+			if (isArray(data.data)) {
+				if (
+					isArrayDate(data.data) ||
+					isArrayString(data.data) ||
+					isArrayNumber(data.data)
+				) {
 					return true;
 				}
-				// console.log("1️⃣  6️⃣");
-				return false;
+				return true;
 			}
-			if (data.operation === "InList" || data.operation === "Not-InList") {
-				// console.log("1️⃣  7️⃣");
-				if (isArray(data.data)) {
-					// console.log("1️⃣  8️⃣");
-
-					if (data.property === "hiringDate") {
-						// console.log("1️⃣  9️⃣");
-
-						return isArrayDate(data.data);
-					} else {
-						// console.log("1️⃣   🔟");
-
-						return isArrayString(data.data);
-					}
-				}
-				// console.log("1️⃣  1️⃣  1️⃣");
-
-				return false;
+			if (
+				typeof data.data === "number" ||
+				typeof data.data === "string" ||
+				Object.prototype.toString.call(new Date(+data.data)) === "[object Date]"
+			) {
+				return true;
 			}
-			if (data.property === "hiringDate") {
-				// console.log("2️⃣  1️⃣");
-				const result =
-					Object.prototype.toString.call(new Date(+data.data)) ===
-					"[object Date]";
-				// console.log("🚀 ~ result:", result);
-				return result;
-			}
-			if (data.property === "position" || data.property == "salaryStatus") {
-				// console.log("3️⃣  1️⃣");
-
-				return isArrayString(data.data);
-			}
-			// console.log("4️⃣   1️⃣");
-
-			// console.log("🚀 ~ typeof data.data:", typeof data.data);
-			// console.log("🚀 ~ schema data.data:::::::::::::", data.data);
-			return typeof data.data === "string";
+			return false;
 		},
 		{
 			path: ["data"],

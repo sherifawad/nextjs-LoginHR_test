@@ -2,6 +2,7 @@ import "server-only";
 
 import { FetchResult, GetServerResponse } from "@/lib/utils/apiFetch";
 import { EmployeePosition } from "@/validation/employeeSchema";
+import { encode } from "base-64";
 import { env } from "process";
 import { z } from "zod";
 
@@ -9,7 +10,12 @@ const codeSchema = z.number().int().positive();
 
 export async function getAllJobs(): Promise<FetchResult<EmployeePosition[]>> {
 	try {
-		const response = await fetch(`${env.NEXT_PUBLIC_API_HOST}/position/getall`);
+		const response = await fetch(`${env.API_URL}/position/getall`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+				"Content-Type": "application/json",
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(
@@ -44,9 +50,12 @@ export async function findByCode(
 	code: number,
 ): Promise<FetchResult<EmployeePosition>> {
 	try {
-		const response = await fetch(
-			`${env.NEXT_PUBLIC_API_HOST}/position/${code}`,
-		);
+		const response = await fetch(`${env.API_URL}/position/${code}`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+				"Content-Type": "application/json",
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, EmployeePosition);

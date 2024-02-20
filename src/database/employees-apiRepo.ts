@@ -1,3 +1,4 @@
+import { encode } from "base-64";
 import "server-only";
 
 import { FetchResult, GetServerResponse } from "@/lib/utils/apiFetch";
@@ -9,7 +10,11 @@ const codeSchema = z.number().int().positive();
 
 export async function getAll(): Promise<FetchResult<Employee[]>> {
 	try {
-		const response = await fetch(`${env.NEXT_PUBLIC_API_HOST}/employee/getall`);
+		const response = await fetch(`${env.API_URL}/employee/getall`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, Employee.array());
@@ -38,9 +43,11 @@ export async function getAll(): Promise<FetchResult<Employee[]>> {
 }
 export async function getByCode(code: number): Promise<FetchResult<Employee>> {
 	try {
-		const response = await fetch(
-			`${env.NEXT_PUBLIC_API_HOST}/employee/${code}`,
-		);
+		const response = await fetch(`${env.API_URL}/employee/${code}`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, Employee);
@@ -80,9 +87,11 @@ export async function getByCode(code: number): Promise<FetchResult<Employee>> {
 // }
 export async function getNewCode(): Promise<FetchResult<number>> {
 	try {
-		const response = await fetch(
-			`${env.NEXT_PUBLIC_API_HOST}/employee/GetMaxCode`,
-		);
+		const response = await fetch(`${env.API_URL}/employee/GetMaxCode`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, codeSchema);
@@ -121,11 +130,13 @@ export async function create(
 			};
 		}
 
-		const response = await fetch(`${env.NEXT_PUBLIC_API_HOST}/employee`, {
-			method: "POST",
-			headers: {
+		const response = await fetch(`${env.API_URL}/employee`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
 				"Content-Type": "application/json",
-			},
+			}),
+			method: "POST",
+
 			body: JSON.stringify(validateEmployeeInputs.data),
 		});
 		if (response.ok) {
@@ -174,18 +185,18 @@ export async function update(
 			};
 		}
 		const response = await fetch(
-			`${env.NEXT_PUBLIC_API_HOST}/employee/${validateCodeInputs.data}`,
+			`${env.API_URL}/employee/${validateCodeInputs.data}`,
 			{
 				method: "PUT",
-				headers: {
+				headers: new Headers({
+					Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
 					"Content-Type": "application/json",
-				},
+				}),
 				body: JSON.stringify(validateEmployeeInputs.data),
 			},
 		);
 		if (response.ok) {
 			const result = await response.json();
-			console.log("🚀 ~ result:", result);
 			const ServerResponse = await GetServerResponse(result, Employee);
 			if (ServerResponse.status === "success") {
 				return {
@@ -221,12 +232,13 @@ export async function _delete(code: number): Promise<FetchResult<Employee>> {
 			};
 		}
 
-		const response = await fetch(
-			`${env.NEXT_PUBLIC_API_HOST}/employee/${code}`,
-			{
-				method: "DELETE",
-			},
-		);
+		const response = await fetch(`${env.API_URL}/employee/${code}`, {
+			method: "DELETE",
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+				"Content-Type": "application/json",
+			}),
+		});
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, Employee);

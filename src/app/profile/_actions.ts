@@ -72,7 +72,7 @@ export async function GetEmployees(
 export async function GetNewEmployee(): Promise<number> {
 	const result = await getNewCode();
 	if (result.status === "error") throw new Error(result.message);
-	return result.data;
+	return result.data + 1;
 }
 
 export async function GetAllJobs() {

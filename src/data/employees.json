@@ -10,16 +10,6 @@
 		}
 	},
 	{
-		"name": "Syd Neame",
-		"code": 2,
-		"salaryStatus": "VALID",
-		"hiringDate": "2021-12-09T22:00:00.000Z",
-		"position": {
-			"positionName": "Manager",
-			"positionCode": 1
-		}
-	},
-	{
 		"name": "Jacobo Parmiter",
 		"code": 7,
 		"salaryStatus": "VALID",

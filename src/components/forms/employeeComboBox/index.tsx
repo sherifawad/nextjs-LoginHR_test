@@ -10,6 +10,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useKeyPress } from "@/hooks/useKeyPress";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
@@ -29,7 +30,8 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 		selectedValue,
 	);
 	const { toast } = useToast();
-	const { deleteParams, setParams } = useSearchUrlParams();
+	const { setParams } = useSearchUrlParams();
+	const [isPending, startTransition] = React.useTransition();
 
 	const onInputChange = (input: string) => {
 		if (isNaN(Number(input))) {
@@ -42,48 +44,62 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 		}
 		setSelectedCode(+input);
 		onSelection(+input);
-		setTimeout(() => {
-			if (input) {
-				deleteParams(["employee"]);
-			}
-		}, 1000);
+		// setTimeout(() => {
+		// 	if (input) {
+		// 		deleteParams(["employee"]);
+		// 	}
+		// }, 1000);
 	};
 
 	useKeyPress(async () => {
 		if (disabled) return;
-		const newCode = await GetNewEmployee();
-		onInputChange(newCode + "");
-		setParams([{ employee: newCode + "" }]);
+		toast({
+			variant: "default",
+			title: "F8 Key Pressed",
+			description: "New Key Selected",
+		});
+		startTransition(async () => {
+			const newCode = await GetNewEmployee();
+			onInputChange(newCode + "");
+			setParams([{ employee: newCode + "" }]);
+		});
 	}, ["F8"]);
 
 	return (
-		<div className='flex flex-shrink-0 flex-row-reverse items-center gap-x-2 bg-muted px-2'>
-			<div className='flex flex-1 items-center gap-x-2 bg-muted px-2'>
-				<CodeInput
-					type='text'
-					name='code'
-					id='code'
-					value={selectedCode}
-					onInputChange={onInputChange}
-				/>
-				{!disabled && <CommandShortcut>⌘F8</CommandShortcut>}
-			</div>
-			{!disabled && (
-				<Popover open={open} onOpenChange={setOpen}>
-					<PopoverTrigger asChild>
-						<TriggerButton isOpen={open} />
-					</PopoverTrigger>
-					<PopoverContent className='h-72 overflow-y-scroll p-0'>
-						<EmployeesCodesTable
-							onRowSelect={code => {
-								onInputChange(code + "");
-								setOpen(false);
-							}}
+		<>
+			{isPending ? (
+				<Skeleton className='h-11 w-full' />
+			) : (
+				<div className='flex flex-shrink-0 flex-row-reverse items-center gap-x-2 bg-muted px-2'>
+					<div className='flex flex-1 items-center gap-x-2 bg-muted px-2'>
+						<CodeInput
+							type='text'
+							name='code'
+							id='code'
+							value={selectedCode}
+							onInputChange={onInputChange}
+							disabled={isPending}
 						/>
-					</PopoverContent>
-				</Popover>
+						{!disabled && <CommandShortcut>⌘F8</CommandShortcut>}
+					</div>
+					{!disabled && (
+						<Popover open={open} onOpenChange={setOpen}>
+							<PopoverTrigger asChild>
+								<TriggerButton isOpen={open} />
+							</PopoverTrigger>
+							<PopoverContent className='h-72 overflow-y-scroll p-0'>
+								<EmployeesCodesTable
+									onRowSelect={code => {
+										onInputChange(code + "");
+										setOpen(false);
+									}}
+								/>
+							</PopoverContent>
+						</Popover>
+					)}
+				</div>
 			)}
-		</div>
+		</>
 	);
 }
 

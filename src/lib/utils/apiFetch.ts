@@ -45,7 +45,6 @@ export const GetServerResponse = async <T>(
 	try {
 		const validate = ServerResponse(schema).safeParse(result);
 		if (!validate.success) {
-			console.log("🚀 ~ GetServerResponse result:", validate.error);
 			return {
 				status: "error",
 				message: validate.error.issues[0].message,

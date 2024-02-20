@@ -3,7 +3,7 @@
 import { GetAllEmployees } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { Employee } from "@/validation/employeeSchema";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 import { Input } from "../../ui/input";
 import {
 	Table,
@@ -13,6 +13,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "../../ui/table";
+import CodeListSkeleton from "./codeList-skeleton";
 
 type Props = {
 	employeesList?: Employee[];
@@ -24,6 +25,8 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 	const [employees, setEmployees] = useState<Employee[]>(
 		employeesList ? employeesList : [],
 	);
+
+	const [isPending, startTransition] = useTransition();
 	const [filteredList, setFilteredList] = useState<Employee[]>(employees);
 
 	const [code, setCode] = useState("");
@@ -31,10 +34,12 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await GetAllEmployees();
+			startTransition(async () => {
+				const result = await GetAllEmployees();
 
-			setEmployees(result);
-			setFilteredList(result);
+				setEmployees(result);
+				setFilteredList(result);
+			});
 		};
 		fetchData();
 	}, []);
@@ -49,64 +54,70 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 	};
 
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead className=''>
-						<Input
-							placeholder='Code'
-							className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-							value={code}
-							onChange={e => {
-								setCode(e.target.value);
-								setName("");
-								setFilteredList(
-									employees.filter(x =>
-										x.code.toString().includes(e.target.value),
-									),
-								);
-							}}
-						/>
-					</TableHead>
-					<TableHead>
-						<Input
-							placeholder='Name'
-							className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-							value={name}
-							onChange={e => {
-								setCode("");
-								setName(e.target.value);
-								setFilteredList(
-									employees.filter(x =>
-										x.name
-											.toLocaleLowerCase()
-											.includes(e.target.value.toLocaleLowerCase()),
-									),
-								);
-							}}
-						/>
-					</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody className=''>
-				{filteredList.length > 0 ? (
-					filteredList.map(e => (
-						<TableRow
-							key={e.code}
-							className='cursor-pointer'
-							onClick={() => SelectionHandler(e.code)}
-						>
-							<TableCell className='font-medium'>{e.code}</TableCell>
-							<TableCell>{e.name}</TableCell>
+		<Suspense fallback={<CodeListSkeleton />}>
+			{isPending ? (
+				<CodeListSkeleton />
+			) : (
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead className=''>
+								<Input
+									placeholder='Code'
+									className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+									value={code}
+									onChange={e => {
+										setCode(e.target.value);
+										setName("");
+										setFilteredList(
+											employees.filter(x =>
+												x.code.toString().includes(e.target.value),
+											),
+										);
+									}}
+								/>
+							</TableHead>
+							<TableHead>
+								<Input
+									placeholder='Name'
+									className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+									value={name}
+									onChange={e => {
+										setCode("");
+										setName(e.target.value);
+										setFilteredList(
+											employees.filter(x =>
+												x.name
+													.toLocaleLowerCase()
+													.includes(e.target.value.toLocaleLowerCase()),
+											),
+										);
+									}}
+								/>
+							</TableHead>
 						</TableRow>
-					))
-				) : (
-					<TableRow className='p-8 text-center font-medium'>
-						No Results.
-					</TableRow>
-				)}
-			</TableBody>
-		</Table>
+					</TableHeader>
+					<TableBody className=''>
+						{filteredList.length > 0 ? (
+							filteredList.map(e => (
+								<TableRow
+									key={e.code}
+									className='cursor-pointer'
+									onClick={() => SelectionHandler(e.code)}
+								>
+									<TableCell className='font-medium'>{e.code}</TableCell>
+									<TableCell>{e.name}</TableCell>
+								</TableRow>
+							))
+						) : (
+							<TableRow className='p-8 text-center font-medium'>
+								No Results.
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			)}
+		</Suspense>
 	);
 }
 

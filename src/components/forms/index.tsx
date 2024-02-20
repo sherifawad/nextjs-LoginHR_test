@@ -9,6 +9,7 @@ import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { cn } from "@/lib/utils";
 import { Employee, SalaryStatusEnum } from "@/validation/employeeSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "lucide-react";
 import React, { ComponentPropsWithoutRef } from "react";
 import { FieldError, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -46,10 +47,7 @@ const defaultValues = {
 	hiringDate: new Date(),
 	name: "",
 	positionCode: null,
-	position: {
-		positionCode: -1,
-		positionName: "",
-	},
+	position: null,
 	salaryStatus: SalaryStatusEnum.enum.VALID,
 };
 
@@ -76,8 +74,12 @@ const EmployeeForm = ({
 			form.setValue("code", employee.code);
 			form.setValue("name", employee.name);
 			form.setValue("hiringDate", employee.hiringDate);
-			form.setValue("position", employee.position);
+
 			form.setValue("salaryStatus", employee.salaryStatus);
+			form.setValue("positionCode", employee.positionCode);
+			if (employee.position) {
+				form.setValue("position", employee.position);
+			}
 		} else {
 			form.reset();
 			form.setValue("code", -1);
@@ -85,7 +87,6 @@ const EmployeeForm = ({
 	}, [employee, form]);
 
 	async function onSubmit(values: z.infer<typeof Employee>) {
-		console.log("🚀 ~ onSubmit ~ values:", values);
 		let initialEmployee = undefined;
 		try {
 			if (editMode && employee) {
@@ -262,8 +263,14 @@ const EmployeeForm = ({
 
 				<div className='flex text-right md:col-span-2'>
 					<div className=' inline-flex gap-4 self-start'>
-						<Button type='submit'>{editMode ? "Update" : "Create"}</Button>
-						{editMode && (
+						<Button type='submit'>
+							{form.formState.isSubmitting ? (
+								<Loader className='animate-spin' />
+							) : (
+								<>{editMode && employee ? "Update" : "Create"}</>
+							)}
+						</Button>
+						{editMode && employee && (
 							<Button
 								type='button'
 								variant={"destructive"}
@@ -271,7 +278,11 @@ const EmployeeForm = ({
 									await deleteEmployee(form.getValues("code"));
 								}}
 							>
-								Delete
+								{form.formState.isSubmitting ? (
+									<Loader className='animate-spin' />
+								) : (
+									<>Delete</>
+								)}
 							</Button>
 						)}
 					</div>

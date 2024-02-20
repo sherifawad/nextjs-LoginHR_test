@@ -76,11 +76,7 @@ export const stringValuesToFilter = (
 			property,
 			operation,
 			// check if is a list of a single number
-			data: dataList
-				? dataList.length === 1 && !isNaN(Number(dataList[0]))
-					? dataList[0]
-					: dataList
-				: dataList,
+			data: dataList,
 		});
 
 		if (validate.success) {
