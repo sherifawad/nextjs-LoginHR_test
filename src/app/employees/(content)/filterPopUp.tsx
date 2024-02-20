@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
 import { EmployeeFilter } from "@/validation/employeeSchema";
-import { Plus } from "lucide-react";
+import { Filter } from "lucide-react";
 import { FormEvent, useCallback, useState } from "react";
 import FilterFormContent from "../../../components/filters/popupFIlterForm/FIlterInput/FilterFormContent";
 
@@ -56,7 +56,7 @@ function FilterForm({ onSubmit: submitHandler, onCancel }: Props) {
 				<Button type='button' onClick={() => onCancel()} variant='outline'>
 					Cancel
 				</Button>
-				<Button type='submit'>Deploy</Button>
+				<Button type='submit'>Apply</Button>
 			</div>
 		</form>
 	);
@@ -81,9 +81,9 @@ function FilterPopUp({
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger asChild>
-				<div className='self-start rounded-md bg-muted p-1'>
-					<Plus className='h-3 w-3' />
-				</div>
+				<Button variant={"secondary"} className='h-8'>
+					<Filter className='h-3 w-3' />
+				</Button>
 			</PopoverTrigger>
 			<PopoverContent
 				className=' p-0'

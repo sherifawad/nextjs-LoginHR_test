@@ -10,9 +10,10 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { useToast } from "@/components/ui/use-toast";
 import { useKeyPress } from "@/hooks/useKeyPress";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { PlusCircleIcon } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import CodeInput from "./comboBox-button";
 import EmployeesCodesTable from "./employeesCodesTable";
 
@@ -27,18 +28,31 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 	const [selectedCode, setSelectedCode] = React.useState<number | undefined>(
 		selectedValue,
 	);
-
+	const { toast } = useToast();
 	const { deleteParams, setParams } = useSearchUrlParams();
 
-	const onInputChange = (code: number) => {
-		setSelectedCode(code);
-		onSelection(code);
+	const onInputChange = (input: string) => {
+		if (isNaN(Number(input))) {
+			toast({
+				variant: "destructive",
+				title: "Invalid Input.",
+				description: "Only Numbers Allowed",
+			});
+			return;
+		}
+		setSelectedCode(+input);
+		onSelection(+input);
+		setTimeout(() => {
+			if (input) {
+				deleteParams(["employee"]);
+			}
+		}, 1000);
 	};
 
 	useKeyPress(async () => {
 		if (disabled) return;
 		const newCode = await GetNewEmployee();
-		onInputChange(newCode);
+		onInputChange(newCode + "");
 		setParams([{ employee: newCode + "" }]);
 	}, ["F8"]);
 
@@ -50,26 +64,19 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 					name='code'
 					id='code'
 					value={selectedCode}
-					onChange={e => {
-						onInputChange(+e.target.value);
-						setTimeout(() => {
-							if (e) {
-								deleteParams(["employee"]);
-							}
-						}, 1000);
-					}}
+					onInputChange={onInputChange}
 				/>
 				{!disabled && <CommandShortcut>⌘F8</CommandShortcut>}
 			</div>
 			{!disabled && (
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
-						<TriggerButton />
+						<TriggerButton isOpen={open} />
 					</PopoverTrigger>
 					<PopoverContent className='h-72 overflow-y-scroll p-0'>
 						<EmployeesCodesTable
 							onRowSelect={code => {
-								onInputChange(code);
+								onInputChange(code + "");
 								setOpen(false);
 							}}
 						/>
@@ -82,7 +89,7 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 
 const TriggerButton = React.forwardRef<
 	HTMLButtonElement,
-	React.ComponentPropsWithoutRef<"button">
+	React.ComponentPropsWithoutRef<"button"> & { isOpen: boolean }
 >((props, ref) => {
 	return (
 		<Button
@@ -94,7 +101,11 @@ const TriggerButton = React.forwardRef<
 			{...props}
 		>
 			<div className='flex h-10 items-center justify-start gap-x-2  '>
-				<PlusCircleIcon className='mr-2 h-4 w-4' />
+				{props.isOpen ? (
+					<ArrowUpCircle className='mr-2 h-4 w-4' />
+				) : (
+					<ArrowDownCircle className='mr-2 h-4 w-4' />
+				)}
 				<div>Code</div>
 			</div>
 		</Button>

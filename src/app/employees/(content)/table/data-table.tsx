@@ -19,7 +19,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Employee } from "@/validation/employeeSchema";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
@@ -30,7 +30,10 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
 	columns,
 	data,
-}: DataTableProps<TData, TValue>) {
+	addFilter,
+}: DataTableProps<TData, TValue> & {
+	addFilter: (filter: EmployeeFilter) => Promise<void>;
+}) {
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
 		[],
 	);
@@ -51,7 +54,7 @@ export function DataTable<TData, TValue>({
 
 	return (
 		<div className='space-y-4'>
-			<DataTableToolbar table={table} />
+			<DataTableToolbar table={table} addFilter={addFilter} />
 			<div className='rounded-md border'>
 				<Table>
 					<TableHeader>

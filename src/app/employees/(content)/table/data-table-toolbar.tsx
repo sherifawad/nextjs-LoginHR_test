@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 
 import { DeleteManyEmployees } from "@/app/employees/_actions";
 import { GetAllJobs } from "@/app/profile/_actions";
-import { EmployeePosition } from "@/validation/employeeSchema";
+import { EmployeeFilter, EmployeePosition } from "@/validation/employeeSchema";
 import React from "react";
+import FilterPopUp from "../filterPopUp";
 import { DataTableViewOptions } from "./data-table-view-options";
 
 interface DataTableToolbarProps<TData> {
@@ -16,7 +17,10 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({
 	table,
-}: DataTableToolbarProps<TData>) {
+	addFilter,
+}: DataTableToolbarProps<TData> & {
+	addFilter: (filter: EmployeeFilter) => Promise<void>;
+}) {
 	const isFiltered = table.getState().columnFilters.length > 0;
 	const selectedData = table.getState().rowSelection;
 	const isSelected =
@@ -53,7 +57,11 @@ export function DataTableToolbar<TData>({
 					</Button>
 				)}
 			</div>
-			<DataTableViewOptions table={table} />
+			<div className='mr-auto flex items-center gap-2'>
+				<DataTableViewOptions table={table} />
+				<FilterPopUp addFilter={addFilter} />
+				<div />
+			</div>
 		</div>
 	);
 }

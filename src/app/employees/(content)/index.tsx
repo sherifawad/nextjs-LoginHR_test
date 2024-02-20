@@ -10,7 +10,6 @@ import { FilterOption } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import EditUserPopUpContent from "./EditUserPopUpContent";
-import FilterPopUp from "./filterPopUp";
 import EmployeesList from "./table";
 import TableSkeleton from "./table/tableSkeletotn";
 
@@ -127,30 +126,36 @@ function FilteredEmployees({
 					<div className=' mx-auto  flex w-full  max-w-xl flex-row-reverse flex-wrap items-end justify-center gap-2'>
 						<ul className='flex flex-wrap gap-2 self-start'>
 							{Filters?.map((item, index) => {
+								const [property, comparison, value] = item.label.split("_");
 								return (
 									<li key={index} className=''>
-										<Button
-											variant={"ghost"}
-											onClick={() => deleteFilter(item.label)}
-											className='flex flex-1 items-center justify-between gap-x-2 whitespace-nowrap rounded-md bg-muted p-1 px-3'
-										>
-											<p className=' flex-1 flex-wrap  text-sm text-primary'>
-												{item.label}
-											</p>
-											<span className='text-base text-destructive'>X</span>
-										</Button>
+										<div className='flex flex-1 items-center justify-between gap-x-2 whitespace-nowrap rounded-md bg-muted p-1 px-3'>
+											{
+												<p className='flex flex-1 flex-wrap  gap-x-2 text-sm capitalize text-primary'>
+													<span className=''>{property}</span>
+													<span className=''>{comparison}</span>
+													<span className=''>{value}</span>
+												</p>
+											}
+											<Button
+												variant={"ghost"}
+												onClick={() => deleteFilter(item.label)}
+											>
+												<span className='text-base text-destructive'>X</span>
+											</Button>
+										</div>
 									</li>
 								);
 							})}
 						</ul>
-						<FilterPopUp addFilter={addFilter} />
+						{/* <FilterPopUp addFilter={addFilter} /> */}
 					</div>
 				)}
 
 				{isPending ? (
 					<TableSkeleton />
 				) : (
-					<EmployeesList employeesList={employeesList} />
+					<EmployeesList employeesList={employeesList} addFilter={addFilter} />
 				)}
 			</div>
 			{isOpenDialog && employeeToEdit && (
