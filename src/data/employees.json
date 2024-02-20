@@ -162,11 +162,11 @@
 	{
 		"code": 21,
 		"name": "sherif awad",
-		"salaryStatus": "NOT_VALID",
+		"salaryStatus": "VALID",
 		"hiringDate": "2024-02-11T22:00:00.000Z",
 		"position": {
-			"positionName": "Manager",
-			"positionCode": 1
+			"positionName": "Programmer",
+			"positionCode": 3
 		}
 	}
 ]

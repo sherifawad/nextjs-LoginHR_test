@@ -135,13 +135,15 @@ export const setComparisonComponentType = (
 	// console.log("🚀 ~ _type:", _type);
 	let comparisonsList: FilterOption[] = [];
 	switch (_type) {
-		case "number": {
+		case "number":
+		case "nullable": {
 			if (
 				operation === FilterComparison.enum.InList ||
 				operation === FilterComparison.enum["Not-InList"]
 			) {
 				return FilterValueSelect.Enum.LIST;
-			} else if (
+			}
+			if (
 				operation === FilterComparison.enum.Between ||
 				operation === FilterComparison.enum["Not-Between"]
 			) {

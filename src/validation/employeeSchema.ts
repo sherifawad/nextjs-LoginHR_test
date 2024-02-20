@@ -3,7 +3,12 @@ import { BasicValues } from "@/types";
 import { z } from "zod";
 import { FilterComparison } from "../components/filters/comparisonSelections/selections/comparisonSelections/comparisonSchema";
 
-export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
+enum SalaryStatus {
+	VALID,
+	NOT_VALID,
+}
+
+export const SalaryStatusEnum = z.nativeEnum(SalaryStatus);
 
 export const EmployeePosition = z.object({
 	positionName: z.string().min(1),
@@ -14,8 +19,9 @@ export const Employee = z.object({
 	code: z.coerce.number(),
 	name: z.string().min(5),
 	salaryStatus: SalaryStatusEnum,
-	hiringDate: z.date(),
-	position: EmployeePosition,
+	hiringDate: z.coerce.date(),
+	positionCode: z.coerce.number().nullable(),
+	position: EmployeePosition.nullable(),
 });
 
 export const EmployeeFilter = z

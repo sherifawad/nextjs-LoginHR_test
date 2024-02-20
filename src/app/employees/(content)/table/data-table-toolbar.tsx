@@ -27,8 +27,9 @@ export function DataTableToolbar<TData>({
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const result = await GetAllJobs();
-
-			setJobs(result);
+			if (result.status === "success") {
+				setJobs(result.data);
+			}
 		};
 		fetchData();
 	}, []);

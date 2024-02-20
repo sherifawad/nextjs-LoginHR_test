@@ -1,6 +1,11 @@
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableColumnFilterHeader } from "@/components/table/data-table-column-header-filter";
-import { Employee, EmployeePosition } from "@/validation/employeeSchema";
+import { getEnumName } from "@/lib/utils/array";
+import {
+	Employee,
+	EmployeePosition,
+	SalaryStatusEnum,
+} from "@/validation/employeeSchema";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -38,12 +43,11 @@ export const columns: ColumnDef<Employee>[] = [
 			<DataTableColumnHeader column={column} title='Salary Status' />
 		),
 		cell: ({ row }) => {
-			const value = row.getValue("salaryStatus");
-			return (
-				<div className='w-[70px] text-center'>
-					{row.getValue("salaryStatus")}
-				</div>
+			const value = getEnumName(
+				row.getValue("salaryStatus"),
+				SalaryStatusEnum.enum,
 			);
+			return <div className='w-[70px] text-center'>{value}</div>;
 		},
 		// enableSorting: false,
 		// enableHiding: false,
@@ -60,16 +64,20 @@ export const columns: ColumnDef<Employee>[] = [
 			<DataTableColumnHeader column={column} title='Job Code' />
 		),
 		cell: ({ row }) => {
-			const position = row.getValue("position") as EmployeePosition;
-			return (
-				<div className='w-[70px] text-center'>{position.positionName}</div>
-			);
+			if (row.getValue("position")) {
+				const position = row.getValue("position") as EmployeePosition;
+				return (
+					<div className='w-[70px] text-center'>{position.positionName}</div>
+				);
+			}
+			return <div className='w-[70px] text-center'>-</div>;
 		},
 		filterFn: (row, id, value) => {
 			if (id === "position") {
 				const original = row.original as Employee;
-
-				return value.includes(original.position.positionCode + "");
+				if (original.position) {
+					return value.includes(original.position.positionCode + "");
+				}
 			}
 		},
 		// enableSorting: false,

@@ -93,13 +93,17 @@ export const getComparisonList = (property: keyof Employee) => {
 	const _type = getType(property);
 	// console.log("🚀 ~ getComparisonList ~ _type:", _type);
 	let comparisonsList: FilterComparisonOption[] = [];
-	if (_type === "number") {
-		comparisonsList = [
-			...EqualComparison,
-			...FavoriteComparison,
-			...IncludeComparison,
-			...BetweenComparison,
-		];
+	if (_type === "number" || _type === "nullable") {
+		if (property === "position") {
+			comparisonsList = ListComparison;
+		} else {
+			comparisonsList = [
+				...EqualComparison,
+				...FavoriteComparison,
+				...IncludeComparison,
+				...BetweenComparison,
+			];
+		}
 	} else if (_type === "string") {
 		comparisonsList = [...EqualComparison, ...IncludeComparison];
 	} else if (_type === "date") {

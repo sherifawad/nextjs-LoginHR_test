@@ -1,13 +1,29 @@
 import { BasicValues, FilterOption } from "@/types";
-import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
+import {
+	Employee,
+	EmployeeFilter,
+	SalaryStatusEnum,
+} from "@/validation/employeeSchema";
 import { enumToLabelKeyValues, isArray } from "./array";
 
 export const generateLabelValueEmployeesList = (
 	employeesList: Employee[],
 	property: keyof Employee,
 ): FilterOption[] => {
+	if (property === "salaryStatus") {
+		return getSalaryStatusName();
+	}
 	const list = employeesList.map(e => e[property]);
 	return enumToLabelKeyValues(list);
+};
+
+export const getSalaryStatusName = () => {
+	const option: FilterOption[] = [];
+	for (var n in SalaryStatusEnum.enum) {
+		if (typeof SalaryStatusEnum.enum[n] === "number")
+			option.push({ label: n, value: SalaryStatusEnum.enum[n] });
+	}
+	return option;
 };
 
 export const getLabelValueList = (

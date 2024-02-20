@@ -28,6 +28,17 @@ export const isArrayString = (value: any): boolean => {
 	});
 	return true;
 };
+export const isArrayNumber = (value: any): boolean => {
+	// console.log("🚀 ~ isArrayNumber ~ value:", value);
+	if (!isIterable(value)) return false;
+	if (!isArray(value)) return false;
+	value.forEach(function (item: any) {
+		if (typeof item !== "number" || isNaN(Number(value))) {
+			return false;
+		}
+	});
+	return true;
+};
 export const isArrayDate = (value: any): boolean => {
 	if (!isIterable(value)) return false;
 	if (!isArray(value)) return false;
@@ -88,9 +99,7 @@ export const iterate = (obj: any) => {
 			}
 		}
 	});
-	return result.filter(
-		({ label }, index) => index === result.findIndex(x => x.label === label),
-	);
+	return result;
 };
 
 export const enumToLabelKeyValues = (value: any): FilterOption[] => {
@@ -99,5 +108,7 @@ export const enumToLabelKeyValues = (value: any): FilterOption[] => {
 	if (!iterable) return result;
 	result = iterate(value);
 
-	return result;
+	return result.filter(
+		({ label }, index) => index === result.findIndex(x => x.label === label),
+	);
 };

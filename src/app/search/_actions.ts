@@ -14,7 +14,6 @@ export const getFilteredEmployees = async ({
 	filters: EmployeeFilter[];
 }): Promise<CreatedFilter> => {
 	let employees = await GetAllEmployees();
-	console.log("🚀 ~ employees:", employees);
 	try {
 		// validate input filter
 		const validFilters: EmployeeFilter[] = [];

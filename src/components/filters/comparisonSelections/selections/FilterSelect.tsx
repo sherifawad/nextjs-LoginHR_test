@@ -39,13 +39,17 @@ function FilterSelect({
 			onValueChange={value => selectionHandler(value)}
 			{...rest}
 		>
-			<SelectTrigger className='bg-muted'>
+			<SelectTrigger className='bg-muted capitalize'>
 				<SelectValue placeholder='Select ' />
 			</SelectTrigger>
 			<SelectContent position='popper'>
 				<ScrollArea className='max-h-60 w-full'>
 					{options.map(i => (
-						<SelectItem key={i.value + ""} value={i.value + ""}>
+						<SelectItem
+							className='capitalize'
+							key={i.value + ""}
+							value={i.value + ""}
+						>
 							{i.label}
 						</SelectItem>
 					))}

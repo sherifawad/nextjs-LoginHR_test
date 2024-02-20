@@ -1,31 +1,32 @@
 import "server-only";
 
 import { Employee } from "@/validation/employeeSchema";
+import path from "path";
 // import { promises as fs } from "fs";
+import { promises as fs } from "fs";
 
-// employees in JSON file for simplicity, store in a db for production applications
-let EmployeesData: Employee[] = (
-	require("../data/employees.json") as Employee[]
-).map(e => ({
-	...e,
-	hiringDate: new Date(e.hiringDate),
-}));
+// // employees in JSON file for simplicity, store in a db for production applications
+// let EmployeesData: Employee[] = (
+// 	require("../data/employees.json") as Employee[]
+// ).map(e => ({
+// 	...e,
+// 	hiringDate: new Date(e.hiringDate),
+// }));
 
-// // const jsonDirectory = path.join(process.cwd(), "tmp");
-// const dataFilePath = path.join(process.cwd(), "src", "data", "employees.json");
-// // const dataFilePath = path.resolve("..", "/data", "employees.json");
-// // console.log("🚀 ~ dataFilePath:", dataFilePath);
+// const jsonDirectory = path.join(process.cwd(), "tmp");
+const dataFilePath = path.join(process.cwd(), "src", "data", "employees.json");
+// const dataFilePath = path.resolve("..", "/data", "employees.json");
+// console.log("🚀 ~ dataFilePath:", dataFilePath);
 
-// const EmployeesData = async function Employees() {
-// 	return JSON.parse(await fs.readFile(dataFilePath, "utf8"));
-// };
+const EmployeesData = async function Employees() {
+	return JSON.parse(await fs.readFile(dataFilePath, "utf8"));
+};
 
 export async function getAll(): Promise<Employee[]> {
-	// return ((await EmployeesData()) as Employee[]).map(e => ({
-	// 	...e,
-	// 	hiringDate: new Date(e.hiringDate),
-	// }));
-	return [...EmployeesData];
+	return ((await EmployeesData()) as Employee[]).map(e => ({
+		...e,
+		hiringDate: new Date(e.hiringDate),
+	}));
 	// return EmployeesData
 }
 export async function getByCode(code: number): Promise<Employee | undefined> {
@@ -55,8 +56,8 @@ export async function create(employee: Employee): Promise<Employee> {
 	// generate new employee id
 
 	// add and save employee
-	EmployeesData = [...employees, employee];
-	// await saveData([...employees, employee]);
+	// EmployeesData = [...employees, employee];
+	await saveData([...employees, employee]);
 
 	return employee;
 }
@@ -83,9 +84,9 @@ export async function update(
 		return e;
 	});
 
-	// await saveData(result);
+	await saveData(result);
 
-	EmployeesData = [...result];
+	// EmployeesData = [...result];
 
 	return employee;
 }
@@ -96,9 +97,9 @@ export async function _delete(code: number): Promise<Employee> {
 	let employee = employees.find(x => x.code === code);
 	if (!employee || employee == null) throw new Error("Not Found");
 	const result = employees.filter(x => x.code !== code);
-	// await saveData(result);
+	await saveData(result);
 
-	EmployeesData = [...result];
+	// EmployeesData = [...result];
 	return employee;
 }
 export async function deleteMany(codeList: number[]): Promise<Employee[]> {
@@ -114,19 +115,19 @@ export async function deleteMany(codeList: number[]): Promise<Employee[]> {
 				return false;
 			}),
 		);
-		// await saveData(result);
+		await saveData(result);
 
-		EmployeesData = [...result];
+		// EmployeesData = [...result];
 		return deletedEmployees;
 	} catch (error) {
 		return [];
 	}
 }
 
-// async function saveData(employees: Employee[]) {
-// 	// await fs.unlink(`${dataFilePath}`);
-// 	await fs.writeFile(`${dataFilePath}`, JSON.stringify(employees, null, 4), {
-// 		encoding: "utf8",
-// 		flag: "w",
-// 	});
-// }
+async function saveData(employees: Employee[]) {
+	// await fs.unlink(`${dataFilePath}`);
+	await fs.writeFile(`${dataFilePath}`, JSON.stringify(employees, null, 4), {
+		encoding: "utf8",
+		flag: "w",
+	});
+}

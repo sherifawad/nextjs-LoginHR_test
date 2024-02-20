@@ -16,7 +16,10 @@ type Props = {
 };
 async function EmployeesPage({ searchParams }: Props) {
 	// get all employees
+
 	const initialEmployees = await GetAllEmployees();
+
+	// const initialEmployees = await GetAllEmployees();
 	let filteredEmployees = initialEmployees;
 	// set empty filters
 	let initialFilters: FilterOption[] = [];

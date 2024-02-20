@@ -34,8 +34,9 @@ export function DataTableToolbar<TData>({
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const result = await GetAllJobs();
-
-			setJobs(result);
+			if (result.status === "success") {
+				setJobs(result.data);
+			}
 		};
 		fetchData();
 	}, []);
@@ -62,7 +63,7 @@ export function DataTableToolbar<TData>({
 						<DataTableFacetedFilter
 							column={table.getColumn("salaryStatus")}
 							title='salaryStatus'
-							options={iterate(SalaryStatusEnum.Enum) as any}
+							options={iterate(SalaryStatusEnum.enum)}
 						/>
 					)}
 					{table.getColumn("position") && (

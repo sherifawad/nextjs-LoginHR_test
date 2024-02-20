@@ -45,11 +45,12 @@ const defaultValues = {
 	code: -1,
 	hiringDate: new Date(),
 	name: "",
+	positionCode: null,
 	position: {
 		positionCode: -1,
 		positionName: "",
 	},
-	salaryStatus: SalaryStatusEnum.Values.VALID,
+	salaryStatus: SalaryStatusEnum.enum.VALID,
 };
 
 const EmployeeForm = ({
@@ -84,13 +85,13 @@ const EmployeeForm = ({
 	}, [employee, form]);
 
 	async function onSubmit(values: z.infer<typeof Employee>) {
+		console.log("🚀 ~ onSubmit ~ values:", values);
+		let initialEmployee = undefined;
 		try {
-			let employee = undefined;
-			if (editMode) {
-				const { code } = values;
-				employee = await UpdateEmployee(code, values);
+			if (editMode && employee) {
+				initialEmployee = await UpdateEmployee(employee.code, values);
 			} else {
-				employee = await CreateEmployee(values);
+				initialEmployee = await CreateEmployee(values);
 			}
 		} catch (error) {
 			let errorMessage = error;
@@ -102,31 +103,33 @@ const EmployeeForm = ({
 				title: "Uh oh! Something went wrong.",
 				description: `${errorMessage}`,
 			});
-		} finally {
-			if (employee) {
-				toast({
-					variant: "success",
-					title: "Success",
-				});
-				deleteParams(["employee"]);
-				window.location.reload();
-			}
 		}
-	}
-
-	const deleteEmployee = async (code: number) => {
-		const deleted = await DeleteEmployee(code);
-		if (deleted) {
+		if (initialEmployee) {
 			toast({
 				variant: "success",
 				title: "Success",
 			});
 			deleteParams(["employee"]);
-		} else {
+			window.location.reload();
+		}
+	}
+
+	const deleteEmployee = async (code: number) => {
+		try {
+			const deleted = await DeleteEmployee(code);
+			if (deleted) {
+				toast({
+					variant: "success",
+					title: "Success",
+				});
+				deleteParams(["employee"]);
+				form.reset();
+			}
+		} catch (error) {
 			toast({
 				variant: "destructive",
 				title: "Uh oh! Something went wrong.",
-				description: "Couldn't Delete",
+				description: error instanceof Error ? error.message : `${error}`,
 			});
 		}
 	};
@@ -170,7 +173,7 @@ const EmployeeForm = ({
 
 				<FormField
 					control={form.control}
-					name='position'
+					name='positionCode'
 					render={({ field }) => (
 						<FormItem>
 							<div className='flex w-full min-w-[300px]  flex-col gap-2'>
@@ -236,16 +239,16 @@ const EmployeeForm = ({
 								<FormLabel>Salary Status</FormLabel>
 								<FormControl>
 									<EmployeeSelect
-										onSelection={field.onChange}
-										selectedValue={field.value}
+										onSelection={e => (e ? field.onChange(+e) : {})}
+										selectedValue={field.value + ""}
 										items={[
 											{
 												label: "Valid",
-												value: SalaryStatusEnum.Values.VALID,
+												value: SalaryStatusEnum.enum.VALID + "",
 											},
 											{
 												label: "Not Valid",
-												value: SalaryStatusEnum.Values.NOT_VALID,
+												value: SalaryStatusEnum.enum.NOT_VALID + "",
 											},
 										]}
 									/>
@@ -266,7 +269,6 @@ const EmployeeForm = ({
 								variant={"destructive"}
 								onClick={async () => {
 									await deleteEmployee(form.getValues("code"));
-									window.location.reload();
 								}}
 							>
 								Delete
