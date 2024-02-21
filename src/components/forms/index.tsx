@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Employee, SalaryStatusEnum } from "@/validation/employeeSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
-import React, { ComponentPropsWithoutRef } from "react";
+import React, { ComponentPropsWithoutRef, useTransition } from "react";
 import { FieldError, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -64,6 +64,8 @@ const EmployeeForm = ({
 	});
 
 	const { toast } = useToast();
+	const [isPending, startTransition] = useTransition();
+
 	const { deleteParams, router } = useSearchUrlParams();
 
 	const [isClient, setIsClient] = React.useState(false);
@@ -111,8 +113,10 @@ const EmployeeForm = ({
 				title: "Success",
 			});
 			deleteParams(["employee"]);
-			router.refresh();
-			// window.location.reload();
+			// router.refresh();
+			startTransition(() => {
+				window.location.reload();
+			});
 		}
 	}
 

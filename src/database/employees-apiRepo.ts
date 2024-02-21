@@ -10,11 +10,14 @@ const codeSchema = z.number().int().positive();
 
 export async function getAll(): Promise<FetchResult<Employee[]>> {
 	try {
-		const response = await fetch(`${env.API_URL}/employee/getall`, {
-			headers: new Headers({
-				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
-			}),
-		});
+		const response = await fetch(
+			`${env.API_URL}/employee/getall?SortBy=code&IsDescending=false`,
+			{
+				headers: new Headers({
+					Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+				}),
+			},
+		);
 		if (response.ok) {
 			const result = await response.json();
 			const ServerResponse = await GetServerResponse(result, Employee.array());
