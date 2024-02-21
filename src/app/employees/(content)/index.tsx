@@ -8,7 +8,13 @@ import { useToast } from "@/components/ui/use-toast";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { FilterOption } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import {
+	Suspense,
+	useCallback,
+	useEffect,
+	useState,
+	useTransition,
+} from "react";
 import EditUserPopUpContent from "./EditUserPopUpContent";
 import EmployeesList from "./table";
 import TableSkeleton from "./table/tableSkeletotn";
@@ -155,7 +161,12 @@ function FilteredEmployees({
 				{isPending ? (
 					<TableSkeleton />
 				) : (
-					<EmployeesList employeesList={employeesList} addFilter={addFilter} />
+					<Suspense>
+						<EmployeesList
+							employeesList={employeesList}
+							addFilter={addFilter}
+						/>
+					</Suspense>
 				)}
 			</div>
 			{isOpenDialog && employeeToEdit && (

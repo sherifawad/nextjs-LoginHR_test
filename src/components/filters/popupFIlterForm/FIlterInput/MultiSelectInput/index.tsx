@@ -27,12 +27,17 @@ function MultiSelectInput({ onValuesChange, property }: Props) {
 	const [selectedValues, setSelectedValues] = useState<FilterOption[]>([]);
 
 	useEffect(() => {
+		let isCancelled = false;
 		const result = async () => {
 			const result = await getSelectedOptions(property);
-			setOptions(result);
+			if (!isCancelled) {
+				setOptions(result);
+			}
 		};
-
 		result();
+		return () => {
+			isCancelled = true;
+		};
 	}, [property]);
 
 	return (

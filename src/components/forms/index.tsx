@@ -64,7 +64,7 @@ const EmployeeForm = ({
 	});
 
 	const { toast } = useToast();
-	const { deleteParams } = useSearchUrlParams();
+	const { deleteParams, router } = useSearchUrlParams();
 
 	const [isClient, setIsClient] = React.useState(false);
 
@@ -111,7 +111,8 @@ const EmployeeForm = ({
 				title: "Success",
 			});
 			deleteParams(["employee"]);
-			window.location.reload();
+			router.refresh();
+			// window.location.reload();
 		}
 	}
 

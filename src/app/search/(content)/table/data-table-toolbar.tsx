@@ -31,7 +31,7 @@ export function DataTableToolbar<TData>({
 		Object.keys(selectedData).length !== 0 ||
 		selectedData.constructor !== Object;
 
-	const onDelete = async () => {
+	const onDelete = () => {
 		const codes = Object.keys(selectedData).map(k => +k);
 		deleteSelected(codes);
 		setRowSelection({});

@@ -20,26 +20,6 @@
 		}
 	},
 	{
-		"name": "Lannie Bonifant",
-		"code": 8,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2021-07-22T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Temple Paddick",
-		"code": 9,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2024-01-21T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
 		"name": "Trudi Aikin",
 		"code": 10,
 		"salaryStatus": "NOT_VALID",

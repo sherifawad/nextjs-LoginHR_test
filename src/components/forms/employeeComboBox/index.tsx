@@ -30,7 +30,7 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 		selectedValue,
 	);
 	const { toast } = useToast();
-	const { setParams } = useSearchUrlParams();
+	const { setParams, router } = useSearchUrlParams();
 	const [isPending, startTransition] = React.useTransition();
 
 	const onInputChange = (input: string) => {

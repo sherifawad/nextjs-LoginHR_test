@@ -1,7 +1,7 @@
 "use server";
 
 import { getFilteredResult } from "@/components/filters/constants";
-import { deleteMany } from "@/database/employees-dataBase";
+import { deleteMany } from "@/database/employees-apiRepo";
 import {
 	dataToStringWithCustomSeparator,
 	getReadableFilterValues,
@@ -10,7 +10,6 @@ import {
 import { FilterOption } from "@/types";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { GetAllEmployees } from "../profile/_actions";
 
 export type CreatedFilter =
@@ -111,17 +110,11 @@ export const getFilteredEmployees = async (
 
 export const DeleteManyEmployees = async (
 	codes: number[],
-): Promise<Employee[]> => {
-	const inputSchema = z.coerce.number().array();
-	const validated = inputSchema.safeParse(codes);
-	if (!validated.success) {
-		return [];
-	}
-	const deleted = await deleteMany(validated.data);
-	if (deleted.length > 0) {
-		revalidatePath("/profile");
-		revalidatePath("/search");
-		revalidatePath("/employees");
-	}
-	return deleted;
+): Promise<number[]> => {
+	const result = await deleteMany(codes);
+	if (result.status === "error") throw new Error(result.message);
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return result.data;
 };

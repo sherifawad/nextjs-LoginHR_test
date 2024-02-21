@@ -1,6 +1,7 @@
 "use client";
 
 import { DeleteManyEmployees } from "@/app/employees/_actions";
+import CodeListSkeleton from "@/components/forms/employeeComboBox/codeList-skeleton";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -9,15 +10,22 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/use-toast";
 import { checkFilterMatch } from "@/lib/utils/filterUtils";
 import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
-import { Minus, Plus } from "lucide-react";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Loader, Minus, Plus } from "lucide-react";
+import {
+	Suspense,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	useTransition,
+} from "react";
 import { getFilteredEmployees } from "../_actions";
 import FilterForm from "./form";
 import { columns } from "./table/columns";
 import { DataTable } from "./table/data-table";
-import TableSkeleton from "./tableSkeletotn";
 
 type Props = {};
 
@@ -30,6 +38,9 @@ function SearchContent({}: Props) {
 	const [filtersComponent, setFiltersComponent] = useState<number[]>([1]);
 	const formRefs = useRef<HTMLFormElement[]>([]);
 	const [isFiltersSet, setIsFiltersSet] = useState(false);
+
+	const { toast } = useToast();
+	const [isPending, startTransition] = useTransition();
 
 	const submitHandler = async (filter: EmployeeFilter) => {
 		setFilters(prev => {
@@ -56,9 +67,11 @@ function SearchContent({}: Props) {
 	};
 
 	const data = useCallback(async () => {
-		const { filteredEmployees } = await getFilteredEmployees({ filters });
-		setFilteredEmployees(filteredEmployees);
-		setIsOpenDialog(true);
+		startTransition(async () => {
+			const { filteredEmployees } = await getFilteredEmployees({ filters });
+			setFilteredEmployees(filteredEmployees);
+			setIsOpenDialog(true);
+		});
 	}, [filters]);
 
 	const onDialogClose = useCallback((value: boolean) => {
@@ -70,12 +83,27 @@ function SearchContent({}: Props) {
 
 	const deleteSelected = useCallback(
 		async (codes: number[]) => {
-			const results = await DeleteManyEmployees(codes);
-			if (results.length > 0) {
-				data();
+			try {
+				startTransition(async () => {
+					const results = await DeleteManyEmployees(codes);
+					if (results.length > 0) {
+						toast({
+							variant: "success",
+							title: "Deleted successfully",
+						});
+					}
+					data();
+				});
+			} catch (error) {
+				toast({
+					variant: "destructive",
+					title: "Uh oh! Something went wrong.",
+					description: error instanceof Error ? error.message : `${error}`,
+				});
+				return;
 			}
 		},
-		[data],
+		[data, toast],
 	);
 
 	useEffect(() => {
@@ -123,8 +151,12 @@ function SearchContent({}: Props) {
 						<Plus className='h-4 w-4' />
 					</Button>
 				</div>
-				<Button className='self-start' onClick={() => applyFilter()}>
-					Apply
+				<Button
+					className='self-start'
+					onClick={() => applyFilter()}
+					disabled={isFiltersSet}
+				>
+					{isFiltersSet ? <Loader className='animate-spin' /> : <>Apply</>}
 				</Button>
 			</div>
 			<DialogContent
@@ -135,16 +167,19 @@ function SearchContent({}: Props) {
 				<DialogHeader>
 					<DialogTitle>Filtered List</DialogTitle>
 				</DialogHeader>
-
-				<Suspense fallback={<TableSkeleton />}>
-					<ScrollArea className='max-h-[60svh]'>
-						<DataTable
-							columns={columns}
-							data={filteredEmployees}
-							deleteSelected={deleteSelected}
-						/>
-					</ScrollArea>
-				</Suspense>
+				{isPending ? (
+					<CodeListSkeleton />
+				) : (
+					<Suspense fallback={<CodeListSkeleton />}>
+						<ScrollArea className='max-h-[60svh]'>
+							<DataTable
+								columns={columns}
+								data={filteredEmployees}
+								deleteSelected={deleteSelected}
+							/>
+						</ScrollArea>
+					</Suspense>
+				)}
 			</DialogContent>
 		</Dialog>
 	);

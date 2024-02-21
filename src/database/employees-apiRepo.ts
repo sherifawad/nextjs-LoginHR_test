@@ -47,6 +47,7 @@ export async function getByCode(code: number): Promise<FetchResult<Employee>> {
 			headers: new Headers({
 				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
 			}),
+			cache: "no-store",
 		});
 		if (response.ok) {
 			const result = await response.json();
@@ -264,24 +265,53 @@ export async function _delete(code: number): Promise<FetchResult<Employee>> {
 		};
 	}
 }
-// export async function deleteMany(codeList: number[]): Promise<Employee[]> {
-// 	try {
-// 		let employees = [...(await getAll())];
-// 		const deletedEmployees: Employee[] = [];
-// 		const result = employees.filter(x =>
-// 			codeList.every(l => {
-// 				if (l !== x.code) {
-// 					return true;
-// 				}
-// 				deletedEmployees.push(x);
-// 				return false;
-// 			}),
-// 		);
-// 		await saveData(result);
 
-// 		// EmployeesData = [...result];
-// 		return deletedEmployees;
-// 	} catch (error) {
-// 		return [];
-// 	}
-// }
+export async function deleteMany(
+	codeList: number[],
+): Promise<FetchResult<number[]>> {
+	try {
+		const validInputs = codeSchema.array().safeParse(codeList);
+		if (!validInputs.success) {
+			return {
+				status: "error",
+				message: validInputs.error.issues[0].message,
+			};
+		}
+
+		const response = await fetch(`${env.API_URL}/employee/deleteMany`, {
+			headers: new Headers({
+				Authorization: `Basic ${encode(`${env.userName}:${env.password}`)}`,
+				"Content-Type": "application/json",
+			}),
+			method: "POST",
+
+			body: JSON.stringify(validInputs.data),
+		});
+		if (response.ok) {
+			const result = await response.json();
+			const ServerResponse = await GetServerResponse(
+				result,
+				codeSchema.array(),
+			);
+			if (ServerResponse.status === "success") {
+				return {
+					status: "success",
+					data: ServerResponse.data,
+				};
+			}
+			return {
+				status: "error",
+				message: ServerResponse.message,
+			};
+		}
+		return {
+			status: "error",
+			message: `${await response.text()}`,
+		};
+	} catch (error) {
+		return {
+			status: "error",
+			message: error instanceof Error ? error.message : `${error}`,
+		};
+	}
+}
