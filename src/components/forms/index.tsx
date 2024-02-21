@@ -165,9 +165,7 @@ const EmployeeForm = ({
 								<FormControl>
 									<CodeComboBox
 										selectedValue={field.value}
-										onSelection={code =>
-											code ? form.setValue("code", code) : undefined
-										}
+										onSelection={v => field.onChange(v)}
 										disabled={disabled}
 									/>
 								</FormControl>

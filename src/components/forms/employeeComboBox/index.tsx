@@ -34,7 +34,7 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 	const [isPending, startTransition] = React.useTransition();
 
 	const onInputChange = (input: string) => {
-		if (isNaN(Number(input))) {
+		if (isNaN(Number(input)) || input.length < 1) {
 			toast({
 				variant: "destructive",
 				title: "Invalid Input.",
