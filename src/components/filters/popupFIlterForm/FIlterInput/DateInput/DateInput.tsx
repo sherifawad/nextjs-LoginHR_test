@@ -14,16 +14,19 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = {
-	onDateSelected: (range: Date | undefined) => void;
-	SelectedDate: Date | undefined;
+	onDateSelected: (dateStringInSeconds: string) => void;
 };
 
-export default function DateInput({ onDateSelected, SelectedDate }: Props) {
-	const [date, setDate] = React.useState<Date | undefined>(SelectedDate);
+export default function DateInput({ onDateSelected }: Props) {
+	const [date, setDate] = React.useState<Date | undefined>(undefined);
 
 	const onSelection = (selectedDate: Date | undefined) => {
 		setDate(selectedDate);
-		onDateSelected(selectedDate);
+		if (selectedDate) {
+			// const date = addDays(selectedDate, 1).getTime().toString();
+			const dateStringInSeconds = selectedDate.getTime().toString();
+			onDateSelected(dateStringInSeconds);
+		}
 	};
 
 	return (
@@ -32,15 +35,20 @@ export default function DateInput({ onDateSelected, SelectedDate }: Props) {
 				<Button
 					variant={"outline"}
 					className={cn(
-						"w-full justify-start text-left font-normal",
+						"w-full  justify-start text-left font-normal",
 						!date && "text-muted-foreground",
 					)}
 				>
 					<CalendarIcon className='mr-2 h-4 w-4' />
-					{date ? format(date, "PPP") : <span>Pick a date</span>}
+					{date ? format(date, "PP") : <span>Pick a date</span>}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className='w-auto p-0'>
+			<PopoverContent
+				className=' p-0'
+				onInteractOutside={e => {
+					e.preventDefault();
+				}}
+			>
 				<Calendar
 					mode='single'
 					selected={date}

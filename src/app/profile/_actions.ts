@@ -5,42 +5,74 @@ import {
 	create,
 	getAll,
 	getByCode,
-	getMany,
 	getNewCode,
-	getOne,
 	update,
-} from "@/database/employees-dataBase";
-import { findByCode, getAllJobs } from "@/database/jobs-DataBase";
-import { Employee } from "@/types";
+} from "@/database/employees-apiRepo";
+import { findByCode, getAllJobs } from "@/database/position-apiRepo";
+import { Employee } from "@/validation/employeeSchema";
+import { revalidatePath } from "next/cache";
 
 export async function UpdateEmployee(
 	code: number,
-	params: { [x in keyof Employee]: Employee[x] },
-) {
-	return update(code, params);
+	employee: Employee,
+): Promise<Employee> {
+	const result = await update(code, employee);
+	if (result.status === "error") throw new Error(result.message);
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return result.data;
 }
-export async function CreateEmployee(employee: Employee) {
-	const validate = Employee.safeParse(employee);
-	if (!validate.success) throw new Error("Invalid Params");
-	return create(validate.data);
+export async function CreateEmployee(employee: Employee): Promise<Employee> {
+	const result = await create(employee);
+	if (result.status === "error") throw new Error(result.message);
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return result.data;
 }
 export async function DeleteEmployee(code: number) {
-	return _delete(code);
+	const result = await _delete(code);
+	if (result.status === "error") throw new Error(result.message);
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return result.data;
 }
-export async function GetAllEmployees() {
-	return getAll();
+export async function GetAllEmployees(): Promise<Employee[]> {
+	const result = await getAll();
+	if (result.status === "error") return [];
+	revalidatePath("/employees");
+	revalidatePath("/profile");
+	revalidatePath("/search");
+	return result.data;
 }
-export async function GetEmployeeUnique(code: number) {
-	return getByCode(code);
+export async function GetEmployeeUnique(
+	code: number,
+): Promise<Employee | undefined> {
+	const result = await getByCode(code);
+	if (result.status === "error") return undefined;
+
+	return result.data;
 }
-export async function GetEmployee(x: (x: Employee) => boolean) {
-	return getOne(x);
+export async function GetEmployee(
+	x: (x: Employee) => boolean,
+): Promise<Employee | undefined> {
+	const result = await getAll();
+	if (result.status === "error") return undefined;
+	return result.data.find(x) ?? undefined;
 }
-export async function GetEmployees(x: (x: Employee) => boolean) {
-	return getMany(x);
+export async function GetEmployees(
+	x: (x: Employee) => boolean,
+): Promise<Employee[]> {
+	const result = await getAll();
+	if (result.status === "error") return [];
+	return result.data.filter(x);
 }
-export async function GetNewEmployee() {
-	return getNewCode();
+export async function GetNewEmployee(): Promise<number> {
+	const result = await getNewCode();
+	if (result.status === "error") throw new Error(result.message);
+	return result.data + 1;
 }
 
 export async function GetAllJobs() {

@@ -1,15 +1,13 @@
-import { isArray } from "@/lib/utils";
+import { isArray } from "@/lib/utils/array";
 import {
 	BasicValues,
-	Employee,
-	EmployeeFilterComparisonOption,
 	EmployeeFilterOperation,
-	Filter,
-	FilterComparison,
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
+import { Employee, EmployeeFilter } from "@/validation/employeeSchema";
 import { z } from "zod";
+import { FilterComparison } from "./comparisonSelections/selections/comparisonSelections/comparisonSchema";
 
 export const NumberOps = {
 	//for operator
@@ -43,98 +41,78 @@ export const StringOps = {
 		a.map(x => x.toLowerCase()).includes(b.toLowerCase()), //contain
 } as const;
 
-export const Operation = (
-	valueA: BasicValues,
+const Operation = (
+	valueA: string | number | Date | object,
 	{ valueB, operation, valueC }: EmployeeFilterOperation,
 ) => {
-	let firstValue: string | number | Date | string[] | number[] | undefined;
-	let secondValue: string | number | Date | string[] | number[] | undefined;
-	let thirdValue: string | number | Date | undefined;
+	let firstValue: string;
+	let secondValue: BasicValues;
+	let thirdValue: string | undefined;
 
-	secondValue = String(valueB).toLocaleLowerCase();
+	if (valueC) thirdValue = valueC as string;
 
 	if (isArray(valueB)) {
 		secondValue = Array.from(valueB as any[]).map(v =>
 			String(v).toLocaleLowerCase(),
 		);
+	} else {
+		secondValue = valueB.toString().toLocaleLowerCase();
 	}
-	if (valueC) thirdValue = String(valueB).toLocaleLowerCase();
 
-	// Set Input Types
-	if (typeof valueA === "object") {
+	// Get First Input Type
+
+	if (Object.prototype.toString.call(valueA) === "[object Date]") {
+		firstValue = new Date(valueA as Date).getTime().toString();
+	} else if (typeof valueA === "object") {
 		firstValue = Object.entries(valueA).map(([_, value]) =>
 			value.toString().toLocaleLowerCase(),
 		)[1];
-	} else if (Object.prototype.toString.call(valueA) === "[object Date]") {
-		firstValue = (valueA as unknown as Date).getTime();
-		secondValue = (valueB as Date).getTime();
-		if (valueC) thirdValue = (valueC as Date).getTime();
 	} else {
-		firstValue = String(valueA).toLocaleLowerCase();
+		firstValue = valueA.toString().toLocaleLowerCase();
 	}
-
 	// Return Comparison Expression
 	switch (operation) {
 		case FilterComparison.Enum.Equal:
 			return firstValue === secondValue;
-		case FilterComparison.Enum.Not_Equal:
+
+		case FilterComparison.Enum["Not-Equal"]:
 			return firstValue !== secondValue;
+
 		case FilterComparison.Enum.GreaterThan:
-			if (firstValue && secondValue) {
-				return firstValue > secondValue;
-			}
-			break;
-		case FilterComparison.Enum.GreaterThan_Or_Equal:
-			if (firstValue && secondValue) {
-				return firstValue >= secondValue;
-			}
-			break;
+			return +firstValue > +secondValue;
+
+		case FilterComparison.Enum["GreaterThan-Or-Equal"]:
+			return +firstValue >= +secondValue;
+
 		case FilterComparison.Enum.LessThan:
-			if (firstValue && secondValue) {
-				return firstValue < secondValue;
-			}
-			break;
-		case FilterComparison.Enum.LessThan_Or_Equal:
-			if (firstValue && secondValue) {
-				return firstValue <= secondValue;
-			}
-			break;
+			return +firstValue < +secondValue;
+
+		case FilterComparison.Enum["LessThan-Or-Equal"]:
+			return +firstValue <= +secondValue;
+
 		case FilterComparison.Enum.InList:
-			if (firstValue && secondValue && isArray(secondValue)) {
-				console.log("🚀 ~ secondValue:", secondValue);
-				console.log("🚀 ~ firstValue:", firstValue);
-				// return (secondValue as string[]).filter(e => e !== firstValue);
-				return (secondValue as string[]).some(
-					y => y === (firstValue as string),
-				);
-			}
-			break;
-		case FilterComparison.Enum.Not_InList:
-			if (firstValue && secondValue && isArray(secondValue)) {
-				return (secondValue as string[]).every(
-					y => y !== (firstValue as string),
-				);
-			}
-			break;
+			return (secondValue as string[]).some(y => y === (firstValue as string));
+
+		case FilterComparison.Enum["Not-InList"]:
+			return (secondValue as string[]).every(y => y !== (firstValue as string));
 
 		case FilterComparison.Enum.Include:
-			if (firstValue && secondValue) {
-				return firstValue.toString().includes(secondValue.toString());
-			}
-			break;
-		case FilterComparison.Enum.Not_Include:
-			if (firstValue && secondValue) {
-				return !firstValue.toString().includes(secondValue.toString());
-			}
-			break;
+			// console.log("🚀 ~ firstValue:", firstValue);
+
+			return firstValue.toString().includes(secondValue.toString());
+
+		case FilterComparison.Enum["Not-Include"]:
+			return !firstValue.toString().includes(secondValue.toString());
+
 		case FilterComparison.Enum.Between:
-			if (firstValue && secondValue && thirdValue) {
-				return firstValue >= secondValue && firstValue <= thirdValue;
+			if (thirdValue) {
+				const dd = +firstValue >= +secondValue && +firstValue <= +thirdValue;
+				return dd;
 			}
 			break;
-		case FilterComparison.Enum.Not_Between:
-			if (firstValue && secondValue && thirdValue) {
-				return firstValue < secondValue || firstValue > thirdValue;
+		case FilterComparison.Enum["Not-Between"]:
+			if (thirdValue) {
+				return +firstValue < +secondValue || +firstValue > +thirdValue;
 			}
 			break;
 
@@ -143,142 +121,31 @@ export const Operation = (
 	}
 };
 
-const FavoriteComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.GreaterThan,
-		value: FilterComparison.Values.GreaterThan,
-	},
-	{
-		label: FilterComparison.enum.LessThan,
-		value: FilterComparison.Values.LessThan,
-	},
-
-	{
-		label: FilterComparison.enum.GreaterThan_Or_Equal,
-		value: FilterComparison.Values.GreaterThan_Or_Equal,
-	},
-	{
-		label: FilterComparison.enum.LessThan_Or_Equal,
-		value: FilterComparison.Values.LessThan_Or_Equal,
-	},
-];
-
-const BlankComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.IsBlank,
-		value: FilterComparison.Values.IsBlank,
-	},
-	{
-		label: FilterComparison.enum.Is_Not_Blank,
-		value: FilterComparison.Values.Is_Not_Blank,
-	},
-];
-const NullComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.Is_Null,
-		value: FilterComparison.Values.Is_Null,
-	},
-	{
-		label: FilterComparison.enum.Is_Not_Null,
-		value: FilterComparison.Values.Is_Not_Null,
-	},
-];
-const BetweenComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.Between,
-		value: FilterComparison.Values.Between,
-	},
-	{
-		label: FilterComparison.enum.Not_Between,
-		value: FilterComparison.Values.Not_Between,
-	},
-];
-const IncludeComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.Include,
-		value: FilterComparison.Values.Include,
-	},
-	{
-		label: FilterComparison.enum.Not_Include,
-		value: FilterComparison.Values.Not_Include,
-	},
-];
-
-const EqualComparison: EmployeeFilterComparisonOption[] = [
-	{ label: FilterComparison.enum.Equal, value: FilterComparison.Values.Equal },
-	{
-		label: FilterComparison.enum.Not_Equal,
-		value: FilterComparison.Values.Not_Equal,
-	},
-];
-const ListComparison: EmployeeFilterComparisonOption[] = [
-	{
-		label: FilterComparison.enum.InList,
-		value: FilterComparison.Values.InList,
-	},
-	{
-		label: FilterComparison.enum.Not_InList,
-		value: FilterComparison.Values.Not_InList,
-	},
-];
-
-export const PropertiesLabels: FilterOption[] = Object.keys(Employee.shape).map(
-	e => ({
-		label: e,
-		value: e,
-	}),
-);
 export const getType = (value: keyof z.infer<typeof Employee>) => {
 	return Object.values(Employee.shape[value]._def.typeName)
 		.toSpliced(0, 3)
 		.join("")
 		.toLocaleLowerCase();
 };
-
-export const getComparisonList = (property: keyof z.infer<typeof Employee>) => {
-	const _type = getType(property);
-	console.log("🚀 ~ getComparisonList ~ _type:", _type);
-	let comparisonsList: EmployeeFilterComparisonOption[] = [];
-	if (_type === "number") {
-		comparisonsList = [
-			...EqualComparison,
-			...FavoriteComparison,
-			...IncludeComparison,
-			...BetweenComparison,
-		];
-	} else if (_type === "string") {
-		comparisonsList = [...EqualComparison, ...IncludeComparison];
-	} else if (_type === "date") {
-		comparisonsList = [
-			...EqualComparison,
-			...FavoriteComparison,
-			...BetweenComparison,
-		];
-	} else if (_type === "object" || _type === "enum" || _type === "nativeenum") {
-		comparisonsList = ListComparison;
-	} else {
-		comparisonsList = [...IncludeComparison, ...ListComparison];
-	}
-	return comparisonsList;
-};
-
 export const setComparisonComponentType = (
-	property: keyof z.infer<typeof Employee>,
+	property: keyof Employee,
 	operation: FilterComparison,
 ): FilterValueSelect => {
 	const _type = getType(property);
-	console.log("🚀 ~ _type:", _type);
+	// console.log("🚀 ~ _type:", _type);
 	let comparisonsList: FilterOption[] = [];
 	switch (_type) {
-		case "number": {
+		case "number":
+		case "nullable": {
 			if (
 				operation === FilterComparison.enum.InList ||
-				operation === FilterComparison.enum.Not_InList
+				operation === FilterComparison.enum["Not-InList"]
 			) {
 				return FilterValueSelect.Enum.LIST;
-			} else if (
+			}
+			if (
 				operation === FilterComparison.enum.Between ||
-				operation === FilterComparison.enum.Not_Between
+				operation === FilterComparison.enum["Not-Between"]
 			) {
 				return FilterValueSelect.Enum.RANGE;
 			}
@@ -288,7 +155,10 @@ export const setComparisonComponentType = (
 			return FilterValueSelect.Enum.TEXT;
 		}
 		case "date": {
-			if (operation === FilterComparison.enum.Between) {
+			if (
+				operation === FilterComparison.enum.Between ||
+				operation === FilterComparison.enum["Not-Between"]
+			) {
 				return FilterValueSelect.Enum.DATE_RANGE;
 			}
 			return FilterValueSelect.Enum.DATE;
@@ -305,70 +175,66 @@ export const setComparisonComponentType = (
 };
 
 // create operation
-export const constructOperation = (
-	filter: Filter,
-): EmployeeFilterOperation | undefined => {
-	const validatedFilter = Filter.safeParse(filter);
-	if (!validatedFilter.success) {
-		console.log("🚀 ~ addFilter ~ validatedFilter:", validatedFilter.error);
-		return undefined;
-	}
+const constructOperation = (
+	filter: EmployeeFilter,
+): EmployeeFilterOperation => {
 	let result: EmployeeFilterOperation;
-	const validatedOperation = FilterComparison.safeParse(
-		validatedFilter.data.operation.value,
-	);
-	if (!validatedOperation.success) {
-		console.log(
-			"🚀 ~ addFilter ~ validatedOperation:",
-			validatedOperation.error,
-		);
-		return undefined;
-	}
-	const validatedData = BasicValues.safeParse(validatedFilter.data.data);
-	if (!validatedData.success) {
-		console.log("🚀 ~ addFilter ~ validatedData:", validatedData.error);
-		return undefined;
-	}
-	console.log("🚀 ~ validatedData:", validatedData.data);
 
 	if (
-		validatedFilter.data.operation.value === FilterComparison.Values.Between ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Not_Between
+		filter.operation === FilterComparison.Values.Between ||
+		filter.operation === FilterComparison.Values["Not-Between"]
 	) {
-		const [value1, value2] = validatedData.data.toString().split(",");
+		const [value1, value2] = filter.data.toString().split(",");
 		result = {
 			valueB: value1,
 			valueC: value2,
-			operation: validatedOperation.data,
+			operation: filter.operation,
 		};
 	} else if (
-		validatedFilter.data.operation.value === FilterComparison.Values.InList ||
-		validatedFilter.data.operation.value ===
-			FilterComparison.Values.Not_InList ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Include ||
-		validatedFilter.data.operation.value === FilterComparison.Values.Not_Include
+		filter.operation === FilterComparison.Values.InList ||
+		filter.operation === FilterComparison.Values["Not-InList"] ||
+		filter.operation === FilterComparison.Values.Include ||
+		filter.operation === FilterComparison.Values["Not-Include"]
 	) {
-		if (
-			validatedFilter.data.property.value === "position" ||
-			validatedFilter.data.property.value === "salaryStatus"
-		) {
+		if (filter.property === "position" || filter.property === "salaryStatus") {
 			result = {
-				valueB: (filter.data as FilterOption[]).map(e => e.value),
-				operation: validatedOperation.data,
+				valueB: filter.data,
+				// valueB: (filter.data as FilterOption[]).map(e => e.value),
+				operation: filter.operation,
 			};
 		} else {
 			result = {
-				valueB: validatedData.data.toString().split(","),
-				operation: validatedOperation.data,
+				valueB: filter.data,
+				// valueB: filter.data.toString().split(","),
+				operation: filter.operation,
 			};
 		}
 	} else {
 		result = {
-			valueB: validatedData.data,
+			valueB: filter.data,
 			valueC: undefined,
-			operation: validatedOperation.data,
+			operation: filter.operation,
 		};
 	}
 
 	return result;
+};
+
+export const getFilteredResult = ({
+	employees,
+	filters,
+}: {
+	employees: Employee[];
+	filters: EmployeeFilter[];
+}): Employee[] => {
+	return employees.filter(x => {
+		return filters.every(f => {
+			const data = constructOperation(f);
+			return Operation(x[f.property] as string | number | Date | object, {
+				valueB: data.valueB,
+				valueC: data.valueC,
+				operation: data.operation,
+			});
+		});
+	});
 };

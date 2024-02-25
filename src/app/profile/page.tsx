@@ -17,8 +17,11 @@ async function Profile({ searchParams }: Props) {
 
 	const validateCode = Searchparams.safeParse(searchParams);
 	if (validateCode.success) {
-		employee = await GetEmployeeUnique(validateCode.data.employee);
-		edit = employee ? true : false;
+		const result = await GetEmployeeUnique(validateCode.data.employee);
+		if (result !== null) {
+			employee = result;
+			edit = true;
+		}
 	}
 	return (
 		<>

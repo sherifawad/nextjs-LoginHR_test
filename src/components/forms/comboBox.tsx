@@ -3,7 +3,7 @@
 import { ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
-import { GetAllJobs, GetJob } from "@/app/profile/_actions";
+import { GetAllJobs } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -17,10 +17,10 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { EmployeePosition } from "@/types";
+import { EmployeePosition } from "@/validation/employeeSchema";
 type Props = {
-	selectedValue: EmployeePosition | undefined;
-	onSelection: (job: EmployeePosition | undefined) => void;
+	selectedValue: number | null;
+	onSelection: (job: number | null) => void;
 };
 
 function ComboBox({ selectedValue, onSelection }: Props) {
@@ -30,8 +30,9 @@ function ComboBox({ selectedValue, onSelection }: Props) {
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const result = await GetAllJobs();
-
-			setJobs(result);
+			if (result.status === "success") {
+				setJobs(result.data);
+			}
 		};
 		fetchData();
 	}, []);
@@ -46,13 +47,13 @@ function ComboBox({ selectedValue, onSelection }: Props) {
 					className=' h-11 w-full justify-between bg-muted'
 				>
 					{selectedValue
-						? jobs.find(x => x.positionCode === selectedValue.positionCode)
-								?.positionName ?? "Select option..."
+						? jobs.find(x => x.positionCode === selectedValue)?.positionName ??
+							"Select option..."
 						: "Select option..."}
 					<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className=' p-0'>
+			<PopoverContent className='w-auto p-0'>
 				<Command>
 					<CommandInput placeholder='Search option...' />
 					<CommandEmpty>No option found.</CommandEmpty>
@@ -62,20 +63,13 @@ function ComboBox({ selectedValue, onSelection }: Props) {
 								key={j.positionCode}
 								value={j.positionCode + ""}
 								onSelect={async currentValue => {
-									const selectedJob = await GetJob(+currentValue);
-									onSelection(selectedJob);
+									const selectedJob = jobs.find(
+										j => j.positionCode === +currentValue,
+									);
+									onSelection(j.positionCode);
 									setOpen(false);
 								}}
 							>
-								{/* TODO: Add check box */}
-								{/* <Check
-									className={cn(
-										"mr-2 h-4 w-4",
-										selectedValue === option.value
-											? "opacity-100"
-											: "opacity-0",
-									)}
-								/> */}
 								{j.positionName}
 							</CommandItem>
 						))}

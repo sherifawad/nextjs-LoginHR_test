@@ -1,6 +1,6 @@
 "use client";
 
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
@@ -15,23 +15,23 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-	onRangeDateSelected: (range: DateRange | undefined) => void;
-	dateRange: DateRange | undefined;
+	onRangeDateInSecondStringSelected: (range: string[]) => void;
 };
 
 export default function DatePickerWithRange({
-	onRangeDateSelected,
-	dateRange = {
-		from: new Date(2023, 0, 20),
-		to: addDays(new Date(2023, 0, 20), 20),
-	},
+	onRangeDateInSecondStringSelected,
 	className,
 }: Props) {
-	const [date, setDate] = React.useState<DateRange | undefined>(dateRange);
+	const [date, setDate] = React.useState<DateRange | undefined>(undefined);
 
 	const onSelection = (range: DateRange | undefined) => {
 		setDate(range);
-		onRangeDateSelected(range);
+		if (range && range.from && range.to)
+			// onRangeDateSelected([addDays(range.from, 1), addDays(range.to, 1)]);
+			onRangeDateInSecondStringSelected([
+				range.from.getTime().toString(),
+				range.to.getTime().toString(),
+			]);
 	};
 
 	return (
@@ -42,7 +42,7 @@ export default function DatePickerWithRange({
 						id='date'
 						variant={"outline"}
 						className={cn(
-							"w-[300px] justify-start text-left font-normal",
+							"w-full justify-start text-left font-normal",
 							!date && "text-muted-foreground",
 						)}
 					>
@@ -50,18 +50,23 @@ export default function DatePickerWithRange({
 						{date?.from ? (
 							date.to ? (
 								<>
-									{format(date.from, "LLL dd, y")} -{" "}
-									{format(date.to, "LLL dd, y")}
+									{format(date.from, "PP")} - {format(date.to, "PP")}
 								</>
 							) : (
-								format(date.from, "LLL dd, y")
+								format(date.from, "PP")
 							)
 						) : (
 							<span>Pick a date</span>
 						)}
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className='w-auto p-0' align='start'>
+				<PopoverContent
+					className='w-auto p-0'
+					align='start'
+					onInteractOutside={e => {
+						e.preventDefault();
+					}}
+				>
 					<Calendar
 						initialFocus
 						mode='range'

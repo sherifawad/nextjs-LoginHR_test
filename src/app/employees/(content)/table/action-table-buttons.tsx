@@ -1,6 +1,6 @@
 import { DeleteEmployee } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 
 type Props = {
 	employee: Employee;

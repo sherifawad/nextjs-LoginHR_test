@@ -1,11 +1,12 @@
 import "server-only";
 
-import { Employee } from "@/types";
-import { promises as fs } from "fs";
+import { Employee } from "@/validation/employeeSchema";
 import path from "path";
+// import { promises as fs } from "fs";
+import { promises as fs } from "fs";
 
-// employees in JSON file for simplicity, store in a db for production applications
-// let Employees: Employee[] = (
+// // employees in JSON file for simplicity, store in a db for production applications
+// let EmployeesData: Employee[] = (
 // 	require("../data/employees.json") as Employee[]
 // ).map(e => ({
 // 	...e,
@@ -17,15 +18,16 @@ const dataFilePath = path.join(process.cwd(), "src", "data", "employees.json");
 // const dataFilePath = path.resolve("..", "/data", "employees.json");
 // console.log("🚀 ~ dataFilePath:", dataFilePath);
 
-const Employees = (async function Employees() {
+const EmployeesData = async function Employees() {
 	return JSON.parse(await fs.readFile(dataFilePath, "utf8"));
-})() as unknown as Promise<Employee[]>;
+};
 
 export async function getAll(): Promise<Employee[]> {
-	return (await Employees).map(e => ({
+	return ((await EmployeesData()) as Employee[]).map(e => ({
 		...e,
 		hiringDate: new Date(e.hiringDate),
 	}));
+	// return EmployeesData
 }
 export async function getByCode(code: number): Promise<Employee | undefined> {
 	return (await getAll()).find(x => x.code === code);
@@ -48,14 +50,15 @@ export async function getNewCode(): Promise<number> {
 }
 
 export async function create(employee: Employee): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	const exist = await getByCode(employee.code);
 	if (exist) throw new Error("Code Duplicate");
 	// generate new employee id
 
 	// add and save employee
-	employees.push(employee);
-	await saveData(employees);
+	// EmployeesData = [...employees, employee];
+	await saveData([...employees, employee]);
+
 	return employee;
 }
 
@@ -63,7 +66,7 @@ export async function update(
 	code: number,
 	params: { [x in keyof Employee]: Employee[x] },
 ): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	let employee = await getByCode(code);
 	if (!employee || employee == null) throw new Error("Not Found");
 	if (params.code && code !== params.code) {
@@ -83,17 +86,42 @@ export async function update(
 
 	await saveData(result);
 
+	// EmployeesData = [...result];
+
 	return employee;
 }
 
 // prefixed with underscore '_' because 'delete' is a reserved word in javascript
 export async function _delete(code: number): Promise<Employee> {
-	let employees = await getAll();
+	let employees = [...(await getAll())];
 	let employee = employees.find(x => x.code === code);
 	if (!employee || employee == null) throw new Error("Not Found");
-	employees = employees.filter(x => x.code !== code);
-	await saveData(employees);
+	const result = employees.filter(x => x.code !== code);
+	await saveData(result);
+
+	// EmployeesData = [...result];
 	return employee;
+}
+export async function deleteMany(codeList: number[]): Promise<Employee[]> {
+	try {
+		let employees = [...(await getAll())];
+		const deletedEmployees: Employee[] = [];
+		const result = employees.filter(x =>
+			codeList.every(l => {
+				if (l !== x.code) {
+					return true;
+				}
+				deletedEmployees.push(x);
+				return false;
+			}),
+		);
+		await saveData(result);
+
+		// EmployeesData = [...result];
+		return deletedEmployees;
+	} catch (error) {
+		return [];
+	}
 }
 
 async function saveData(employees: Employee[]) {

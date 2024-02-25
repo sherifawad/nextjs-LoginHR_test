@@ -6,7 +6,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/employeeSchema";
 import { FormEvent, useState } from "react";
 import PopUpDialogue from "../../popup-dialogue";
 

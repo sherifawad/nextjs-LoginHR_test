@@ -1,12 +1,19 @@
 "use client";
 
-import { CreateEmployee, UpdateEmployee } from "@/app/profile/_actions";
+import {
+	CreateEmployee,
+	DeleteEmployee,
+	UpdateEmployee,
+} from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee, SalaryStatusEnum } from "@/types";
+import { cn } from "@/lib/utils";
+import { Employee, SalaryStatusEnum } from "@/validation/employeeSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { Loader } from "lucide-react";
+import React, { ComponentPropsWithoutRef, useTransition } from "react";
 import { FieldError, useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "../ui/button";
 import {
 	Form,
 	FormControl,
@@ -29,30 +36,37 @@ export const formatErrors = (errors: Record<string, FieldError>) =>
 		message: errors[key].message,
 	}));
 
-type Props = {
+type Props = ComponentPropsWithoutRef<"form"> & {
 	employee?: Employee;
 	editMode?: boolean;
+	disabled?: boolean;
 };
 
 const defaultValues = {
 	code: -1,
 	hiringDate: new Date(),
 	name: "",
-	position: {
-		positionCode: -1,
-		positionName: "",
-	},
-	salaryStatus: SalaryStatusEnum.Values.VALID,
+	positionCode: null,
+	position: null,
+	salaryStatus: SalaryStatusEnum.enum.VALID,
 };
 
-const EmployeeForm = ({ employee, editMode }: Props) => {
+const EmployeeForm = ({
+	employee,
+	editMode,
+	disabled,
+	className,
+	...rest
+}: Props) => {
 	const form = useForm<z.infer<typeof Employee>>({
 		resolver: zodResolver(Employee),
 		defaultValues,
 	});
 
 	const { toast } = useToast();
-	const { deleteParams } = useSearchUrlParams();
+	const [isPending, startTransition] = useTransition();
+
+	const { deleteParams, router } = useSearchUrlParams();
 
 	const [isClient, setIsClient] = React.useState(false);
 
@@ -62,8 +76,12 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 			form.setValue("code", employee.code);
 			form.setValue("name", employee.name);
 			form.setValue("hiringDate", employee.hiringDate);
-			form.setValue("position", employee.position);
+
 			form.setValue("salaryStatus", employee.salaryStatus);
+			form.setValue("positionCode", employee.positionCode);
+			if (employee.position) {
+				form.setValue("position", employee.position);
+			}
 		} else {
 			form.reset();
 			form.setValue("code", -1);
@@ -71,13 +89,12 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 	}, [employee, form]);
 
 	async function onSubmit(values: z.infer<typeof Employee>) {
+		let initialEmployee = undefined;
 		try {
-			let employee = undefined;
-			if (editMode) {
-				const { code } = values;
-				employee = await UpdateEmployee(code, values);
+			if (editMode && employee) {
+				initialEmployee = await UpdateEmployee(employee.code, values);
 			} else {
-				employee = await CreateEmployee(values);
+				initialEmployee = await CreateEmployee(values);
 			}
 		} catch (error) {
 			let errorMessage = error;
@@ -89,16 +106,39 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 				title: "Uh oh! Something went wrong.",
 				description: `${errorMessage}`,
 			});
-		} finally {
-			if (employee) {
+		}
+		if (initialEmployee) {
+			toast({
+				variant: "success",
+				title: "Success",
+			});
+			deleteParams(["employee"]);
+			// router.refresh();
+			startTransition(() => {
+				window.location.reload();
+			});
+		}
+	}
+
+	const deleteEmployee = async (code: number) => {
+		try {
+			const deleted = await DeleteEmployee(code);
+			if (deleted) {
 				toast({
 					variant: "success",
 					title: "Success",
 				});
 				deleteParams(["employee"]);
+				form.reset();
 			}
+		} catch (error) {
+			toast({
+				variant: "destructive",
+				title: "Uh oh! Something went wrong.",
+				description: error instanceof Error ? error.message : `${error}`,
+			});
 		}
-	}
+	};
 
 	if (!isClient) return null;
 
@@ -106,40 +146,50 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='grid  grid-cols-1 gap-4 gap-x-2 px-8 text-sm md:grid-cols-2'
+				className={cn(
+					"  px-8 text-sm",
+					disabled
+						? "space-y-4"
+						: "grid grid-cols-1 items-center gap-4 md:grid-cols-[repeat(2,minmax(100px,1fr))]",
+					className,
+				)}
+				{...rest}
 			>
 				<FormField
 					control={form.control}
 					name='code'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Employee Code</FormLabel>
-							<FormControl>
-								<CodeComboBox
-									selectedValue={field.value}
-									onSelection={code =>
-										code ? form.setValue("code", code) : undefined
-									}
-								/>
-							</FormControl>
-							<FormMessage />
+							<div className='flex w-full flex-col gap-2 '>
+								<FormLabel>Employee Code</FormLabel>
+								<FormControl>
+									<CodeComboBox
+										selectedValue={field.value}
+										onSelection={v => field.onChange(v)}
+										disabled={disabled}
+									/>
+								</FormControl>
+								<FormMessage />
+							</div>
 						</FormItem>
 					)}
 				/>
 
 				<FormField
 					control={form.control}
-					name='position'
+					name='positionCode'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Employee Code</FormLabel>
-							<FormControl>
-								<ComboBox
-									selectedValue={field.value}
-									onSelection={field.onChange}
-								/>
-							</FormControl>
-							<FormMessage />
+							<div className='flex w-full min-w-[300px]  flex-col gap-2'>
+								<FormLabel>Employee Position</FormLabel>
+								<FormControl>
+									<ComboBox
+										selectedValue={field.value}
+										onSelection={field.onChange}
+									/>
+								</FormControl>
+								<FormMessage />
+							</div>
 						</FormItem>
 					)}
 				/>
@@ -149,16 +199,18 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 					name='name'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Employee Name</FormLabel>
-							<FormControl>
-								<Input
-									className='mt-1 h-10 w-full rounded border bg-muted px-4'
-									placeholder='Name'
-									{...field}
-								/>
-							</FormControl>
-							<FormDescription>Select Employee Name</FormDescription>
-							<FormMessage />
+							<div className='flex w-full flex-col gap-2'>
+								<FormLabel>Employee Name</FormLabel>
+								<FormControl>
+									<Input
+										className='mt-1 h-10 w-full rounded border bg-muted px-4'
+										placeholder='Name'
+										{...field}
+									/>
+								</FormControl>
+								<FormDescription>Select Employee Name</FormDescription>
+								<FormMessage />
+							</div>
 						</FormItem>
 					)}
 				/>
@@ -167,12 +219,17 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 					name='hiringDate'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Hiring Date</FormLabel>
-							<FormControl>
-								<DatePicker onDateSelect={field.onChange} date={field.value} />
-							</FormControl>
-							<FormDescription>Select Hiring Date</FormDescription>
-							<FormMessage />
+							<div className='flex w-full flex-col gap-2'>
+								<FormLabel>Hiring Date</FormLabel>
+								<FormControl>
+									<DatePicker
+										onDateSelect={field.onChange}
+										date={field.value}
+									/>
+								</FormControl>
+								<FormDescription>Select Hiring Date</FormDescription>
+								<FormMessage />
+							</div>
 						</FormItem>
 					)}
 				/>
@@ -182,37 +239,55 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 					name='salaryStatus'
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Salary Status</FormLabel>
-							<FormControl>
-								<EmployeeSelect
-									onSelection={field.onChange}
-									selectedValue={field.value}
-									items={[
-										{
-											label: "Valid",
-											value: SalaryStatusEnum.Values.VALID,
-										},
-										{
-											label: "Not Valid",
-											value: SalaryStatusEnum.Values.NOT_VALID,
-										},
-									]}
-								/>
-							</FormControl>
-							<FormDescription>Select Salary Status</FormDescription>
-							<FormMessage />
+							<div className='flex w-full flex-col gap-2'>
+								<FormLabel>Salary Status</FormLabel>
+								<FormControl>
+									<EmployeeSelect
+										onSelection={e => (e ? field.onChange(+e) : {})}
+										selectedValue={field.value + ""}
+										items={[
+											{
+												label: "Valid",
+												value: SalaryStatusEnum.enum.VALID + "",
+											},
+											{
+												label: "Not Valid",
+												value: SalaryStatusEnum.enum.NOT_VALID + "",
+											},
+										]}
+									/>
+								</FormControl>
+								<FormDescription>Select Salary Status</FormDescription>
+								<FormMessage />
+							</div>
 						</FormItem>
 					)}
 				/>
 
-				<div className='text-right md:col-span-2'>
-					<div className='inline-flex items-end'>
-						<button
-							type='submit'
-							className='rounded bg-primary px-4 py-2 font-bold text-white hover:bg-primary'
-						>
-							{editMode ? "Update" : "Create"}
-						</button>
+				<div className='flex text-right md:col-span-2'>
+					<div className=' inline-flex gap-4 self-start'>
+						<Button type='submit'>
+							{form.formState.isSubmitting ? (
+								<Loader className='animate-spin' />
+							) : (
+								<>{editMode && employee ? "Update" : "Create"}</>
+							)}
+						</Button>
+						{editMode && employee && (
+							<Button
+								type='button'
+								variant={"destructive"}
+								onClick={async () => {
+									await deleteEmployee(form.getValues("code"));
+								}}
+							>
+								{form.formState.isSubmitting ? (
+									<Loader className='animate-spin' />
+								) : (
+									<>Delete</>
+								)}
+							</Button>
+						)}
 					</div>
 				</div>
 			</form>

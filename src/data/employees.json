@@ -10,80 +10,10 @@
 		}
 	},
 	{
-		"name": "Syd Neame",
-		"code": 2,
-		"salaryStatus": "VALID",
-		"hiringDate": "2021-12-09T22:00:00.000Z",
-		"position": {
-			"positionName": "Manager",
-			"positionCode": 1
-		}
-	},
-	{
-		"name": "Gwennie Templeton",
-		"code": 3,
-		"salaryStatus": "VALID",
-		"hiringDate": "2023-05-19T21:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Ajay Cristofaro",
-		"code": 4,
-		"salaryStatus": "VALID",
-		"hiringDate": "2022-05-30T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Waylen Downse",
-		"code": 5,
-		"salaryStatus": "VALID",
-		"hiringDate": "2021-10-08T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Ginger Forlonge",
-		"code": 6,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2021-08-04T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
 		"name": "Jacobo Parmiter",
 		"code": 7,
 		"salaryStatus": "VALID",
 		"hiringDate": "2021-08-15T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Lannie Bonifant",
-		"code": 8,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2021-07-22T22:00:00.000Z",
-		"position": {
-			"positionName": "HR",
-			"positionCode": 2
-		}
-	},
-	{
-		"name": "Temple Paddick",
-		"code": 9,
-		"salaryStatus": "NOT_VALID",
-		"hiringDate": "2024-01-21T22:00:00.000Z",
 		"position": {
 			"positionName": "HR",
 			"positionCode": 2
@@ -202,11 +132,11 @@
 	{
 		"code": 21,
 		"name": "sherif awad",
-		"salaryStatus": "NOT_VALID",
+		"salaryStatus": "VALID",
 		"hiringDate": "2024-02-11T22:00:00.000Z",
 		"position": {
-			"positionName": "Manager",
-			"positionCode": 1
+			"positionName": "Programmer",
+			"positionCode": 3
 		}
 	}
 ]

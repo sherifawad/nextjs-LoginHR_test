@@ -9,6 +9,7 @@ function Logo() {
 				src={logo}
 				alt='Login-Hr Logo'
 				className='flex-shrink-0 bg-primary-foreground'
+				priority
 			/>
 		</Link>
 	);
