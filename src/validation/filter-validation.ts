@@ -74,7 +74,7 @@ export const FilterItemObject = <T extends SomeZodObject>(dataType: T) =>
 		})
 		.refine(
 			data => {
-				console.log("🚀 ~ dataType:", dataType.shape);
+				if (data.Value.length < 1) return false;
 				const _type = Object.entries(dataType.shape).find(
 					([key]) =>
 						key.toLocaleLowerCase() === data.Property.toLocaleLowerCase(),
@@ -87,21 +87,6 @@ export const FilterItemObject = <T extends SomeZodObject>(dataType: T) =>
 				)
 					return false;
 
-				let _definition = _type[1];
-				const innerDefinition = Object.entries(_type[1]._def).find(
-					([key]) =>
-						key.toLocaleLowerCase() === "innerType".toLocaleLowerCase(),
-				);
-
-				// while (
-				// 	_type[1] instanceof ZodOptional ||
-				// 	_type[1] instanceof ZodNullable
-				// ) {
-				// 	_definition = _type[1].unwrap();
-				// }
-				// if (innerDefinition) {
-				// 	_definition = innerDefinition[1];
-				// }
 				const _normalizeType = normalizeType(_type[1]);
 
 				switch (_normalizeType?._def.typeName) {
@@ -140,18 +125,21 @@ export type FilterItemObject<T> = z.infer<FilterItemObjectType<z.AnyZodObject>>;
 export const FilterItem = <T extends SomeZodObject>(dataType: T) =>
 	z
 		.object({
-			Field: z.string().refine(d => {
+			Property: z.string().refine(d => {
 				return Object.keys(dataType.keyof().Enum).some(
 					k => k.toLocaleLowerCase() === d.toLocaleLowerCase(),
 				);
 			}),
 			Operator: filterOperatorSchema,
-			Value: z.any(),
+			Value: z.any().array(),
 		})
 		.refine(
 			data => {
+				if (data.Value.length < 1) return false;
+
 				const _type = Object.entries(dataType.shape).find(
-					([key]) => key.toLocaleLowerCase() === data.Field.toLocaleLowerCase(),
+					([key]) =>
+						key.toLocaleLowerCase() === data.Property.toLocaleLowerCase(),
 				);
 
 				if (
@@ -160,40 +148,26 @@ export const FilterItem = <T extends SomeZodObject>(dataType: T) =>
 					!_type[1]?._def.typeName
 				)
 					return false;
-				switch (_type[1]?._def.typeName) {
+
+				const _normalizeType = normalizeType(_type[1]);
+
+				switch (_normalizeType?._def.typeName) {
 					case "ZodNumber":
-						if (isArray(data.Value)) {
-							return Array.from(data.Value).every(
-								v => _type[1].safeParse(Number(v)).success,
-							);
-						} else {
-							return _type[1].safeParse(Number(data.Value)).success;
-						}
+						return data.Value.every(
+							v => _normalizeType.safeParse(Number(v)).success,
+						);
+
 					case "ZodString":
-						if (isArray(data.Value)) {
-							return Array.from(data.Value).every(
-								v => _type[1].safeParse(String(v)).success,
-							);
-						} else {
-							return _type[1].safeParse(String(data.Value)).success;
-						}
+						return data.Value.every(
+							v => _normalizeType.safeParse(String(v)).success,
+						);
 					case "ZodDate":
-						if (isArray(data.Value)) {
-							return Array.from(data.Value).every(
-								v => _type[1].safeParse(new Date(v as any)).success,
-							);
-						} else {
-							return _type[1].safeParse(new Date(data.Value)).success;
-						}
+						return data.Value.every(
+							v => _normalizeType.safeParse(new Date(v)).success,
+						);
 
 					default:
-						if (isArray(data.Value)) {
-							return Array.from(data.Value).every(
-								v => _type[1].safeParse(v as any).success,
-							);
-						} else {
-							return _type[1].safeParse(data.Value).success;
-						}
+						return data.Value.every(v => _normalizeType.safeParse(v).success);
 				}
 			},
 			{

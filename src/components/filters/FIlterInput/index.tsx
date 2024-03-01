@@ -94,7 +94,12 @@ function FilterInput<T extends SomeZodObject>({
 				);
 				return;
 			}
-			return;
+			onValuesChange(
+				values.map(v => ({
+					label: v,
+					value: v,
+				})),
+			);
 		},
 		[Operator, _type, onValuesChange],
 	);
@@ -163,7 +168,9 @@ function FilterInput<T extends SomeZodObject>({
 							? selectedValues[0].value
 							: undefined
 					}
-					onValueChange={i => onValuesSelection(i ? [i] : [])}
+					onValueChange={i => {
+						onValuesSelection(i ? [i] : []);
+					}}
 				/>
 			)}
 

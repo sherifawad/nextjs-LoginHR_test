@@ -1,7 +1,9 @@
+import { DynamicForm } from "./DynamicForm";
+
 type Props = {};
 
 function SearchPage({}: Props) {
-	return <div>SearchPage</div>;
+	return <DynamicForm />;
 }
 
 export default SearchPage;

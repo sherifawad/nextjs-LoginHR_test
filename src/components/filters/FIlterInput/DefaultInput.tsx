@@ -1,22 +1,25 @@
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 type Props = {
-	onValueChange: (value: string | number | undefined) => void;
-	inputValue: string | number | undefined;
+	onValueChange: (value?: string | null) => void;
+	inputValue?: string | null;
 };
 
 function DefaultInput({ onValueChange, inputValue }: Props) {
-	const [value, setValue] = useState<string | number | undefined>("");
-	const onInputChange = (value: string) => {
-		setValue(value);
-		onValueChange(value);
-	};
+	const [value, setValue] = useState<string | null | undefined>(inputValue);
+	const onInputChange = useCallback(
+		(value?: string | null) => {
+			setValue(value);
+			onValueChange(value);
+		},
+		[onValueChange],
+	);
 	return (
 		<>
 			<Input
 				className='bg-muted'
-				value={value}
+				value={value ? value : ""}
 				onChange={e => onInputChange(e.target.value)}
 			/>
 		</>
