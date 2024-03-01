@@ -1,7 +1,6 @@
-import { isArray } from "@/lib/utils";
+import { isArray } from "@/lib/utils/array";
 import {
 	BasicValues,
-	Employee,
 	EmployeeFilterComparisonOption,
 	EmployeeFilterOperation,
 	Filter,
@@ -9,6 +8,7 @@ import {
 	FilterOption,
 	FilterValueSelect,
 } from "@/types";
+import { EmployeeSchema } from "@/validation/generated-zod-schemas";
 import { z } from "zod";
 
 export const NumberOps = {
@@ -222,20 +222,22 @@ const ListComparison: EmployeeFilterComparisonOption[] = [
 	},
 ];
 
-export const PropertiesLabels: FilterOption[] = Object.keys(Employee.shape).map(
-	e => ({
-		label: e,
-		value: e,
-	}),
-);
-export const getType = (value: keyof z.infer<typeof Employee>) => {
-	return Object.values(Employee.shape[value]._def.typeName)
+export const PropertiesLabels: FilterOption[] = Object.keys(
+	EmployeeSchema.shape,
+).map(e => ({
+	label: e,
+	value: e,
+}));
+export const getType = (value: keyof z.infer<typeof EmployeeSchema>) => {
+	return Object.values(EmployeeSchema.shape[value]._def.typeName)
 		.toSpliced(0, 3)
 		.join("")
 		.toLocaleLowerCase();
 };
 
-export const getComparisonList = (property: keyof z.infer<typeof Employee>) => {
+export const getComparisonList = (
+	property: keyof z.infer<typeof EmployeeSchema>,
+) => {
 	const _type = getType(property);
 	console.log("🚀 ~ getComparisonList ~ _type:", _type);
 	let comparisonsList: EmployeeFilterComparisonOption[] = [];
@@ -263,7 +265,7 @@ export const getComparisonList = (property: keyof z.infer<typeof Employee>) => {
 };
 
 export const setComparisonComponentType = (
-	property: keyof z.infer<typeof Employee>,
+	property: keyof z.infer<typeof EmployeeSchema>,
 	operation: FilterComparison,
 ): FilterValueSelect => {
 	const _type = getType(property);

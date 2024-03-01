@@ -63,36 +63,6 @@ export const ConvertToDate = (inputDateString: string) => {
 export const stringTrim = (str: string): string =>
 	str.replace(/\s\s+/g, " ").trim();
 
-export const isArray = function (a: unknown) {
-	return Array.isArray(a);
-};
-
-export const isObject = function (o: unknown) {
-	return o === Object(o) && !isArray(o) && typeof o !== "function";
-};
-
-export function isIterable(variable: unknown) {
-	return isArray(variable) || isObject(variable);
-}
-
-export function serialize(obj: any) {
-	return JSON.parse(JSON.stringify(obj));
-}
-
-export const getEnumName = (key: string, enumValue: any) => {
-	const valid = isIterable(enumValue);
-	let value = undefined;
-	if (valid) {
-		for (var n in enumValue) {
-			if (enumValue[n] === key) {
-				value = n;
-				break;
-			}
-		}
-	}
-	return value;
-};
-
 const keyValuePair = (obj: Object) => {
 	return Object.entries(obj).map(entry => entry);
 };
@@ -146,12 +116,10 @@ export const iterate = (obj: any) => {
 		({ label }, index) => index === result.findIndex(x => x.label === label),
 	);
 };
-
-export const enumToLabelKeyValues = (value: any) => {
-	let result: FilterOption[] = [];
-	const iterable = isIterable(value);
-	if (!iterable) return result;
-	result = iterate(value);
-
-	return result;
-};
+export type GetTypeByProperty = <T>(
+	property: keyof T,
+) => T extends { property: infer value } ? value : never;
+export const nameOfFactory =
+	<T>() =>
+	(name: keyof T) =>
+		name;

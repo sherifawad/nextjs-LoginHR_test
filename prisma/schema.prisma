@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// generator zod {
+//   provider      = "zod-prisma"
+//   output        = "../src/validation/generated-zod-schemas"
+//   relationModel = true // (default) Create and export both plain and related models.
+//   // relationModel         = "default" // Do not export model without relations.
+//   // relationModel         = false // Do not generate related model
+
+//   modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+//   // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
+
+//   modelSuffix = "Schema" // (default) Suffix to apply to your prisma models when naming Zod schemas
+
+//   // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
+//   useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+
+//   // imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+
+//   // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
+//   prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+//   // prismaJsonNullability = false // allows null assignment to optional JSON fields
+// }
+
+// generator zod {
+//   provider                         = "npx zod-prisma-types"
+//   useMultipleFiles                 = true // default is false
+//   writeBarrelFiles                 = false // default is true
+//   createInputTypes                 = false // default is true
+//   createModelTypes                 = true // default is true
+//   addInputTypeValidation           = true // default is true
+//   addIncludeType                   = false // default is true
+//   addSelectType                    = false // default is true
+//   validateWhereUniqueInput         = false // default is true
+//   createOptionalDefaultValuesTypes = true // default is false
+//   createRelationValuesTypes        = true // default is false
+//   createPartialTypes               = true // default is false
+//   useDefaultValidators             = true // default is true
+//   coerceDate                       = false // default is true
+//   writeNullishInModelTypes         = true // default is false
+// }
+
+model Employee {
+  id           Int       @id @default(autoincrement())
+  code         Int       @unique
+  name         String
+  salaryStatus Int       @default(0)
+  hiringDate   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Position     Position? @relation(fields: [positionId], references: [id])
+  positionId   Int?
+}
+
+model Position {
+  id        Int        @id @default(autoincrement())
+  code      Int        @unique
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  employees Employee[]
+}

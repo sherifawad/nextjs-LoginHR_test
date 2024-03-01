@@ -1,3 +1,5 @@
+"use server";
+
 import { Column } from "@tanstack/react-table";
 import { ArrowDown, ArrowDownUp, ArrowUp, EyeOff } from "lucide-react";
 
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,7 +21,7 @@ interface DataTableColumnHeaderProps<TData, TValue>
 	title: string;
 }
 
-export function DataTableColumnFilterHeader<TData, TValue>({
+export async function DataTableColumnFilterHeader<TData, TValue>({
 	column,
 	title,
 	className,
@@ -47,12 +50,27 @@ export function DataTableColumnFilterHeader<TData, TValue>({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align='start'>
-					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-						<ArrowUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+					{/* <DropdownMenuItem onClick={() => column.toggleSorting(false)}> */}
+					<DropdownMenuItem>
+						<Link
+							href={{
+								pathname: "/employees",
+								query: { sort: "desc" },
+							}}
+						>
+							<ArrowUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+						</Link>
 						Asc
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-						<ArrowDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+					<DropdownMenuItem>
+						<Link
+							href={{
+								pathname: "/employees",
+								query: { sort: "asc" },
+							}}
+						>
+							<ArrowDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+						</Link>
 						Desc
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />

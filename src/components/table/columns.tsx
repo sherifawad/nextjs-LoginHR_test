@@ -1,6 +1,6 @@
-import { Employee, EmployeePosition } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
+import { Employee } from "../../../prisma/generated/zod/modelSchema/EmployeeSchema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableColumnFilterHeader } from "./data-table-column-header-filter";
 
@@ -53,27 +53,27 @@ export const columns: ColumnDef<Employee>[] = [
 			}
 		},
 	},
-	{
-		accessorKey: "position",
-		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title='Job Code' />
-		),
-		cell: ({ row }) => {
-			const position = row.getValue("position") as EmployeePosition;
-			return (
-				<div className='w-[70px] text-center'>{position.positionName}</div>
-			);
-		},
-		filterFn: (row, id, value) => {
-			if (id === "position") {
-				const original = row.original as Employee;
+	// {
+	// 	accessorKey: "position",
+	// 	header: ({ column }) => (
+	// 		<DataTableColumnHeader column={column} title='Job Code' />
+	// 	),
+	// 	cell: ({ row }) => {
+	// 		const position = row.getValue("position") as EmployeePosition;
+	// 		return (
+	// 			<div className='w-[70px] text-center'>{position.positionName}</div>
+	// 		);
+	// 	},
+	// 	filterFn: (row, id, value) => {
+	// 		if (id === "position") {
+	// 			const original = row.original as Employee;
 
-				return value.includes(original.position.positionCode + "");
-			}
-		},
-		// enableSorting: false,
-		// enableHiding: false,
-	},
+	// 			return value.includes(original.position.positionCode + "");
+	// 		}
+	// 	},
+	// 	// enableSorting: false,
+	// 	// enableHiding: false,
+	// },
 
 	{
 		accessorKey: "hiringDate",

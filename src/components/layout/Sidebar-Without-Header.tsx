@@ -7,7 +7,11 @@ import { usePathname } from "next/navigation";
 import Logo from "../Logo";
 
 const SideBarLinks = [
-	{ name: "Employees", href: "/employees", icon: ListIcon },
+	{
+		name: "Employees",
+		href: "/employees?page=1&pageSize=5&sort=desc&sortBy=updatedAt",
+		icon: ListIcon,
+	},
 	{ name: "Profile", href: "/profile", icon: User2 },
 	{ name: "Search", href: "/search", icon: SearchIcon },
 ];

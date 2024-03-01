@@ -3,7 +3,6 @@
 import {
 	_delete,
 	create,
-	getAll,
 	getByCode,
 	getMany,
 	getNewCode,
@@ -11,7 +10,7 @@ import {
 	update,
 } from "@/database/employees-dataBase";
 import { findByCode, getAllJobs } from "@/database/jobs-DataBase";
-import { Employee } from "@/types";
+import { Employee, EmployeeSchema } from "@/validation/generated-zod-schemas";
 
 export async function UpdateEmployee(
 	code: number,
@@ -20,16 +19,14 @@ export async function UpdateEmployee(
 	return update(code, params);
 }
 export async function CreateEmployee(employee: Employee) {
-	const validate = Employee.safeParse(employee);
+	const validate = EmployeeSchema.safeParse(employee);
 	if (!validate.success) throw new Error("Invalid Params");
 	return create(validate.data);
 }
 export async function DeleteEmployee(code: number) {
 	return _delete(code);
 }
-export async function GetAllEmployees() {
-	return getAll();
-}
+
 export async function GetEmployeeUnique(code: number) {
 	return getByCode(code);
 }

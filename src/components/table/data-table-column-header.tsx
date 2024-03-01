@@ -12,6 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface DataTableColumnHeaderProps<TData, TValue>
 	extends React.HTMLAttributes<HTMLDivElement> {
@@ -48,14 +49,28 @@ export function DataTableColumnHeader<TData, TValue>({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align='start'>
-					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-						<ArrowUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
-						Asc
-					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-						<ArrowDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
-						Desc
-					</DropdownMenuItem>
+					<Link
+						href={{
+							pathname: "/employees",
+							query: { sort: "asc" },
+						}}
+					>
+						<DropdownMenuItem>
+							<ArrowUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+							Asc
+						</DropdownMenuItem>
+					</Link>
+					<Link
+						href={{
+							pathname: "/employees",
+							query: { sort: "desc" },
+						}}
+					>
+						<DropdownMenuItem>
+							<ArrowDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
+							Desc
+						</DropdownMenuItem>
+					</Link>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
 						<EyeOff className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />

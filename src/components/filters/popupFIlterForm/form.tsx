@@ -1,4 +1,4 @@
-import { GetAllEmployees } from "@/app/profile/_actions";
+import { GetAllEmployeesAction } from "@/app/(actions)/_EmployeesActions";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -8,7 +8,7 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { enumToLabelKeyValues } from "@/lib/utils";
+import { enumToLabelKeyValues } from "@/lib/utils/array";
 import {
 	BasicValues,
 	EmployeeFilterComparisonOption,
@@ -25,12 +25,12 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import FilterInput from "../FIlterInput";
 import {
 	PropertiesLabels,
 	getComparisonList,
 	setComparisonComponentType,
 } from "../constants";
-import FilterInput from "./FIlterInput";
 import FilterSelect from "./FilterSelect";
 
 type Props = {
@@ -53,7 +53,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 	const [data, setData] = useState<BasicValues | undefined>();
 	const [component, setComponent] = useState<FilterValueSelect | undefined>();
 	const [options, setOptions] = useState<FilterOption[]>([]);
-	const employees = useMemo(async () => await GetAllEmployees(), []);
+	const employees = useMemo(async () => await GetAllEmployeesAction(), []);
 
 	// comparison
 	const [operation, setOperation] = useState<
@@ -72,7 +72,7 @@ function FilterPopUpForm({ setIsOpen, addFilter }: Props) {
 			);
 			setComponent(component);
 			if (component === FilterValueSelect.Enum.LIST) {
-				const list = (await employees).map(e => e[property!.label]);
+				const list = (await employees)?.items?.map(e => e[property!.label]);
 				console.log("🚀 ~ list:", list);
 				const result = enumToLabelKeyValues(list);
 				setOptions(result);

@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	Select,
 	SelectContent,
@@ -6,7 +7,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { BasicValues, FilterOption } from "@/types";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { useState } from "react";
 
@@ -43,7 +43,7 @@ function FilterSelect({
 				<SelectValue placeholder='Select ' />
 			</SelectTrigger>
 			<SelectContent position='popper'>
-				<ScrollArea className='max-h-60'>
+				<ScrollArea className='h-60'>
 					{options.map(i => (
 						<SelectItem key={i.value + ""} value={i.value + ""}>
 							{i.label}

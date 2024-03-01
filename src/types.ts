@@ -1,28 +1,8 @@
 import { z } from "zod";
+import { EmployeeSchema } from "./validation/generated-zod-schemas";
 
 export const SalaryStatusEnum = z.enum(["VALID", "NOT_VALID"]);
 export type SalaryStatusEnum = z.infer<typeof SalaryStatusEnum>;
-
-export const EmployeePosition = z.object({
-	positionName: z.string().min(1),
-	positionCode: z.coerce.number().int().min(1).positive(),
-});
-export type EmployeePosition = z.infer<typeof EmployeePosition>;
-
-export const Employee = z.object({
-	code: z.coerce.number(),
-	name: z.string().min(5),
-	salaryStatus: SalaryStatusEnum,
-	hiringDate: z.date(),
-	position: EmployeePosition,
-});
-
-export type Employee = z.infer<typeof Employee>;
-
-export type employeeFilter = {
-	[key in keyof Employee]: Employee[key];
-};
-export type UpdatedEmployee = Omit<Partial<Employee>, "code">;
 
 // export type EmployeeContextType = {
 // 	employees: Employee[];
@@ -57,7 +37,7 @@ export const FilterOption = z.object({
 	value: BasicValues,
 });
 export const EmployeePropertyOption = z.object({
-	label: z.custom<keyof z.infer<typeof Employee>>(),
+	label: z.custom<keyof z.infer<typeof EmployeeSchema>>(),
 	value: BasicValues,
 });
 
@@ -122,3 +102,8 @@ export const EmployeeFilterOperation = z.object({
 });
 
 export type EmployeeFilterOperation = z.infer<typeof EmployeeFilterOperation>;
+
+export type SelectionType = {
+	label: string;
+	value: string;
+};

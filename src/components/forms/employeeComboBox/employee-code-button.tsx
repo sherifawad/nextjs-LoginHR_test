@@ -1,105 +1,124 @@
 "use client";
 
-import { DeleteEmployee, GetEmployees } from "@/app/profile/_actions";
-import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Employee } from "@/types";
-import { FormEvent, useState } from "react";
-import PopUpDialogue from "../../popup-dialogue";
-
-const CodeSearchTrigger = () => {
-	return <Button>Search</Button>;
-};
+import { GetAllEmployeesAction } from "@/app/profile/_actions";
+import useSearchUrlParams from "@/hooks/useSearchUrlParams";
+import { Employee } from "@/validation/generated-zod-schemas";
+import { Suspense, useEffect, useState, useTransition } from "react";
+import { Input } from "../../ui/input";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "../../ui/table";
+import CodeListSkeleton from "./codeList-skeleton";
 
 type Props = {
-	editEmployee: (code: number) => void;
+	employeesList?: Employee[];
+	onRowSelect: (code: number) => void;
 };
 
-function EmployeeCodeSearch({ editEmployee }: Props) {
-	const [employeeCodeSearch, setEmployeeCodeSearch] = useState<
-		number | undefined
-	>();
-	const [list, setList] = useState<Employee[]>([]);
+function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
+	const { setParams } = useSearchUrlParams();
+	const [employees, setEmployees] = useState<Employee[]>(
+		employeesList ? employeesList : [],
+	);
 
-	const onDelete = async (code: number) => {
-		DeleteEmployee(code);
-		const filteredList = list.filter(e => e.code !== code);
-		if (filteredList.length < 1) {
-			setEmployeeCodeSearch(undefined);
-		}
-		setList(filteredList);
-	};
+	const [isPending, startTransition] = useTransition();
+	const [filteredList, setFilteredList] = useState<Employee[]>(employees);
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const [code, setCode] = useState("");
+	const [name, setName] = useState("");
 
-		if (!employeeCodeSearch) return;
-		const filteredList = await GetEmployees(x => x.code === employeeCodeSearch);
-		setList(filteredList);
+	useEffect(() => {
+		const fetchData = async () => {
+			startTransition(async () => {
+				const result = await GetAllEmployeesAction();
+
+				setEmployees(result?.items || []);
+				setFilteredList(result?.items || []);
+			});
+		};
+		fetchData();
+	}, []);
+
+	const SelectionHandler = (code: number) => {
+		onRowSelect(code);
+		setParams([
+			{
+				employee: code + "",
+			},
+		]);
 	};
 
 	return (
-		<PopUpDialogue
-			title='Find Employee Using Code'
-			triggerComponent={CodeSearchTrigger}
-		>
-			<div className='flex flex-col space-y-4'>
-				<form onSubmit={handleSubmit}>
-					<div className='flex flex-col space-y-1.5'>
-						<Label htmlFor='code'>Employee code</Label>
-						<div className='flex items-center justify-between space-x-2'>
-							<Input
-								id='code'
-								name='code'
-								placeholder='Code of the Employee'
-								type='number'
-								value={employeeCodeSearch || ""}
-								onChange={e => setEmployeeCodeSearch(+e.target.value)}
-								required
-							/>
-							<Button type='submit'>S</Button>
-						</div>
-					</div>
-				</form>
-				<ul>
-					{list.length < 1 && <div className='text-center'>No Results.</div>}
-					<Separator className='my-4' />
-					{list.map(e => (
-						<li key={e.code}>
-							<div className='grid grid-cols-[1fr_4fr_auto] items-center px-4'>
-								<div>{e.code}</div>
-								<div>{e.name}</div>
-								<div className='flex items-center justify-between gap-x-3'>
-									<DialogClose
-										className='inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
-										onClick={() => {
-											editEmployee(e.code!);
-											setEmployeeCodeSearch(undefined);
-											setList([]);
-										}}
-									>
-										Edit
-									</DialogClose>
-									<Button
-										type='button'
-										size={"sm"}
-										variant={"destructive"}
-										onClick={() => onDelete(e.code!)}
-									>
-										Delete
-									</Button>
-								</div>
-							</div>
-							<Separator className='my-4' />
-						</li>
-					))}
-				</ul>
-			</div>
-		</PopUpDialogue>
+		<Suspense fallback={<CodeListSkeleton />}>
+			{isPending ? (
+				<CodeListSkeleton />
+			) : (
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead className=''>
+								<Input
+									placeholder='Code'
+									className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+									value={code}
+									onChange={e => {
+										setCode(e.target.value);
+										setName("");
+										setFilteredList(
+											employees.filter(x =>
+												x.code.toString().includes(e.target.value),
+											),
+										);
+									}}
+								/>
+							</TableHead>
+							<TableHead>
+								<Input
+									placeholder='Name'
+									className=' w-full rounded border border-none   px-4 text-primary outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+									value={name}
+									onChange={e => {
+										setCode("");
+										setName(e.target.value);
+										setFilteredList(
+											employees.filter(x =>
+												x.name
+													.toLocaleLowerCase()
+													.includes(e.target.value.toLocaleLowerCase()),
+											),
+										);
+									}}
+								/>
+							</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody className=''>
+						{filteredList.length > 0 ? (
+							filteredList.map(e => (
+								<TableRow
+									key={e.code}
+									className='cursor-pointer'
+									onClick={() => SelectionHandler(e.code)}
+								>
+									<TableCell className='font-medium'>{e.code}</TableCell>
+									<TableCell>{e.name}</TableCell>
+								</TableRow>
+							))
+						) : (
+							<TableRow className='p-8 text-center font-medium'>
+								No Results.
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			)}
+		</Suspense>
 	);
 }
 
-export default EmployeeCodeSearch;
+export default EmployeesCodesTable;

@@ -1,8 +1,8 @@
 "use client";
 
-import { GetAllEmployees } from "@/app/profile/_actions";
+import { GetAllEmployeesAction } from "@/app/(actions)/_EmployeesActions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/generated-zod-schemas";
 import { useEffect, useState } from "react";
 import { Input } from "../../ui/input";
 import {
@@ -31,10 +31,10 @@ function EmployeesCodesTable({ employeesList, onRowSelect }: Props) {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await GetAllEmployees();
+			const result = await GetAllEmployeesAction();
 
-			setEmployees(result);
-			setFilteredList(result);
+			setEmployees(result?.items || []);
+			setFilteredList(result?.items || []);
 		};
 		fetchData();
 	}, []);

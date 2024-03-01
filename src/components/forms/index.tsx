@@ -1,27 +1,18 @@
 "use client";
 
-import { CreateEmployee, UpdateEmployee } from "@/app/profile/_actions";
+import { UpdateEmployeeAction } from "@/app/(actions)/_EmployeesActions";
+import { CreateEmployee } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
-import { Employee, SalaryStatusEnum } from "@/types";
+import { cn } from "@/lib/utils";
+import { Employee, EmployeeSchema } from "@/validation/generated-zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { ComponentPropsWithoutRef, startTransition } from "react";
 import { FieldError, useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+import { Form } from "../ui/form";
+import { ScrollArea } from "../ui/scroll-area";
 import { useToast } from "../ui/use-toast";
-import ComboBox from "./comboBox";
-import DatePicker from "./datePicker";
-import CodeComboBox from "./employeeComboBox";
-import EmployeeSelect from "./employeeSelect";
+import EmployeeFormContent from "./employee-form-content";
 
 export const formatErrors = (errors: Record<string, FieldError>) =>
 	Object.keys(errors).map(key => ({
@@ -29,55 +20,55 @@ export const formatErrors = (errors: Record<string, FieldError>) =>
 		message: errors[key].message,
 	}));
 
-type Props = {
+type Props = ComponentPropsWithoutRef<"form"> & {
 	employee?: Employee;
-	editMode?: boolean;
+	disabled?: boolean;
 };
 
-const defaultValues = {
+const defaultValues: Omit<Employee, "id"> = {
 	code: -1,
-	hiringDate: new Date(),
+	hiringDate: null,
 	name: "",
-	position: {
-		positionCode: -1,
-		positionName: "",
-	},
-	salaryStatus: SalaryStatusEnum.Values.VALID,
+	salaryStatus: 0,
+	positionId: -1,
 };
 
-const EmployeeForm = ({ employee, editMode }: Props) => {
-	const form = useForm<z.infer<typeof Employee>>({
-		resolver: zodResolver(Employee),
+const EmployeeForm = ({ employee, disabled, className, ...rest }: Props) => {
+	const form = useForm<z.infer<typeof EmployeeSchema>>({
+		resolver: zodResolver(EmployeeSchema),
 		defaultValues,
 	});
 
 	const { toast } = useToast();
-	const { deleteParams } = useSearchUrlParams();
+	const { deleteParams, pathname, searchParams, router } = useSearchUrlParams();
 
 	const [isClient, setIsClient] = React.useState(false);
 
 	React.useEffect(() => {
 		setIsClient(true);
 		if (employee) {
+			form.setValue("id", employee.id);
 			form.setValue("code", employee.code);
 			form.setValue("name", employee.name);
 			form.setValue("hiringDate", employee.hiringDate);
-			form.setValue("position", employee.position);
 			form.setValue("salaryStatus", employee.salaryStatus);
+			form.setValue("positionId", employee.positionId);
 		} else {
 			form.reset();
 			form.setValue("code", -1);
 		}
 	}, [employee, form]);
 
-	async function onSubmit(values: z.infer<typeof Employee>) {
+	async function onSubmit(values: z.infer<typeof EmployeeSchema>) {
+		let employeeResult = undefined;
 		try {
-			let employee = undefined;
-			if (editMode) {
-				const { code } = values;
-				employee = await UpdateEmployee(code, values);
+			if (employee?.id) {
+				employeeResult = await UpdateEmployeeAction({
+					id: employee.id,
+					employee: values,
+				});
 			} else {
-				employee = await CreateEmployee(values);
+				employeeResult = await CreateEmployee(values);
 			}
 		} catch (error) {
 			let errorMessage = error;
@@ -90,12 +81,11 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 				description: `${errorMessage}`,
 			});
 		} finally {
-			if (employee) {
+			if (employeeResult) {
 				toast({
 					variant: "success",
 					title: "Success",
 				});
-				deleteParams(["employee"]);
 			}
 		}
 	}
@@ -104,118 +94,36 @@ const EmployeeForm = ({ employee, editMode }: Props) => {
 
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className='grid  grid-cols-1 gap-4 gap-x-2 px-8 text-sm md:grid-cols-2'
-			>
-				<FormField
-					control={form.control}
-					name='code'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Employee Code</FormLabel>
-							<FormControl>
-								<CodeComboBox
-									selectedValue={field.value}
-									onSelection={code =>
-										code ? form.setValue("code", code) : undefined
-									}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
+			<ScrollArea className='h-[70svh]'>
+				<form
+					onSubmit={form.handleSubmit(v =>
+						startTransition(() => {
+							onSubmit(v);
+						}),
 					)}
-				/>
+					className={cn(
+						"  px-8 text-sm",
+						disabled
+							? "space-y-4"
+							: "grid grid-cols-1 items-center gap-4 md:grid-cols-[repeat(2,minmax(100px,1fr))]",
+						className,
+					)}
+					{...rest}
+				>
+					<EmployeeFormContent control={form.control} disabled={disabled} />
 
-				<FormField
-					control={form.control}
-					name='position'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Employee Code</FormLabel>
-							<FormControl>
-								<ComboBox
-									selectedValue={field.value}
-									onSelection={field.onChange}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name='name'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Employee Name</FormLabel>
-							<FormControl>
-								<Input
-									className='mt-1 h-10 w-full rounded border bg-muted px-4'
-									placeholder='Name'
-									{...field}
-								/>
-							</FormControl>
-							<FormDescription>Select Employee Name</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name='hiringDate'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Hiring Date</FormLabel>
-							<FormControl>
-								<DatePicker onDateSelect={field.onChange} date={field.value} />
-							</FormControl>
-							<FormDescription>Select Hiring Date</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name='salaryStatus'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Salary Status</FormLabel>
-							<FormControl>
-								<EmployeeSelect
-									onSelection={field.onChange}
-									selectedValue={field.value}
-									items={[
-										{
-											label: "Valid",
-											value: SalaryStatusEnum.Values.VALID,
-										},
-										{
-											label: "Not Valid",
-											value: SalaryStatusEnum.Values.NOT_VALID,
-										},
-									]}
-								/>
-							</FormControl>
-							<FormDescription>Select Salary Status</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<div className='text-right md:col-span-2'>
-					<div className='inline-flex items-end'>
-						<button
-							type='submit'
-							className='rounded bg-primary px-4 py-2 font-bold text-white hover:bg-primary'
-						>
-							{editMode ? "Update" : "Create"}
-						</button>
+					<div className='text-right md:col-span-2'>
+						<div className='inline-flex items-end'>
+							<button
+								type='submit'
+								className='rounded bg-primary px-4 py-2 font-bold text-white hover:bg-primary'
+							>
+								{employee?.id ? "Update" : "Create"}
+							</button>
+						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			</ScrollArea>
 		</Form>
 	);
 };
