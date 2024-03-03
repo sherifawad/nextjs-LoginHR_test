@@ -1,5 +1,5 @@
 import DateInput from "@/components/DateInput/DateInput";
-import { SelectionType } from "@/types";
+import useFilterValuesOutput from "@/hooks/useFilterValuesOutput";
 import {
 	FilterOperator,
 	filterOperatorSchema,
@@ -11,11 +11,12 @@ import DateRange from "./between/dateRange";
 import NumberRange from "./between/numberRange";
 
 type Props<T extends SomeZodObject> = React.HTMLAttributes<HTMLDivElement> & {
-	onValuesChange: (values: SelectionType[]) => void;
-	selectedValues?: SelectionType[];
+	onValuesChange: (values: any[]) => void;
+	selectedValues?: any[];
 	schema: T;
 	property: string;
 	Operator: FilterOperator;
+	keyLabel?: boolean;
 };
 
 function FilterInput<T extends SomeZodObject>({
@@ -24,9 +25,14 @@ function FilterInput<T extends SomeZodObject>({
 	schema,
 	property,
 	Operator,
+	keyLabel = false,
 	...rest
 }: Props<T>) {
+	const [value, setValue] = useState<any[] | undefined>(selectedValues);
+
 	const [_type, setType] = useState("");
+
+	const { onSelection } = useFilterValuesOutput({ keyLabel });
 
 	useEffect(() => {
 		const _type = Object.entries(schema.shape).find(
@@ -39,69 +45,10 @@ function FilterInput<T extends SomeZodObject>({
 
 	const onValuesSelection = useCallback(
 		(values: any[]) => {
-			if (Operator === filterOperatorSchema.enum.Between) {
-				if (_type === "ZodNumber") {
-					onValuesChange(
-						values.map(v => ({
-							label: v + "",
-							value: v + "",
-						})),
-					);
-					return;
-				}
-				if (_type === "ZodDate") {
-					onValuesChange(
-						values.map(v => {
-							const formattedDate = new Intl.DateTimeFormat("en-GB").format(
-								new Date(v),
-							);
-							return {
-								label: formattedDate,
-								value: v + "",
-							};
-						}),
-					);
-					return;
-				}
-				return;
-			}
-			if (
-				Operator === filterOperatorSchema.enum.In ||
-				Operator === filterOperatorSchema.enum.Not_in
-			) {
-				return;
-			}
-			if (_type === "ZodNumber") {
-				onValuesChange(
-					values.map(v => ({
-						label: v + "",
-						value: v + "",
-					})),
-				);
-				return;
-			}
-			if (_type === "ZodDate") {
-				onValuesChange(
-					values.map(v => {
-						const formattedDate = new Intl.DateTimeFormat("en-GB").format(
-							new Date(v),
-						);
-						return {
-							label: formattedDate,
-							value: v + "",
-						};
-					}),
-				);
-				return;
-			}
-			onValuesChange(
-				values.map(v => ({
-					label: v,
-					value: v,
-				})),
-			);
+			setValue(values);
+			onValuesChange(onSelection({ _type, Operator, values }));
 		},
-		[Operator, _type, onValuesChange],
+		[Operator, _type, onSelection, onValuesChange],
 	);
 
 	return (
@@ -112,9 +59,7 @@ function FilterInput<T extends SomeZodObject>({
 					Operator === filterOperatorSchema.enum.Not_Between ? (
 						<DateRange
 							inputValue={
-								selectedValues
-									? selectedValues.map(v => new Date(v.value))
-									: undefined
+								value ? value.map(v => new Date(String(v))) : undefined
 							}
 							onValueChange={v => {
 								if (!v || v.length !== 2) return;
@@ -124,8 +69,8 @@ function FilterInput<T extends SomeZodObject>({
 					) : (
 						<DateInput
 							SelectedDate={
-								selectedValues && selectedValues.length === 1
-									? new Date(selectedValues[0].value)
+								value && value.length === 1
+									? new Date(String(value[0]))
 									: undefined
 							}
 							onDateSelected={d => onValuesSelection(d ? [d] : [])}
@@ -138,11 +83,7 @@ function FilterInput<T extends SomeZodObject>({
 					{Operator === filterOperatorSchema.enum.Between ||
 					Operator === filterOperatorSchema.enum.Not_Between ? (
 						<NumberRange
-							inputValue={
-								selectedValues
-									? selectedValues.map(v => Number(v.value))
-									: undefined
-							}
+							inputValue={value ? value.map(v => Number(v)) : undefined}
 							onValueChange={v => {
 								if (!v || v.length !== 2) return;
 								onValuesSelection(v);
@@ -151,9 +92,7 @@ function FilterInput<T extends SomeZodObject>({
 					) : (
 						<DefaultInput
 							inputValue={
-								selectedValues && selectedValues.length === 1
-									? selectedValues[0].value
-									: undefined
+								value && value.length === 1 ? String(value[0]) : undefined
 							}
 							onValueChange={i => onValuesSelection(i ? [i] : [])}
 						/>
@@ -164,9 +103,7 @@ function FilterInput<T extends SomeZodObject>({
 			{_type === "ZodString" && (
 				<DefaultInput
 					inputValue={
-						selectedValues && selectedValues.length === 1
-							? selectedValues[0].value
-							: undefined
+						value && value.length === 1 ? String(value[0]) : undefined
 					}
 					onValueChange={i => {
 						onValuesSelection(i ? [i] : []);

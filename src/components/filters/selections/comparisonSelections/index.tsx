@@ -7,14 +7,17 @@ import FilterSelect from "../FilterSelect";
 import { getComparisonList } from "./comparisonList";
 
 type Props<T extends SomeZodObject> = SelectPrimitive.SelectProps & {
-	onValueChange: (value?: FilterOperator) => Promise<void>;
+	onSelectionChange: (selection?: {
+		label: string;
+		value: FilterOperator;
+	}) => Promise<void>;
 	property?: string;
 	selectedValue?: string;
 	schema: T;
 };
 
 function OperatorSelection<T extends SomeZodObject>({
-	onValueChange,
+	onSelectionChange,
 	selectedValue,
 	property,
 	schema,
@@ -28,11 +31,13 @@ function OperatorSelection<T extends SomeZodObject>({
 	const onChange = useCallback(
 		(selected: SelectionType | undefined) => {
 			setValue(selected);
-			onValueChange(
-				selected?.value ? (selected.value as FilterOperator) : undefined,
+			onSelectionChange(
+				selected?.value
+					? { label: selected.label, value: selected.value as FilterOperator }
+					: undefined,
 			);
 		},
-		[onValueChange],
+		[onSelectionChange],
 	);
 
 	useEffect(() => {

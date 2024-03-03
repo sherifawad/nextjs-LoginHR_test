@@ -1,6 +1,6 @@
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import { SelectionType } from "@/types";
+import { SelectionAny } from "@/types";
 import { FilterOperator } from "@/validation/filter-operator-validation";
 import { FilterItemObject } from "@/validation/filter-validation";
 import {
@@ -47,7 +47,7 @@ function FilterFormContent<T extends SomeZodObject>({
 	// comparison
 
 	const onComparisonChange = useCallback(
-		async (value: FilterOperator) => {
+		async (value: { label: string; value: FilterOperator }) => {
 			if (!selectionData?.Property) {
 				toast({
 					variant: "destructive",
@@ -66,7 +66,7 @@ function FilterFormContent<T extends SomeZodObject>({
 	);
 
 	const onDataSet = useCallback(
-		async (values: SelectionType[]) => {
+		async (values: SelectionAny[]) => {
 			setSelectionData(prev => ({
 				...prev,
 				Value: values,
@@ -96,9 +96,9 @@ function FilterFormContent<T extends SomeZodObject>({
 			<OperatorSelection
 				property={selectionData?.Property}
 				schema={schema}
-				onValueChange={async value => {
+				onSelectionChange={async value => {
 					if (!value) return;
-					onComparisonChange(value as FilterOperator);
+					onComparisonChange(value);
 				}}
 			/>
 			{/* <Input className='bg-muted' onChange={e => onDataSet(e.target.value)} /> */}
@@ -106,11 +106,13 @@ function FilterFormContent<T extends SomeZodObject>({
 			{selectionData?.Operator && selectionData?.Property ? (
 				<FilterInput
 					property={selectionData?.Property}
-					Operator={selectionData?.Operator}
-					selectedValues={selectionData?.Value?.map(v => ({
-						...v,
-						value: v.toString(),
-					}))}
+					Operator={selectionData?.Operator.value}
+					keyLabel
+					selectedValues={
+						selectionData?.Value
+							? (selectionData?.Value as SelectionAny[])
+							: undefined
+					}
 					schema={schema}
 					onValuesChange={async values => {
 						onDataSet(values);

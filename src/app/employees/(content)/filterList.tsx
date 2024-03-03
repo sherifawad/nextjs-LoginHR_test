@@ -14,14 +14,14 @@ function FilterList() {
 				{filterList?.map((item, index) => {
 					return (
 						<li
-							key={`${item.Property}_${item.Operator}_${item.Value[0].label}`}
+							key={`${index}_${item.Property}_${item.Operator.label}_${item.Value[0].label}`}
 							className=''
 						>
 							<div className='flex flex-1 items-center justify-between gap-x-2 whitespace-nowrap rounded-md bg-muted p-1 px-3'>
 								{
 									<div className='flex flex-1 flex-wrap  gap-x-2 text-sm capitalize text-primary'>
 										<span className=''>{item.Property}</span>
-										<span className=''>{item.Operator}</span>
+										<span className=''>{item.Operator.label}</span>
 										{item.Value.map(v => (
 											<span key={v.label} className=''>
 												{v.label}
@@ -31,7 +31,7 @@ function FilterList() {
 								}
 								<Button
 									variant={"ghost"}
-									onClick={() => deleteEmployeesFilter(item)}
+									onClick={() => deleteEmployeesFilter(index)}
 								>
 									<span className='text-base text-destructive'>X</span>
 								</Button>

@@ -18,7 +18,7 @@ const EditUserPopUpContent = ({ employeeToUpdate }: Props) => {
 			</DialogHeader>
 			<EmployeeForm
 				employee={employeeToUpdate}
-				editMode={true}
+				// editMode={true}
 				// disabled={true}
 			/>
 		</DialogContent>

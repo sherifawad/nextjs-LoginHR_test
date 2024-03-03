@@ -1,7 +1,6 @@
 "use client";
 
 import { UpdateEmployeeAction } from "@/app/(actions)/_EmployeesActions";
-import { CreateEmployee } from "@/app/profile/_actions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { cn } from "@/lib/utils";
 import { Employee, EmployeeSchema } from "@/validation/generated-zod-schemas";
@@ -68,7 +67,7 @@ const EmployeeForm = ({ employee, disabled, className, ...rest }: Props) => {
 					employee: values,
 				});
 			} else {
-				employeeResult = await CreateEmployee(values);
+				// employeeResult = await CreateEmployee(values);
 			}
 		} catch (error) {
 			let errorMessage = error;

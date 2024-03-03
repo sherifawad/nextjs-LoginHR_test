@@ -71,7 +71,7 @@ export function EmployeesDataTable<TData, TValue>({
 
 	return (
 		<div className='space-y-4 py-8'>
-			<EmployeeTableToolbar table={table}  />
+			<EmployeeTableToolbar table={table} />
 			<DataTableBody
 				totalColumns={totalColumns}
 				headers={headers}

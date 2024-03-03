@@ -57,16 +57,16 @@ export const getLabelValueList = (
 	);
 };
 
-export const checkFilterMatch = (
-	valueA: EmployeeFilter,
-	valueB: EmployeeFilter,
-): boolean => {
-	return !(
-		valueA.operation !== valueB.operation ||
-		valueA.property !== valueB.property ||
-		valueA.data.toString() !== valueB.data.toString()
-	);
-};
+// export const checkFilterMatch = (
+// 	valueA: EmployeeFilter,
+// 	valueB: EmployeeFilter,
+// ): boolean => {
+// 	return !(
+// 		valueA.operation !== valueB.operation ||
+// 		valueA.property !== valueB.property ||
+// 		valueA.data.toString() !== valueB.data.toString()
+// 	);
+// };
 
 export const dataToStringWithCustomSeparator = (
 	data: BasicValues,
@@ -78,65 +78,65 @@ export const dataToStringWithCustomSeparator = (
 	return data.toString();
 };
 
-export const stringValuesToFilter = (
-	searchParams: string,
-): EmployeeFilter[] => {
-	const result: EmployeeFilter[] = [];
-	const filtersList = searchParams.split(",");
-	filtersList.forEach(l => {
-		const filters = l.split("_");
-		if (filters.length !== 3) return;
-		const [property, operation, data] = filters;
-		const dataList = data.split("*");
-		const validate = EmployeeFilter.safeParse({
-			property,
-			operation,
-			// check if is a list of a single number
-			data: dataList,
-		});
+// export const stringValuesToFilter = (
+// 	searchParams: string,
+// ): EmployeeFilter[] => {
+// 	const result: EmployeeFilter[] = [];
+// 	const filtersList = searchParams.split(",");
+// 	filtersList.forEach(l => {
+// 		const filters = l.split("_");
+// 		if (filters.length !== 3) return;
+// 		const [property, operation, data] = filters;
+// 		const dataList = data.split("*");
+// 		const validate = EmployeeFilter.safeParse({
+// 			property,
+// 			operation,
+// 			// check if is a list of a single number
+// 			data: dataList,
+// 		});
 
-		if (validate.success) {
-			result.push(validate.data);
-		} else {
-			console.log("🚀 ~ validate:", validate.error);
-		}
-	});
-	return result;
-};
-export const getReadableFilterValues = (
-	filter: EmployeeFilter,
-	employees: Employee[],
-): EmployeeFilter => {
-	if (filter.operation === "InList" || filter.operation === "Not-InList") {
-		const list = getLabelValueList(
-			filter.data as string[],
-			employees,
-			filter.property,
-		);
+// 		if (validate.success) {
+// 			result.push(validate.data);
+// 		} else {
+// 			console.log("🚀 ~ validate:", validate.error);
+// 		}
+// 	});
+// 	return result;
+// };
+// export const getReadableFilterValues = (
+// 	filter: EmployeeFilter,
+// 	employees: Employee[],
+// ): EmployeeFilter => {
+// 	if (filter.operation === "InList" || filter.operation === "Not-InList") {
+// 		const list = getLabelValueList(
+// 			filter.data as string[],
+// 			employees,
+// 			filter.property,
+// 		);
 
-		filter = {
-			...filter,
-			data: list.map(l => l.label),
-		};
-	}
-	if (filter.property === "hiringDate") {
-		if (isArray(filter.data)) {
-			filter = {
-				...filter,
-				data: (filter.data as string[]).map(l => {
-					// isNumber
-					return new Intl.DateTimeFormat("en-GB").format(new Date(+l));
-				}),
-			};
-		} else {
-			filter = {
-				...filter,
-				data: new Intl.DateTimeFormat("en-GB").format(new Date(+filter.data)),
-			};
-		}
-	}
-	return filter;
-};
+// 		filter = {
+// 			...filter,
+// 			data: list.map(l => l.label),
+// 		};
+// 	}
+// 	if (filter.property === "hiringDate") {
+// 		if (isArray(filter.data)) {
+// 			filter = {
+// 				...filter,
+// 				data: (filter.data as string[]).map(l => {
+// 					// isNumber
+// 					return new Intl.DateTimeFormat("en-GB").format(new Date(+l));
+// 				}),
+// 			};
+// 		} else {
+// 			filter = {
+// 				...filter,
+// 				data: new Intl.DateTimeFormat("en-GB").format(new Date(+filter.data)),
+// 			};
+// 		}
+// 	}
+// 	return filter;
+// };
 
 export function normalizeType(type: ZodType): ZodTypeAny {
 	while (
@@ -152,7 +152,7 @@ export function normalizeType(type: ZodType): ZodTypeAny {
 
 export const generateFilterSchema = <Z extends z.ZodType<any>>(
 	baseSchema: Z,
-) => {
+): z.ZodType<any> => {
 	/** Unwrap nested optionals, nullables, and defaults */
 	while (
 		baseSchema instanceof z.ZodOptional ||

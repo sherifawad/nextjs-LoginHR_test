@@ -4,13 +4,15 @@ import {
 } from "@/app/(actions)/_EmployeesActions";
 import EmployeeForm from "@/components/forms";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export async function generateStaticParams() {
 	const result = await GetAllEmployeesAction();
-
-	return result?.items.map(e => ({
-		id: e.id + "",
-	}));
+	if (result)
+		return result.items.map(e => ({
+			id: e.id + "",
+		}));
+	return [];
 }
 
 async function EmployeeProfilePage({
@@ -28,7 +30,9 @@ async function EmployeeProfilePage({
 				Employee Profile
 			</h1>
 			<section>
-				<EmployeeForm employee={employee} />
+				<Suspense fallback={<>Employee Loading....</>}>
+					<EmployeeForm employee={employee} />
+				</Suspense>
 			</section>
 		</>
 	);

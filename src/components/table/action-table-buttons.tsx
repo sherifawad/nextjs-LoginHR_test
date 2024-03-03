@@ -1,6 +1,5 @@
-import { DeleteEmployee } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
-import { Employee } from "@/types";
+import { Employee } from "@/validation/generated-zod-schemas";
 
 type Props = {
 	employee: Employee;
@@ -13,9 +12,9 @@ function EmployeeActions({ employee }: Props) {
 			<Button
 				size={"sm"}
 				variant={"destructive"}
-				onClick={async () => {
-					DeleteEmployee(employee.code!);
-				}}
+				// onClick={async () => {
+				// 	DeleteEmployee(employee.code!);
+				// }}
 			>
 				Delete
 			</Button>

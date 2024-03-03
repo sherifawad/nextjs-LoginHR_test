@@ -107,3 +107,7 @@ export type SelectionType = {
 	label: string;
 	value: string;
 };
+export type SelectionAny = {
+	label: string;
+	value: any[];
+};

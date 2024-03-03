@@ -6,9 +6,9 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { GetAllJobs } from "@/app/profile/_actions";
 import { iterate } from "@/lib/utils";
-import { EmployeePosition, SalaryStatusEnum } from "@/types";
+import { SalaryStatusEnum } from "@/types";
+import { Position } from "@/validation/generated-zod-schemas";
 import React from "react";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
@@ -22,16 +22,16 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
 
-	const [jobs, setJobs] = React.useState<EmployeePosition[]>([]);
+	const [jobs, setJobs] = React.useState<Position[]>([]);
 
-	React.useEffect(() => {
-		const fetchData = async () => {
-			const result = await GetAllJobs();
+	// React.useEffect(() => {
+	// 	const fetchData = async () => {
+	// 		const result = await GetAllJobs();
 
-			setJobs(result);
-		};
-		fetchData();
-	}, []);
+	// 		setJobs(result);
+	// 	};
+	// 	fetchData();
+	// }, []);
 
 	return (
 		<div className='flex items-center justify-between'>
@@ -56,8 +56,8 @@ export function DataTableToolbar<TData>({
 						column={table.getColumn("position")}
 						title='JobCode'
 						options={jobs.map(j => ({
-							label: j.positionName,
-							value: j.positionCode + "",
+							label: j.name,
+							value: j.code + "",
 						}))}
 					/>
 				)}

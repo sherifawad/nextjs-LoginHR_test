@@ -1,18 +1,17 @@
-import * as z from "zod"
-import { CompleteEmployee, RelatedEmployeeSchema } from "./index"
+import * as z from "zod";
+import { CompleteEmployee, RelatedEmployeeSchema } from "./index";
 
 export const PositionSchema = z.object({
-  id: z.number().int(),
-  code: z.number().int(),
-  name: z.string(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-})
+	id: z.number().int(),
+	code: z.number().int(),
+	name: z.string(),
+	createdAt: z.date().optional(),
+	updatedAt: z.date().optional(),
+});
 
-
-export interface Position extends z.infer<typeof PositionSchema>{}
+export interface Position extends z.infer<typeof PositionSchema> {}
 export interface CompletePosition extends z.infer<typeof PositionSchema> {
-  employees: CompleteEmployee[]
+	employees: CompleteEmployee[];
 }
 
 /**
@@ -20,6 +19,8 @@ export interface CompletePosition extends z.infer<typeof PositionSchema> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const RelatedPositionSchema: z.ZodSchema<CompletePosition> = z.lazy(() => PositionSchema.extend({
-  employees: RelatedEmployeeSchema.array(),
-}))
+export const RelatedPositionSchema: z.ZodSchema<CompletePosition> = z.lazy(() =>
+	PositionSchema.extend({
+		employees: RelatedEmployeeSchema.array(),
+	}),
+);

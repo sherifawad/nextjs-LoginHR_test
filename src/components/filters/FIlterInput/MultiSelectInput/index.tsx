@@ -10,7 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SelectionType } from "@/types";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SomeZodObject } from "zod";
 import MultiSelectContent from "./MultiSelectContent";
 
@@ -32,19 +32,19 @@ function MultiSelectInput<T extends SomeZodObject>({
 
 	const [value, setValue] = useState<SelectionType[]>([]);
 
-	useEffect(() => {
-		let isCancelled = false;
-		const result = async () => {
-			const result = await getSelectedOptions(property);
-			if (!isCancelled) {
-				setOptions(result);
-			}
-		};
-		result();
-		return () => {
-			isCancelled = true;
-		};
-	}, [property]);
+	// useEffect(() => {
+	// 	let isCancelled = false;
+	// 	const result = async () => {
+	// 		const result = await getSelectedOptions(property);
+	// 		if (!isCancelled) {
+	// 			setOptions(result);
+	// 		}
+	// 	};
+	// 	result();
+	// 	return () => {
+	// 		isCancelled = true;
+	// 	};
+	// }, [property]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -102,7 +102,9 @@ function MultiSelectInput<T extends SomeZodObject>({
 					setIsOpen={setIsOpen}
 					selectedValues={value}
 					setSelectedValues={setValue}
-					onValuesChange={onValuesChange}
+					onValuesChange={vs =>
+						onValueChange(vs.map(v => ({ label: v, value: v })))
+					}
 				/>
 			</DialogContent>
 		</Dialog>

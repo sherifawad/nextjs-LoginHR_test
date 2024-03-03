@@ -2,7 +2,6 @@
 
 import * as React from "react";
 
-import { GetNewEmployee } from "@/app/profile/_actions";
 import { Button } from "@/components/ui/button";
 import { CommandShortcut } from "@/components/ui/command";
 import {
@@ -58,11 +57,11 @@ function CodeComboBox({ selectedValue, onSelection, disabled = false }: Props) {
 			title: "F8 Key Pressed",
 			description: "New Key Selected",
 		});
-		startTransition(async () => {
-			const newCode = await GetNewEmployee();
-			onInputChange(newCode + "");
-			setParams([{ employee: newCode + "" }]);
-		});
+		// startTransition(async () => {
+		// 	const newCode = await GetNewEmployee();
+		// 	onInputChange(newCode + "");
+		// 	setParams([{ employee: newCode + "" }]);
+		// });
 	}, ["F8"]);
 
 	return (

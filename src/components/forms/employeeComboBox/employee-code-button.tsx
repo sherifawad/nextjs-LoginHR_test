@@ -1,6 +1,6 @@
 "use client";
 
-import { GetAllEmployeesAction } from "@/app/profile/_actions";
+import { GetAllEmployeesAction } from "@/app/(actions)/_EmployeesActions";
 import useSearchUrlParams from "@/hooks/useSearchUrlParams";
 import { Employee } from "@/validation/generated-zod-schemas";
 import { Suspense, useEffect, useState, useTransition } from "react";

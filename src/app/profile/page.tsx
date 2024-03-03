@@ -1,7 +1,7 @@
 import EmployeeForm from "@/components/forms";
 
 import { z } from "zod";
-import { GetEmployeeUnique } from "./_actions";
+import { GetUniqueEmployeeAction } from "../(actions)/_EmployeesActions";
 
 const Searchparams = z.object({
 	employee: z.coerce.number().int().min(1).positive(),
@@ -17,7 +17,9 @@ async function Profile({ searchParams }: Props) {
 
 	const validateCode = Searchparams.safeParse(searchParams);
 	if (validateCode.success) {
-		employee = await GetEmployeeUnique(validateCode.data.employee);
+		employee = await GetUniqueEmployeeAction({
+			id: validateCode.data.employee,
+		});
 		edit = employee ? true : false;
 	}
 	return (
@@ -26,7 +28,7 @@ async function Profile({ searchParams }: Props) {
 				Employee Profile
 			</h1>
 			<section>
-				<EmployeeForm employee={employee} editMode={edit} />
+				<EmployeeForm employee={employee} />
 			</section>
 		</>
 	);

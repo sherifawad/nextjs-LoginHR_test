@@ -64,7 +64,10 @@ export const FilterItemObject = <T extends SomeZodObject>(dataType: T) =>
 					k => k.toLocaleLowerCase() === d.toLocaleLowerCase(),
 				);
 			}),
-			Operator: filterOperatorSchema,
+			Operator: z.object({
+				label: z.string(),
+				value: filterOperatorSchema,
+			}),
 			Value: z
 				.object({
 					label: z.string(),
@@ -130,7 +133,10 @@ export const FilterItem = <T extends SomeZodObject>(dataType: T) =>
 					k => k.toLocaleLowerCase() === d.toLocaleLowerCase(),
 				);
 			}),
-			Operator: filterOperatorSchema,
+			Operator: z.object({
+				label: z.string(),
+				value: filterOperatorSchema,
+			}),
 			Value: z.any().array(),
 		})
 		.refine(

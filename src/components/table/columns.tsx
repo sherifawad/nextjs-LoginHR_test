@@ -1,6 +1,6 @@
+import { Employee } from "@/validation/generated-zod-schemas";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timer } from "lucide-react";
-import { Employee } from "../../../prisma/generated/zod/modelSchema/EmployeeSchema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableColumnFilterHeader } from "./data-table-column-header-filter";
 
