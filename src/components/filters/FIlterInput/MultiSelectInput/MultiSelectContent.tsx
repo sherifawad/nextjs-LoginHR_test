@@ -12,60 +12,81 @@ import { cn } from "@/lib/utils";
 import { SelectionType } from "@/types";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { CheckIcon } from "lucide-react";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import {
+	Dispatch,
+	SetStateAction,
+	useCallback,
+	useEffect,
+	useState,
+} from "react";
 
 type Props = {
 	options: SelectionType[];
-	setIsOpen: Dispatch<SetStateAction<boolean>>;
-	setSelectedValues: Dispatch<SetStateAction<SelectionType[]>>;
-	selectedValues: SelectionType[] | undefined;
+	setIsOpen?: Dispatch<SetStateAction<boolean>>;
+	selectedValues?: string[];
 	onValuesChange: (values: string[]) => void;
+	title?: string;
+	className?: string;
+	disabled?: boolean;
 };
 
 function MultiSelectContent({
 	options,
 	setIsOpen,
-	setSelectedValues,
 	selectedValues,
 	onValuesChange,
+	className,
+	disabled,
+	title = "title",
 }: Props) {
+	const [values, setValues] = useState<SelectionType[]>([]);
 	const onValuesSelection = useCallback(
-		(values: SelectionType[]) => {
-			setSelectedValues(values);
-			if (values.length > 0) {
-				const selectedArray = values.map(v =>
+		(valuesSelected: SelectionType[]) => {
+			setValues(valuesSelected);
+			if (valuesSelected.length > 0) {
+				const selectedArray = valuesSelected.map(v =>
 					v.value.toString().toLocaleLowerCase(),
 				);
 				onValuesChange(selectedArray);
 			}
 		},
-		[onValuesChange, setSelectedValues],
+		[onValuesChange],
 	);
+
+	useEffect(() => {
+		if (
+			!options ||
+			options.length < 1 ||
+			!selectedValues ||
+			selectedValues.length < 1
+		)
+			return;
+		setValues(options.filter(opt => selectedValues.includes(opt.value)));
+	}, [options, selectedValues]);
+
 	return (
-		<div className=''>
+		<div className={className}>
 			<Command>
-				<CommandInput placeholder={"title"} />
+				<CommandInput placeholder={title} disabled={disabled} />
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
 					<ScrollArea className='max-h-72'>
 						<CommandGroup>
 							{options.map(option => {
-								const isSelected = (selectedValues as any[])?.find(
+								const isSelected = (values as any[])?.find(
 									x => x.value === option.value,
 								);
 								return (
 									<CommandItem
 										key={option.label}
 										onSelect={() => {
-											let values = [];
+											let LValues = [];
 											if (isSelected) {
-												values = ((selectedValues as any[]) ?? []).filter(
-													x => x.value !== option.value,
-												);
+												LValues = values.filter(x => x.value !== option.value);
 											} else {
-												values = [...((selectedValues as any[]) ?? []), option];
+												LValues = [...values, option];
 											}
-											onValuesSelection(values);
+											onValuesSelection(LValues);
 										}}
 									>
 										<div
@@ -85,17 +106,20 @@ function MultiSelectContent({
 						</CommandGroup>
 					</ScrollArea>
 					<CommandSeparator />
-					{selectedValues && ((selectedValues as any[]) ?? []).length > 0 && (
+					{values && values.length > 0 && (
 						<div className='flex  flex-row items-center gap-x-2 p-2'>
 							<Button
 								variant={"ghost"}
-								onClick={() => setSelectedValues([])}
+								onClick={() => setValues([])}
 								className=''
 							>
 								Clear filters
 							</Button>
 							<div className='flex flex-1 justify-end'>
-								<Button className='' onClick={() => setIsOpen(false)}>
+								<Button
+									className=''
+									onClick={() => (setIsOpen ? setIsOpen(false) : undefined)}
+								>
 									Save
 								</Button>
 							</div>

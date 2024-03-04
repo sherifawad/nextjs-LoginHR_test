@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ListIcon, SearchIcon, User2 } from "lucide-react";
+import { Filter, ListIcon, SearchIcon, User2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "../Logo";
@@ -14,6 +14,7 @@ const SideBarLinks = [
 	},
 	{ name: "Profile", href: "/profile", icon: User2 },
 	{ name: "Search", href: "/search", icon: SearchIcon },
+	{ name: "Query", href: "/query", icon: Filter },
 ];
 
 function SidebarNoHeader() {

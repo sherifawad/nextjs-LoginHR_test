@@ -17,20 +17,20 @@ import MultiSelectContent from "./MultiSelectContent";
 type Props<T extends SomeZodObject> = {
 	onValueChange: (value?: SelectionType[]) => Promise<void>;
 	property?: string;
-	selectedValue?: string;
+	selectedValues?: string[];
 	schema: T;
 };
 
 function MultiSelectInput<T extends SomeZodObject>({
 	onValueChange,
-	selectedValue,
+	selectedValues,
 	property,
 	schema,
 }: Props<T>) {
 	const [options, setOptions] = useState<SelectionType[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
 
-	const [value, setValue] = useState<SelectionType[]>([]);
+	// const [value, setValue] = useState<SelectionType[]>([]);
 
 	// useEffect(() => {
 	// 	let isCancelled = false;
@@ -52,27 +52,27 @@ function MultiSelectInput<T extends SomeZodObject>({
 				<Button variant='outline' className='h-8 border-dashed'>
 					<Plus className='mr-2 h-4 w-4' />
 
-					{value && value.length > 0 && (
+					{selectedValues && selectedValues.length > 0 && (
 						<>
 							<Separator orientation='vertical' className='mx-2 h-4' />
 							<Badge
 								variant='secondary'
 								className='mx-1 rounded-sm font-normal lg:hidden'
 							>
-								{value.length}
+								{selectedValues.length}
 							</Badge>
 							<div className='hidden space-x-1 md:flex'>
-								{value.length > 2 ? (
+								{selectedValues.length > 2 ? (
 									<Badge
 										variant='secondary'
 										className='rounded-sm px-1 font-normal'
 									>
-										{value.length} selected
+										{selectedValues.length} selected
 									</Badge>
 								) : (
 									options
 										.filter(option =>
-											value?.some(v => v.value === option.value),
+											selectedValues?.some(v => v === option.value),
 										)
 										.map(option => (
 											<Badge
@@ -100,8 +100,7 @@ function MultiSelectInput<T extends SomeZodObject>({
 				<MultiSelectContent
 					options={options}
 					setIsOpen={setIsOpen}
-					selectedValues={value}
-					setSelectedValues={setValue}
+					selectedValues={selectedValues}
 					onValuesChange={vs =>
 						onValueChange(vs.map(v => ({ label: v, value: v })))
 					}

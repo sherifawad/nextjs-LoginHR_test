@@ -51,6 +51,25 @@
 	}
 }
 
+.queryBuilder {
+	@apply rounded-lg border bg-card text-card-foreground shadow-sm;
+}
+
+.ruleGroup-header {
+	@apply flex;
+}
+
+.ruleGroup-combinators {
+	@apply flex h-10  items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1;
+}
+
+.ruleGroup-addRule {
+	@apply ml-auto inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground ring-offset-background transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+}
+.ruleGroup-addGroup {
+	@apply inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground ring-offset-background transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+}
+
 @layer base {
 	* {
 		@apply border-border;

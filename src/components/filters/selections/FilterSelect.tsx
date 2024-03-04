@@ -14,6 +14,7 @@ type Props = SelectPrimitive.SelectProps & {
 	options: SelectionType[];
 
 	selectedValue: string | undefined;
+	className?: string;
 	onSelection: (value: SelectionType | undefined) => void;
 };
 
@@ -21,6 +22,7 @@ function FilterSelect({
 	options = [],
 	selectedValue,
 	onSelection,
+	className,
 	...rest
 }: Props) {
 	const [value, setValue] = useState<string | undefined>(
@@ -42,7 +44,7 @@ function FilterSelect({
 			<SelectTrigger className='bg-muted capitalize'>
 				<SelectValue placeholder='Select ' />
 			</SelectTrigger>
-			<SelectContent position='popper'>
+			<SelectContent position='popper' className={className}>
 				<ScrollArea className='h-[30svh] w-full'>
 					{options.map(i => (
 						<SelectItem
